@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import './loginform.css';
 import { useNavigate } from 'react-router-dom';
 
-const LoginForm = () => {
+const RegisterForm = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
+    id: '',
     email: '',
     password: ''
   });
@@ -19,19 +20,31 @@ const LoginForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log('Login attempt with:', formData);
+    // Handle registration logic here
+    console.log('Registration attempt with:', formData);
   };
 
   return (
     <div className="login-container">
       <p className="create-account-text">
-        New to the platform? <a href="#" onClick={(e) => { e.preventDefault(); navigate('/register'); }}>Create an account</a>
+        Already have an account? <a href="#" onClick={(e) => { e.preventDefault(); navigate('/'); }}>Sign in</a>
       </p>
       <form onSubmit={handleSubmit} className="login-form">
         <div className="form-header">
-          <h2>Welcome Back!</h2>
-          <p>Please sign in to continue</p>
+          <h2>Create Account</h2>
+          <p>Please fill in your details to register</p>
+        </div>
+        <div className="form-group">
+          <label>ID</label>
+          <input
+            type="text"
+            name="id"
+            placeholder="Enter your ID"
+            value={formData.id}
+            onChange={handleChange}
+            required
+          />
+          <i className="fas fa-id-card input-icon"></i>
         </div>
         <div className="form-group">
           <label>Email Address</label>
@@ -50,25 +63,19 @@ const LoginForm = () => {
           <input
             type="password"
             name="password"
-            placeholder="Enter your password"
+            placeholder="Create your password"
             value={formData.password}
             onChange={handleChange}
             required
           />
           <i className="fas fa-lock input-icon"></i>
         </div>
-        <div className="form-options">
-          <label className="remember-me">
-            <input type="checkbox" /> Remember me
-          </label>
-          <a href="/forgot-password" className="forgot-password">Forgot Password?</a>
-        </div>
         <button type="submit" className="login-button">
-          Sign In
+          Create Account
         </button>
       </form>
     </div>
   );
 };
 
-export default LoginForm; 
+export default RegisterForm; 
