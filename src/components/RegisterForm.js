@@ -5,9 +5,11 @@ import { useNavigate } from 'react-router-dom';
 const RegisterForm = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    id: '',
+    fullName: '',
+    username: '',
     email: '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   });
 
   const handleChange = (e) => {
@@ -35,16 +37,28 @@ const RegisterForm = () => {
           <p>Please fill in your details to register</p>
         </div>
         <div className="form-group">
-          <label>ID</label>
+          <label>Full Name</label>
           <input
             type="text"
-            name="id"
-            placeholder="Enter your ID"
-            value={formData.id}
+            name="fullName"
+            placeholder="Enter your full name"
+            value={formData.fullName}
             onChange={handleChange}
             required
           />
-          <i className="fas fa-id-card input-icon"></i>
+          <i className="fas fa-user input-icon"></i>
+        </div>
+        <div className="form-group">
+          <label>Username</label>
+          <input
+            type="text"
+            name="username"
+            placeholder="Choose a username"
+            value={formData.username}
+            onChange={handleChange}
+            required
+          />
+          <i className="fas fa-at input-icon"></i>
         </div>
         <div className="form-group">
           <label>Email Address</label>
@@ -65,6 +79,18 @@ const RegisterForm = () => {
             name="password"
             placeholder="Create your password"
             value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          <i className="fas fa-lock input-icon"></i>
+        </div>
+        <div className="form-group">
+          <label>Confirm Password</label>
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm your password"
+            value={formData.confirmPassword}
             onChange={handleChange}
             required
           />
