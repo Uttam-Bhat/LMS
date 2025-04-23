@@ -61,7 +61,9 @@ const LoginForm = () => {
           <label className="remember-me">
             <input type="checkbox" /> Remember me
           </label>
-          <a href="/forgot-password" className="forgot-password">Forgot Password?</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/forgot-password'); }} className="forgot-password">
+            Forgot Password?
+          </a>
         </div>
         <button type="submit" className="login-button">
           Sign In
