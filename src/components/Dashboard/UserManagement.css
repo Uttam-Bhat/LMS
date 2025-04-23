@@ -1,0 +1,192 @@
+.user-management {
+  padding: 2rem;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 1.75rem;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.add-user-btn {
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-user-btn:hover {
+  background-color: #1664d9;
+}
+
+.user-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.search-box {
+  position: relative;
+  width: 300px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.search-box i {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filter-btn {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+  background: white;
+  color: #666;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  border-color: #1877f2;
+  color: #1877f2;
+}
+
+.filter-btn.active {
+  background: #1877f2;
+  color: white;
+  border-color: #1877f2;
+}
+
+.users-table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-table th {
+  background: #f8f9fa;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #666;
+  border-bottom: 1px solid #e1e1e1;
+}
+
+.users-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e1e1e1;
+  color: #1a1a1a;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-info i {
+  font-size: 1.5rem;
+  color: #666;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.role-badge.teacher {
+  background: #e7f0fe;
+  color: #1877f2;
+}
+
+.role-badge.student {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.access-level-select {
+  padding: 0.5rem;
+  border: 1px solid #e1e1e1;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #1a1a1a;
+  width: 120px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-buttons button {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.edit-btn {
+  background: #e7f0fe;
+  color: #1877f2;
+}
+
+.edit-btn:hover {
+  background: #1877f2;
+  color: white;
+}
+
+.delete-btn {
+  background: #fee7e7;
+  color: #f21818;
+}
+
+.delete-btn:hover {
+  background: #f21818;
+  color: white;
+} 

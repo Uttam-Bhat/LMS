@@ -40,25 +40,41 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="quick-actions">
+        <div className="quick-actions-section">
           <h2>Quick Actions</h2>
-          <div className="action-buttons">
-            <button className="action-button">
-              <i className="fas fa-plus"></i>
-              Create New Course
-            </button>
-            <button className="action-button">
-              <i className="fas fa-user-plus"></i>
-              Add New User
-            </button>
-            <button className="action-button">
-              <i className="fas fa-file-medical"></i>
-              Create Exam
-            </button>
-            <button className="action-button">
-              <i className="fas fa-chart-bar"></i>
-              View Reports
-            </button>
+          <div className="quick-actions-grid">
+            <div className="quick-action-card">
+              <div className="quick-action-icon">
+                <i className="fas fa-plus-circle"></i>
+              </div>
+              <h3>Create Course</h3>
+              <p>Add a new course to the system</p>
+              <button className="quick-action-btn">Create Now</button>
+            </div>
+            <div className="quick-action-card">
+              <div className="quick-action-icon">
+                <i className="fas fa-user-plus"></i>
+              </div>
+              <h3>Add User</h3>
+              <p>Register a new user account</p>
+              <button className="quick-action-btn">Add User</button>
+            </div>
+            <div className="quick-action-card">
+              <div className="quick-action-icon">
+                <i className="fas fa-file-medical"></i>
+              </div>
+              <h3>Create Exam</h3>
+              <p>Create a new examination</p>
+              <button className="quick-action-btn">Create Exam</button>
+            </div>
+            <div className="quick-action-card">
+              <div className="quick-action-icon">
+                <i className="fas fa-chart-bar"></i>
+              </div>
+              <h3>View Reports</h3>
+              <p>Access detailed analytics</p>
+              <button className="quick-action-btn">View Reports</button>
+            </div>
           </div>
         </div>
       </div>

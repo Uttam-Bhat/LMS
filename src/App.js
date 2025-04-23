@@ -4,6 +4,7 @@ import LoginForm from './components/Login/LoginForm';
 import RegisterForm from './components/Login/RegisterForm';
 import ForgotPassword from './components/Login/ForgotPassword';
 import AdminDashboard from './components/Dashboard/AdminDashboard';
+import UserManagement from './components/Dashboard/UserManagement';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<UserManagement />} />
         </Routes>
       </div>
     </Router>
