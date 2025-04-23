@@ -1,8 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoginForm from './components/LoginForm';
-import RegisterForm from './components/RegisterForm';
-import ForgotPassword from './components/ForgotPassword';
+import LoginForm from './components/Login/LoginForm';
+import RegisterForm from './components/Login/RegisterForm';
+import ForgotPassword from './components/Login/ForgotPassword';
+import AdminDashboard from './components/Dashboard/AdminDashboard';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <Route path="/" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </div>
     </Router>
