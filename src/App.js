@@ -5,6 +5,7 @@ import RegisterForm from './components/Login/RegisterForm';
 import ForgotPassword from './components/Login/ForgotPassword';
 import AdminDashboard from './components/Dashboard/AdminDashboard';
 import UserManagement from './components/Dashboard/UserManagement';
+import CourseManagement from './components/Dashboard/CourseManagement';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<UserManagement />} />
+          <Route path="/admin/courses" element={<CourseManagement />} />
         </Routes>
       </div>
     </Router>
