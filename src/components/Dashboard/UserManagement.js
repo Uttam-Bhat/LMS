@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import './UserManagement.css';
 import { FaUserPlus, FaSearch, FaUserCircle, FaPencilAlt, FaTrashAlt } from 'react-icons/fa';
 import DashboardLayout from './DashboardLayout';
+import CreateUserModal from './CreateUserModal';
 
 const UserManagement = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showCreateUserModal, setShowCreateUserModal] = useState(false);
 
   const users = [
     { id: 1, name: 'John Doe', email: 'john.doe@example.com', role: 'teacher', accessLevel: 'admin' },
@@ -34,7 +36,10 @@ const UserManagement = () => {
       <div className="user-management">
         <div className="page-header">
           <h1>User Management</h1>
-          <button className="add-user-btn">
+          <button 
+            className="add-user-btn"
+            onClick={() => setShowCreateUserModal(true)}
+          >
             <FaUserPlus />
             Add New User
           </button>
@@ -120,6 +125,10 @@ const UserManagement = () => {
             </tbody>
           </table>
         </div>
+
+        {showCreateUserModal && (
+          <CreateUserModal onClose={() => setShowCreateUserModal(false)} />
+        )}
       </div>
     </DashboardLayout>
   );

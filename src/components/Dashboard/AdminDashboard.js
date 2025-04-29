@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import CreateCourseModal from './CreateCourseModal';
+import CreateUserModal from './CreateUserModal';
 import './Dashboard.css';
 
 const AdminDashboard = () => {
   const [showCreateCourseModal, setShowCreateCourseModal] = useState(false);
+  const [showCreateUserModal, setShowCreateUserModal] = useState(false);
 
   return (
     <DashboardLayout>
@@ -65,7 +67,12 @@ const AdminDashboard = () => {
               </div>
               <h3>Add User</h3>
               <p>Register a new user account</p>
-              <button className="quick-action-btn">Add User</button>
+              <button 
+                className="quick-action-btn"
+                onClick={() => setShowCreateUserModal(true)}
+              >
+                Add User
+              </button>
             </div>
             <div className="quick-action-card">
               <div className="quick-action-icon">
@@ -88,6 +95,9 @@ const AdminDashboard = () => {
 
         {showCreateCourseModal && (
           <CreateCourseModal onClose={() => setShowCreateCourseModal(false)} />
+        )}
+        {showCreateUserModal && (
+          <CreateUserModal onClose={() => setShowCreateUserModal(false)} />
         )}
       </div>
     </DashboardLayout>
