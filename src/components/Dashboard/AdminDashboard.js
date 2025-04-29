@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from './DashboardLayout';
+import CreateCourseModal from './CreateCourseModal';
 import './Dashboard.css';
 
 const AdminDashboard = () => {
+  const [showCreateCourseModal, setShowCreateCourseModal] = useState(false);
+
   return (
     <DashboardLayout>
       <div className="dashboard-welcome">
@@ -49,7 +52,12 @@ const AdminDashboard = () => {
               </div>
               <h3>Create Course</h3>
               <p>Add a new course to the system</p>
-              <button className="quick-action-btn">Create Now</button>
+              <button 
+                className="quick-action-btn"
+                onClick={() => setShowCreateCourseModal(true)}
+              >
+                Create Now
+              </button>
             </div>
             <div className="quick-action-card">
               <div className="quick-action-icon">
@@ -77,6 +85,10 @@ const AdminDashboard = () => {
             </div>
           </div>
         </div>
+
+        {showCreateCourseModal && (
+          <CreateCourseModal onClose={() => setShowCreateCourseModal(false)} />
+        )}
       </div>
     </DashboardLayout>
   );

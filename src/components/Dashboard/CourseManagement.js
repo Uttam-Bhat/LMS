@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import DashboardLayout from './DashboardLayout';
+import CreateCourseModal from './CreateCourseModal';
 import './CourseManagement.css';
 import { FaPlus, FaEdit, FaTrashAlt, FaUserPlus, FaChartLine } from 'react-icons/fa';
 
 const CourseManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [showCreateCourseModal, setShowCreateCourseModal] = useState(false);
   
   // Sample data - replace with actual data from your backend
   const courses = [
@@ -51,7 +53,10 @@ const CourseManagement = () => {
             <h1>Course Management</h1>
             <p>Create, manage and track your courses</p>
           </div>
-          <button className="create-course-btn">
+          <button 
+            className="create-course-btn"
+            onClick={() => setShowCreateCourseModal(true)}
+          >
             <FaPlus />
             Create New Course
           </button>
@@ -160,6 +165,10 @@ const CourseManagement = () => {
             ))}
           </div>
         </div>
+
+        {showCreateCourseModal && (
+          <CreateCourseModal onClose={() => setShowCreateCourseModal(false)} />
+        )}
       </div>
     </DashboardLayout>
   );
