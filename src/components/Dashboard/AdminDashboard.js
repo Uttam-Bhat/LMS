@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
 import CreateCourseModal from './CreateCourseModal';
 import CreateUserModal from './CreateUserModal';
+import CreateExamModal from './CreateExamModal';
+import ViewReportsModal from './ViewReportsModal';
 import './Dashboard.css';
 
 const AdminDashboard = () => {
   const [showCreateCourseModal, setShowCreateCourseModal] = useState(false);
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
+  const [showCreateExamModal, setShowCreateExamModal] = useState(false);
+  const [showViewReportsModal, setShowViewReportsModal] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <DashboardLayout>
@@ -80,7 +86,12 @@ const AdminDashboard = () => {
               </div>
               <h3>Create Exam</h3>
               <p>Create a new examination</p>
-              <button className="quick-action-btn">Create Exam</button>
+              <button 
+                className="quick-action-btn"
+                onClick={() => setShowCreateExamModal(true)}
+              >
+                Create Exam
+              </button>
             </div>
             <div className="quick-action-card">
               <div className="quick-action-icon">
@@ -88,7 +99,12 @@ const AdminDashboard = () => {
               </div>
               <h3>View Reports</h3>
               <p>Access detailed analytics</p>
-              <button className="quick-action-btn">View Reports</button>
+              <button 
+                className="quick-action-btn"
+                onClick={() => setShowViewReportsModal(true)}
+              >
+                View Reports
+              </button>
             </div>
           </div>
         </div>
@@ -98,6 +114,12 @@ const AdminDashboard = () => {
         )}
         {showCreateUserModal && (
           <CreateUserModal onClose={() => setShowCreateUserModal(false)} />
+        )}
+        {showCreateExamModal && (
+          <CreateExamModal onClose={() => setShowCreateExamModal(false)} />
+        )}
+        {showViewReportsModal && (
+          <ViewReportsModal onClose={() => setShowViewReportsModal(false)} />
         )}
       </div>
     </DashboardLayout>
