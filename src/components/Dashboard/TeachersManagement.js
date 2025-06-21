@@ -61,7 +61,7 @@ const TeachersManagement = () => {
         </div>
         <div className="user-filters">
           <div className="search-box">
-            <FaSearch />
+            <span className="search-icon"><FaSearch /></span>
             <input
               type="text"
               placeholder="Search teachers..."

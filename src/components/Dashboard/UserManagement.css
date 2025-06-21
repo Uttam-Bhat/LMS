@@ -54,12 +54,17 @@
   font-size: 0.95rem;
 }
 
-.search-box i {
+.search-box i,
+.search-box .search-icon {
   position: absolute;
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
   color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.2em;
 }
 
 .filter-buttons {

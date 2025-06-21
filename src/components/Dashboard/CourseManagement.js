@@ -7,6 +7,8 @@ import { FaPlus, FaEdit, FaTrashAlt, FaUserPlus, FaChartLine } from 'react-icons
 const CourseManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateCourseModal, setShowCreateCourseModal] = useState(false);
+  const [modalType, setModalType] = useState(null); // 'edit' | 'report' | 'addUser' | 'delete'
+  const [selectedCourse, setSelectedCourse] = useState(null);
   
   // Sample data - replace with actual data from your backend
   const courses = [
@@ -44,6 +46,15 @@ const CourseManagement = () => {
     course.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     course.teacher.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const openModal = (type, course) => {
+    setModalType(type);
+    setSelectedCourse(course);
+  };
+  const closeModal = () => {
+    setModalType(null);
+    setSelectedCourse(null);
+  };
 
   return (
     <DashboardLayout>
@@ -148,16 +159,16 @@ const CourseManagement = () => {
                   <span className="completion-text">{course.completion}% Completed</span>
                 </div>
                 <div className="course-actions">
-                  <button className="action-btn edit" title="Edit course">
+                  <button className="action-btn edit" title="Edit course" onClick={() => openModal('edit', course)}>
                     <FaEdit />
                   </button>
-                  <button className="action-btn assign" title="Assign teachers">
+                  <button className="action-btn assign" title="Add User" onClick={() => openModal('addUser', course)}>
                     <FaUserPlus />
                   </button>
-                  <button className="action-btn track" title="View progress">
+                  <button className="action-btn track" title="View Report" onClick={() => openModal('report', course)}>
                     <FaChartLine />
                   </button>
-                  <button className="action-btn delete" title="Delete course">
+                  <button className="action-btn delete" title="Delete course" onClick={() => openModal('delete', course)}>
                     <FaTrashAlt />
                   </button>
                 </div>
@@ -168,6 +179,32 @@ const CourseManagement = () => {
 
         {showCreateCourseModal && (
           <CreateCourseModal onClose={() => setShowCreateCourseModal(false)} />
+        )}
+        {/* Action Modals */}
+        {modalType && selectedCourse && (
+          <div className="modal-overlay">
+            <div className="create-course-modal">
+              <div className="modal-header">
+                <h2>
+                  {modalType === 'edit' && 'Edit Course'}
+                  {modalType === 'report' && 'Course Report'}
+                  {modalType === 'addUser' && 'Add User to Course'}
+                  {modalType === 'delete' && 'Delete Course'}
+                </h2>
+                <button className="close-button" onClick={closeModal}>×</button>
+              </div>
+              <div style={{ padding: '1rem 0' }}>
+                {modalType === 'edit' && <p>Edit course: {selectedCourse.name}</p>}
+                {modalType === 'report' && <p>Report for course: {selectedCourse.name}</p>}
+                {modalType === 'addUser' && <p>Add user to course: {selectedCourse.name}</p>}
+                {modalType === 'delete' && <p>Are you sure you want to delete course: {selectedCourse.name}?</p>}
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="cancel-btn" onClick={closeModal}>Close</button>
+                {modalType === 'delete' && <button type="button" className="create-btn" onClick={closeModal}>Delete</button>}
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </DashboardLayout>

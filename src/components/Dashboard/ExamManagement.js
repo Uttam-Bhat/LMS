@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import './ExamManagement.css';
 import { 
@@ -10,13 +10,18 @@ import {
   FaQuestionCircle,
   FaClock
 } from 'react-icons/fa';
+import CreateExamModal from './CreateExamModal';
+import CreateTemplateModal from './CreateTemplateModal';
 
 const ExamManagement = () => {
+  const [showCreateExamModal, setShowCreateExamModal] = useState(false);
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [editTemplate, setEditTemplate] = useState(null);
   // Sample data - replace with actual data from your backend
-  const templates = [
-    { id: 1, title: 'Mid-term Template', subject: 'Computer Science', questions: 30, status: 'active' },
-    { id: 2, title: 'Final Exam Template', subject: 'Mathematics', questions: 50, status: 'draft' },
-  ];
+  const [templates, setTemplates] = useState([
+    { id: 1, title: 'Mid-term Template', subject: 'Computer Science', questions: 30, status: 'active', questionList: [] },
+    { id: 2, title: 'Final Exam Template', subject: 'Mathematics', questions: 50, status: 'draft', questionList: [] },
+  ]);
 
   const questionSets = [
     { id: 1, title: 'Programming Basics', count: 100, type: 'Multiple Choice' },
@@ -42,23 +47,42 @@ const ExamManagement = () => {
     },
   ];
 
+  const fileInputRef = React.useRef();
+
+  const handleCreateTemplate = () => {
+    setEditTemplate(null);
+    setShowTemplateModal(true);
+  };
+  const handleEditTemplate = (template) => {
+    setEditTemplate(template);
+    setShowTemplateModal(true);
+  };
+
   return (
     <DashboardLayout>
       <div className="exam-management">
         <div className="page-header">
           <h1>Exam Management</h1>
-          <button className="create-exam-btn">
+          <button className="create-exam-btn" onClick={() => setShowCreateExamModal(true)}>
             <FaPlus />
             Create New Exam
           </button>
         </div>
-
+        {showCreateExamModal && (
+          <CreateExamModal onClose={() => setShowCreateExamModal(false)} />
+        )}
+        {showTemplateModal && (
+          <CreateTemplateModal 
+            onClose={() => setShowTemplateModal(false)} 
+            template={editTemplate}
+          />
+        )}
         <div className="exam-sections">
           {/* Exam Templates Section */}
           <div className="exam-section-card">
             <div className="section-header">
               <h2>Exam Templates</h2>
-              <button title="Create Template">
+              <button title="Create Template" onClick={handleCreateTemplate}>
                 <FaPlus />
               </button>
             </div>
@@ -72,7 +96,7 @@ const ExamManagement = () => {
                     </span>
                   </div>
                   <div className="item-actions">
-                    <button className="action-btn edit" title="Edit template">
+                    <button className="action-btn edit" title="Edit template" onClick={() => handleEditTemplate(template)}>
                       <FaEdit />
                     </button>
                     <button className="action-btn delete" title="Delete template">
@@ -88,9 +112,21 @@ const ExamManagement = () => {
           <div className="exam-section-card">
             <div className="section-header">
               <h2>Question Bank</h2>
-              <button title="Upload Questions">
+              <button title="Upload Questions" onClick={() => fileInputRef.current && fileInputRef.current.click()}>
                 <FaUpload />
               </button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={e => {
+                  // You can handle the file upload here
+                  // For now, just log the file name
+                  if (e.target.files && e.target.files[0]) {
+                    alert('Selected file: ' + e.target.files[0].name);
+                  }
+                }}
+              />
             </div>
             <div className="question-bank">
               <div className="upload-area">
