@@ -7,7 +7,7 @@ const CreateUserModal = ({ onClose }) => {
     username: '',
     email: '',
     password: '',
-    userType: ''
+    loginType: '',
   });
 
   const handleChange = (e) => {
@@ -63,6 +63,21 @@ const CreateUserModal = ({ onClose }) => {
           </div>
 
           <div className="form-group">
+            <label htmlFor="loginType">Login Type</label>
+            <select
+              id="loginType"
+              name="loginType"
+              value={formData.loginType}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select login type</option>
+              <option value="teacher">Teacher</option>
+              <option value="student">Student</option>
+            </select>
+          </div>
+
+          <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
               type="password"
@@ -73,22 +88,6 @@ const CreateUserModal = ({ onClose }) => {
               placeholder="Enter password"
               required
             />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="userType">User Type</label>
-            <select
-              id="userType"
-              name="userType"
-              value={formData.userType}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select user type</option>
-              <option value="admin">Admin</option>
-              <option value="teacher">Teacher</option>
-              <option value="student">Student</option>
-            </select>
           </div>
 
           <div className="modal-footer">

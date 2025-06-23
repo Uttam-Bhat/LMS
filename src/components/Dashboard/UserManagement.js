@@ -10,10 +10,10 @@ const UserManagement = () => {
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
 
   const users = [
-    { id: 1, name: 'John Doe', email: 'john.doe@example.com', role: 'teacher', accessLevel: 'admin' },
-    { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', role: 'teacher', accessLevel: 'editor' },
-    { id: 3, name: 'Mike Johnson', email: 'mike.j@example.com', role: 'student', accessLevel: 'viewer' },
-    { id: 4, name: 'Sarah Williams', email: 'sarah.w@example.com', role: 'student', accessLevel: 'viewer' },
+    { id: 1, name: 'John Doe', email: 'john.doe@example.com', role: 'teacher' },
+    { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', role: 'teacher' },
+    { id: 3, name: 'Mike Johnson', email: 'mike.j@example.com', role: 'student' },
+    { id: 4, name: 'Sarah Williams', email: 'sarah.w@example.com', role: 'student' },
   ];
 
   const handleFilterChange = (filter) => {
@@ -47,7 +47,7 @@ const UserManagement = () => {
 
         <div className="user-filters">
           <div className="search-box">
-            <FaSearch />
+            <span className="search-icon"><FaSearch /></span>
             <input
               type="text"
               placeholder="Search users..."
@@ -84,7 +84,6 @@ const UserManagement = () => {
                 <th>User</th>
                 <th>Email</th>
                 <th>Role</th>
-                <th>Access Level</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -102,13 +101,6 @@ const UserManagement = () => {
                     <span className={`role-badge ${user.role}`}>
                       {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                     </span>
-                  </td>
-                  <td>
-                    <select className="access-level-select" defaultValue={user.accessLevel}>
-                      <option value="admin">Admin</option>
-                      <option value="editor">Editor</option>
-                      <option value="viewer">Viewer</option>
-                    </select>
                   </td>
                   <td>
                     <div className="action-buttons">

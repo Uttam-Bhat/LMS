@@ -9,7 +9,8 @@ const RegisterForm = () => {
     username: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    userType: ''
   });
 
   const handleChange = (e) => {
@@ -71,6 +72,19 @@ const RegisterForm = () => {
             required
           />
           <i className="fas fa-envelope input-icon"></i>
+        </div>
+        <div className="form-group">
+          <label>User Type</label>
+          <select
+            name="userType"
+            value={formData.userType}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Select user type</option>
+            <option value="teacher">Teacher</option>
+            <option value="student">Student</option>
+          </select>
         </div>
         <div className="form-group">
           <label>Password</label>
