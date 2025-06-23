@@ -29,7 +29,9 @@ function App() {
           <Route path="/student" element={<StudentDashboard />} />
           <Route path="/student/Course" element={<StudentDashboard />} />
           <Route path="/student/Exam" element={<StudentDashboard />} />
-           <Route path="/student/Result" element={<StudentDashboard />} />
+          <Route path="/student/Notifications" element={<StudentDashboard />} />
+          <Route path="/student/Result" element={<StudentDashboard />} />
+          <Route path="/student/Logout" element={<StudentDashboard />} />
         </Routes>
       </div>
     </Router>

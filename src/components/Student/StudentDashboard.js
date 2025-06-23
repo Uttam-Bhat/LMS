@@ -1,9 +1,9 @@
-import StudentLayout from './StudentLayout';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Course from './Course';
 import Exam from './Exam';
-import Result from './Result';
+import './StudentDashboard.css';
+import StudentLayout from './StudentLayout';
 
 const StudentDashboard = () => {
   const [showCourse, setShowCourse] = useState(false);
@@ -18,7 +18,7 @@ const StudentDashboard = () => {
         <p>Manage your learning assessment system from here</p>
         <div className="dashboard-stats">
           <div className="stat-card">
-            <i className="fas fa-active"></i>
+            <i className="fas fa-book"></i>
             <div className="stat-content">
               <h3>Courses</h3>
               <p>5</p>
@@ -27,15 +27,15 @@ const StudentDashboard = () => {
           <div className="stat-card">
             <i className="fas fa-file-alt"></i>
             <div className="stat-content">
-              <h3>Exam Completed</h3>
+              <h3>Exam Compeleted</h3>
               <p>2</p>
             </div>
           </div>
           <div className="stat-card">
             <i className="fas fa-chart-line"></i>
             <div className="stat-content">
-              <h3>Results Processed</h3>
-              <p>156</p>
+              <h3>Result</h3>
+              <p>1</p>
             </div>
           </div>
         </div>
@@ -45,41 +45,28 @@ const StudentDashboard = () => {
         <div className="quick-actions-grid">
           <div className="quick-action-card">
             <div className="quick-action-icon">
-              <i className="fas fa-plus-circle"></i>
+              <i className="fas fa-book"></i>
             </div>
-            <h3>Create Course</h3>
-            <p>Add a new course to the system</p>
+            <h3>Enroll Course</h3>
+            <p>Join to the new course</p>
             <button 
               className="quick-action-btn"
               onClick={() => setShowCourse(true)}
             >
-              Create Now
+              Enroll
             </button>
           </div>
           <div className="quick-action-card">
             <div className="quick-action-icon">
-              <i className="fas fa-user-plus"></i>
+              <i className="fas fa-file-alt"></i>
             </div>
-            <h3>Add User</h3>
-            <p>Register a new user account</p>
+            <h3>Write Exam</h3>
+            <p>Attempt to write the exam</p>
             <button 
               className="quick-action-btn"
               onClick={() => setShowExam(true)}
             >
-              Add User
-            </button>
-          </div>
-          <div className="quick-action-card">
-            <div className="quick-action-icon">
-              <i className="fas fa-file-medical"></i>
-            </div>
-            <h3>Create Exam</h3>
-            <p>Create a new examination</p>
-            <button 
-              className="quick-action-btn"
-              onClick={() => setShowResult(true)}
-            >
-              Create Exam
+              Attempt
             </button>
           </div>
         </div>
@@ -88,9 +75,6 @@ const StudentDashboard = () => {
         )}
         {showExam && (
           <Exam onClose={() => setShowExam(false)} />
-        )}
-        {showResult && (
-          <Result onClose={() => setShowResult(false)} />
         )}
       </div>
     </StudentLayout>

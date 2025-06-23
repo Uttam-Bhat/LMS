@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import '../Dashboard/Dashboard.css';
+import './StudentDashboard.css';
 
 const StudentLayout = ({ children }) => {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const StudentLayout = ({ children }) => {
       {/* Header */}
       <header className="dashboard-header">
         <div className="header-left">
-          <h1 className="logo">LAMS</h1>
+          <h1 className="logo">Student</h1>
         </div>
         <div className="header-right">
           <div className="profile-dropdown">
@@ -92,9 +92,17 @@ const StudentLayout = ({ children }) => {
                 <i className="fas fa-chalkboard-teacher"></i>
                 <span>Exam</span>
               </Link>
+              <Link to="/student/Notifications" className={location.pathname === '/student/Notifications' ? 'active' : ''}>
+                <i class="fa-solid fa-bell"></i>
+                <span>Notifications</span>
+              </Link>
               <Link to="/student/result" className={location.pathname === '/student/result' ? 'active' : ''}>
-                <i className="fas fa-user-graduate"></i>
+                <i class="fa-solid fa-square-poll-vertical"></i>
                 <span>Result</span>
+              </Link>
+              <Link to="/student/Logout" className={location.pathname === '/student/Logout' ? 'active' : ''}>
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
               </Link>
             </div>
           </nav>
