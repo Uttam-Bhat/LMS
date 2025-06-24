@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import './loginform.css';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './loginform.css';
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const LoginForm = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:3000/api/login', {
+      const response = await axios.post('http://localhost:3000/api/user/login', {
         email: formData.email,
         password: formData.password
       });

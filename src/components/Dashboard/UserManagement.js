@@ -17,7 +17,7 @@ const [error, setError] = useState(null);
 useEffect(() => {
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/register');
+      const response = await axios.get('http://localhost:3000/api/user/register');
       setUsers(response.data); // Expecting array of user objects
       setLoading(false);
     } catch (err) {
