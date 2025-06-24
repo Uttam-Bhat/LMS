@@ -1,15 +1,33 @@
 import axios from 'axios';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import './CreateUserModal.css';
-const CreateUserModal = ({ onClose }) => {
+const CreateUserModal = ({ onClose, editUser, onUpdate }) => {
   const [formData, setFormData] = useState({
-    fullName:'',
+    fullname:'',
     username: '',
     email: '',
     password: '',
     loginType: '',
   });
+
+  useEffect(() => {
+    if (editUser) {
+      setFormData({
+        fullname: editUser.fullname || '',
+        username: editUser.username || '',
+        email: editUser.email || '',
+        loginType: editUser.user_type || '',
+      });
+    } else {
+      setFormData({
+        fullname: '',
+        username: '',
+        email: '',
+        loginType: '',
+      });
+    }
+  }, [editUser]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,36 +36,34 @@ const CreateUserModal = ({ onClose }) => {
       [name]: value
     }));
   };
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await axios.post('http://localhost:3000/api/register', {
-        fullname: formData.fullName,
+      const payload = {
+        fullname: formData.fullname,
         username: formData.username,
         email: formData.email,
         user_type: formData.loginType,
-        password: formData.password
-      }, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      console.log('User created:', response.data);
-      alert('User added successfully!');
-      onClose();
+      };
+      if (editUser) {
+        await axios.put(`http://localhost:3000/api/admin/edit/${editUser.id}`, payload);
+        alert('User updated successfully');
+      } else {
+        await axios.post('http://localhost:3000/api/admin/register', payload);
+        alert('User added successfully');
+      }
+      onUpdate(); // Refresh user list
+      onClose();  // Close modal
     } catch (error) {
-      console.error('Add user failed:', error);
-      alert(error.response?.data?.message || 'User registration failed!');
+      console.error('Error updating user:', error.response?.data || error.message);
+      alert('Failed to update user');
     }
   };
-
   return (
     <div className="modal-overlay">
       <div className="create-user-modal">
         <div className="modal-header">
-          <h2>Add New User</h2>
+          <h2>{editUser ? 'Edit User' : 'Add New User'}</h2>
           <button className="close-button" onClick={onClose}>
             <FaTimes />
           </button>
@@ -55,15 +71,16 @@ const handleSubmit = async (e) => {
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="fullName">Full Name</label>
+            <label htmlFor="fullname">Full Name</label>
             <input
               type="text"
-              id="fullName"
-              name="fullName"
-              value={formData.fullName}
+              id="fullname"
+              name="fullname"
+              value={formData.fullname}
               onChange={handleChange}
               placeholder="Enter Full Name"
               required
+              readOnly={!!editUser && false}
             />
           </div>
 
@@ -77,6 +94,7 @@ const handleSubmit = async (e) => {
               onChange={handleChange}
               placeholder="Enter username"
               required
+              readOnly={!!editUser && false}
             />
           </div>
 
@@ -90,6 +108,7 @@ const handleSubmit = async (e) => {
               onChange={handleChange}
               placeholder="Enter email address"
               required
+              readOnly={!!editUser}
             />
           </div>
 
@@ -101,6 +120,7 @@ const handleSubmit = async (e) => {
               value={formData.loginType}
               onChange={handleChange}
               required
+              disabled={!!editUser}
             >
               <option value="">Select login type</option>
               <option value="teacher">Teacher</option>
@@ -108,25 +128,27 @@ const handleSubmit = async (e) => {
             </select>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter password"
-              required
-            />
-          </div>
+          {!editUser && (
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter password"
+                required
+              />
+            </div>
+          )}
 
           <div className="modal-footer">
             <button type="button" className="cancel-btn" onClick={onClose}>
               Cancel
             </button>
             <button type="submit" className="add-btn">
-              Add User
+              {editUser ? 'Save Changes' : 'Add User'}
             </button>
           </div>
         </form>

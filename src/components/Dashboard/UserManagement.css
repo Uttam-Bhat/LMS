@@ -149,6 +149,10 @@
   background: #e8f5e9;
   color: #2e7d32;
 }
+.role-badge.admin {
+  background: #f4dae1;
+  color: #7d2e43;
+}
 
 .access-level-select {
   padding: 0.5rem;

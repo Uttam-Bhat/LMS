@@ -9,6 +9,8 @@ const UserManagement = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
+  const [editUser, setEditUser] = useState(null);
+  const [editUserData, setEditUserData] = useState(null);
 
   const [users, setUsers] = useState([]);
 const [loading, setLoading] = useState(true);
@@ -43,7 +45,20 @@ useEffect(() => {
                          user.email.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
-
+  const handleDeleteUser = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this user?')) return;
+  
+    try {
+      await axios.delete(`http://localhost:3000/api/admin/delete/${id}`);
+      alert('User deleted successfully');
+  
+      // Remove user from local state
+      setUsers(prevUsers => prevUsers.filter(user => user.id !== id));
+    } catch (error) {
+      console.error('Failed to delete user:', error);
+      alert('Error deleting user');
+    }
+  };
   return (
     <DashboardLayout>
       <div className="user-management">
@@ -111,16 +126,16 @@ useEffect(() => {
                   </td>
                   <td>{user.email}</td>
                   <td>
-                <span className={`role-badge ${user.role || 'unknown'}`}>
-                     {user.user_type ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Unknown'}
-              </span>
+                  <span className={`role-badge ${user.user_type || 'unknown'}`}>
+                     {(user.user_type|| 'unknown').charAt(0).toUpperCase() + (user.user_type || 'unknown').slice(1)}
+                  </span>
             </td>
                   <td>
                     <div className="action-buttons">
-                      <button className="edit-btn" title="Edit user">
+                      <button className="edit-btn" title="Edit user" onClick={() => { setEditUserData(user); setShowCreateUserModal(true); }}>
                         <FaPencilAlt />
                       </button>
-                      <button className="delete-btn" title="Delete user">
+                      <button className="delete-btn" title="Delete user" onClick={() => setEditUser(user)}>
                         <FaTrashAlt />
                       </button>
                     </div>
@@ -131,10 +146,27 @@ useEffect(() => {
           </table>
         </div>
 
-        {showCreateUserModal && (
-          <CreateUserModal onClose={() => setShowCreateUserModal(false)} />
-        )}
+        {(showCreateUserModal || editUserData) && (
+  <CreateUserModal
+    onClose={() => {
+      setShowCreateUserModal(false);
+      setEditUserData(null);
+    }}
+    editUser={editUserData}
+  />
+)}
+
       </div>
+      {showCreateUserModal && (
+  <CreateUserModal
+    onClose={() => {
+      setShowCreateUserModal(false);
+      setEditUserData(null);  // ✅ Reset user on close
+    }}
+    editUser={editUserData}
+  />
+)}
+
     </DashboardLayout>
   );
 };
