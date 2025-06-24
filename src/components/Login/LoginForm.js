@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './loginform.css';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -32,9 +33,9 @@ const LoginForm = () => {
 
       // Role-based redirection
       if (user.user_type === 'admin') {
-        navigate('/admin-dashboard');
+        navigate('/admin');
       }else if (user.user_type === 'student') {
-        navigate('/student-dashboard');
+        navigate('/student');
       } else {
         alert('Unknown user type');
       }
