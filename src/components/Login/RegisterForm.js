@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
-import './loginform.css';
+import axios from 'axios';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './loginform.css';
 
 const RegisterForm = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    fullName: '',
+    fullname: '',
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
-    userType: ''
+    user_type: ''
   });
 
   const handleChange = (e) => {
@@ -19,6 +20,30 @@ const RegisterForm = () => {
       ...prevState,
       [name]: value
     }));
+  };
+ const handleRegister = async (e) => {
+    e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:3000/api/register', {
+        fullname: formData.fullname,
+        username: formData.username,
+        email: formData.email,
+        user_type: formData.user_type,
+        password: formData.password
+      });
+
+      console.log('Registration successful:', response.data);
+      alert('Registration successful!');
+    } catch (error) {
+      console.error('Registration failed:', error.response?.data || error.message);
+      alert('Registration failed!');
+    }
   };
 
   const handleSubmit = (e) => {
@@ -32,7 +57,7 @@ const RegisterForm = () => {
       <p className="create-account-text">
         Already have an account? <a href="#" onClick={(e) => { e.preventDefault(); navigate('/'); }}>Sign in</a>
       </p>
-      <form onSubmit={handleSubmit} className="login-form">
+      <form onSubmit={handleRegister} className="login-form">
         <div className="form-header">
           <h2>Create Account</h2>
           <p>Please fill in your details to register</p>
@@ -41,9 +66,9 @@ const RegisterForm = () => {
           <label>Full Name</label>
           <input
             type="text"
-            name="fullName"
+            name="fullname"
             placeholder="Enter your full name"
-            value={formData.fullName}
+            value={formData.fullname}
             onChange={handleChange}
             required
           />
@@ -76,8 +101,8 @@ const RegisterForm = () => {
         <div className="form-group">
           <label>User Type</label>
           <select
-            name="userType"
-            value={formData.userType}
+            name="user_type"
+            value={formData.user_type}
             onChange={handleChange}
             required
           >
