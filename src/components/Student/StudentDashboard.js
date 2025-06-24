@@ -2,82 +2,93 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Course from './Course';
 import Exam from './Exam';
-import './StudentDashboard.css';
 import StudentLayout from './StudentLayout';
+import styles from './StudentDashboard.module.css';
 
 const StudentDashboard = () => {
+  // Example student info (replace with real data as needed)
+  const student = {
+    name: 'John',
+    degree: 'B.Tech CSE',
+    year: '3rd Year',
+    avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+  };
   const [showCourse, setShowCourse] = useState(false);
   const [showExam, setShowExam] = useState(false);
-  const [showResult, setShowResult] = useState(false);
   const navigate = useNavigate();
 
   return (
     <StudentLayout>
-      <div className="dashboard-welcome">
-        <h1>Welcome Student</h1>
-        <p>Manage your learning assessment system from here</p>
-        <div className="dashboard-stats">
-          <div className="stat-card">
+      <div className={styles.dashboardMain}>
+        <div className={styles.headerRow}>
+          <h1 className={styles.welcome}>Welcome, {student.name}!</h1>
+          <div className={styles.subInfo}>{student.degree} {student.year}</div>
+        </div>
+        <div className={styles.cardsGridSingleRow}>
+          <div className={styles.card}>
             <i className="fas fa-book"></i>
-            <div className="stat-content">
-              <h3>Courses</h3>
-              <p>5</p>
+            <div>
+              <div className={styles.cardTitle}>My Courses</div>
+              <div className={styles.cardDesc}>5 Active Courses</div>
             </div>
           </div>
-          <div className="stat-card">
-            <i className="fas fa-file-alt"></i>
-            <div className="stat-content">
-              <h3>Exam Compeleted</h3>
-              <p>2</p>
+          <div className={styles.card}>
+            <i className="fas fa-flask"></i>
+            <div>
+              <div className={styles.cardTitle}>Upcoming Exams</div>
+              <div className={styles.cardDesc}>Math – June 25</div>
             </div>
           </div>
-          <div className="stat-card">
+          <div className={styles.card}>
             <i className="fas fa-chart-line"></i>
-            <div className="stat-content">
-              <h3>Result</h3>
-              <p>1</p>
+            <div>
+              <div className={styles.cardTitle}>My Performance</div>
+              <div className={styles.cardDesc}><b>GPA: 8.5</b></div>
+              <div className={styles.cardSubDesc}>New Exam: A Grade</div>
+            </div>
+          </div>
+          <div className={styles.cardClickable} onClick={() => navigate('/student/Notifications')} tabIndex={0} role="button">
+            <i className="fas fa-bell"></i>
+            <div>
+              <div className={styles.cardTitle}>Notifications</div>
+              <div className={styles.cardDesc}>1 new message</div>
             </div>
           </div>
         </div>
-      </div>
-      <div className="quick-actions-section">
-        <h2>Quick Actions</h2>
-        <div className="quick-actions-grid">
-          <div className="quick-action-card">
-            <div className="quick-action-icon">
+        <div className={styles.quickActionsSection}>
+          <h2 className={styles.quickActionsTitle}>Quick Actions</h2>
+          <div className={styles.quickActionsGrid}>
+            <div className={styles.quickActionCard}>
               <i className="fas fa-book"></i>
+              <div>
+                <div className={styles.quickActionTitle}>Enroll Course</div>
+                <div className={styles.quickActionDesc}>Join a new course</div>
+                <button className={styles.quickActionBtn} onClick={() => setShowCourse(true)}>
+                  Enroll
+                </button>
+              </div>
             </div>
-            <h3>Enroll Course</h3>
-            <p>Join to the new course</p>
-            <button 
-              className="quick-action-btn"
-              onClick={() => setShowCourse(true)}
-            >
-              Enroll
-            </button>
-          </div>
-          <div className="quick-action-card">
-            <div className="quick-action-icon">
+            <div className={styles.quickActionCard}>
               <i className="fas fa-file-alt"></i>
+              <div>
+                <div className={styles.quickActionTitle}>Apply Exam</div>
+                <div className={styles.quickActionDesc}>Attempt an exam</div>
+                <button className={styles.quickActionBtn} onClick={() => setShowExam(true)}>
+                  Apply
+                </button>
+              </div>
             </div>
-            <h3>Write Exam</h3>
-            <p>Attempt to write the exam</p>
-            <button 
-              className="quick-action-btn"
-              onClick={() => setShowExam(true)}
-            >
-              Attempt
-            </button>
           </div>
+          {showCourse && (
+            <Course onClose={() => setShowCourse(false)} />
+          )}
+          {showExam && (
+            <Exam onClose={() => setShowExam(false)} />
+          )}
         </div>
-        {showCourse && (
-          <Course onClose={() => setShowCourse(false)} />
-        )}
-        {showExam && (
-          <Exam onClose={() => setShowExam(false)} />
-        )}
       </div>
     </StudentLayout>
   );
 };
+
 export default StudentDashboard;
