@@ -40,9 +40,14 @@ const RegisterForm = () => {
 
       console.log('Registration successful:', response.data);
       alert('Registration successful!');
+      navigate('/');
     } catch (error) {
-      console.error('Registration failed:', error.response?.data || error.message);
-      alert('Registration failed!');
+      if (error.response?.status === 409) {
+        alert('Email or Username already exists!');
+      } else {
+        console.error('Registration failed:', error.response?.data || error.message);
+        alert('Registration failed!');
+      }
     }
   };
 
