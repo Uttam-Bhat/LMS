@@ -1,7 +1,7 @@
+import axios from 'axios';
 import { useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import './CreateUserModal.css';
-
 const CreateUserModal = ({ onClose }) => {
   const [formData, setFormData] = useState({
     fullName:'',
@@ -18,12 +18,29 @@ const CreateUserModal = ({ onClose }) => {
       [name]: value
     }));
   };
-
-  const handleSubmit = (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Form submitted:', formData);
-    onClose();
+
+    try {
+      const response = await axios.post('http://localhost:3000/api/register', {
+        fullname: formData.fullName,
+        username: formData.username,
+        email: formData.email,
+        user_type: formData.loginType,
+        password: formData.password
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('User created:', response.data);
+      alert('User added successfully!');
+      onClose();
+    } catch (error) {
+      console.error('Add user failed:', error);
+      alert(error.response?.data?.message || 'User registration failed!');
+    }
   };
 
   return (

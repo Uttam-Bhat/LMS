@@ -1,0 +1,172 @@
+.stream-management {
+  padding: 2rem;
+}
+
+.stream-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.stream-header h1 {
+  font-size: 1.75rem;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.add-stream-btn {
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-stream-btn:hover {
+  background-color: #1664d9;
+}
+
+.stream-filters {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.stream-search-box {
+  position: relative;
+  width: 300px;
+}
+
+.stream-search-box input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 1rem;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.stream-table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.stream-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.stream-table th {
+  background: #f8f9fa;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #666;
+  border-bottom: 1px solid #e1e1e1;
+}
+
+.stream-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e1e1e1;
+  color: #1a1a1a;
+}
+
+.stream-action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.stream-edit-btn {
+  background: #e7f0fe;
+  color: #1877f2;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.stream-edit-btn:hover {
+  background: #1877f2;
+  color: white;
+}
+
+.stream-delete-btn {
+  background: #fee7e7;
+  color: #f21818;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.stream-delete-btn:hover {
+  background: #f21818;
+  color: white;
+}
+
+/* Modal styles */
+.stream-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.stream-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  min-width: 350px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+}
+
+.stream-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.stream-modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.stream-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.stream-modal input {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.stream-modal .add-stream-btn {
+  width: 100%;
+  margin-top: 0.5rem;
+} 

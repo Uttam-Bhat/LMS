@@ -1,21 +1,34 @@
-import React, { useState } from 'react';
-import './UserManagement.css';
-import { FaUserPlus, FaSearch, FaUserCircle, FaPencilAlt, FaTrashAlt } from 'react-icons/fa';
-import DashboardLayout from './DashboardLayout';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { FaPencilAlt, FaSearch, FaTrashAlt, FaUserCircle, FaUserPlus } from 'react-icons/fa';
 import CreateUserModal from './CreateUserModal';
+import DashboardLayout from './DashboardLayout';
+import './UserManagement.css';
 
 const UserManagement = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
 
-  const users = [
-    { id: 1, name: 'John Doe', email: 'john.doe@example.com', role: 'teacher' },
-    { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', role: 'teacher' },
-    { id: 3, name: 'Mike Johnson', email: 'mike.j@example.com', role: 'student' },
-    { id: 4, name: 'Sarah Williams', email: 'sarah.w@example.com', role: 'student' },
-  ];
+  const [users, setUsers] = useState([]);
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState(null);
 
+useEffect(() => {
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/register');
+      setUsers(response.data); // Expecting array of user objects
+      setLoading(false);
+    } catch (err) {
+      console.error('Failed to fetch users:', err);
+      setError('Failed to load users');
+      setLoading(false);
+    }
+  };
+
+  fetchUsers();
+}, []);
   const handleFilterChange = (filter) => {
     setActiveFilter(filter);
   };
@@ -93,7 +106,7 @@ const UserManagement = () => {
                   <td>
                     <div className="user-info">
                       <FaUserCircle />
-                      <span>{user.name}</span>
+                      <span>{user.fullname}</span>
                     </div>
                   </td>
                   <td>{user.email}</td>

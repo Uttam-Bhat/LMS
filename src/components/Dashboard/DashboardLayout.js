@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { FaAngleDown, FaHome, FaUsers, FaBook, FaChalkboardTeacher, FaUserGraduate, FaFileAlt, FaChartBar, FaStream, FaLayerGroup, FaListAlt, FaBookOpen, FaThList, FaFolderOpen } from 'react-icons/fa';
 import './Dashboard.css';
 
 const DashboardLayout = ({ children }) => {
@@ -8,6 +9,7 @@ const DashboardLayout = ({ children }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
     // Add logout logic here
@@ -81,31 +83,51 @@ const DashboardLayout = ({ children }) => {
           <nav className="sidebar-nav">
             <div className="nav-section">
               <Link to="/admin" className={location.pathname === '/admin' ? 'active' : ''}>
-                <i className="fas fa-home"></i>
+                <FaHome />
                 <span>Dashboard</span>
               </Link>
               <Link to="/admin/users" className={location.pathname === '/admin/users' ? 'active' : ''}>
-                <i className="fas fa-users"></i>
+                <FaUsers />
                 <span>User Management</span>
               </Link>
-              <Link to="/admin/teachers" className={location.pathname === '/admin/teachers' ? 'active' : ''}>
-                <i className="fas fa-chalkboard-teacher"></i>
-                <span>Teachers</span>
-              </Link>
-              <Link to="/admin/students" className={location.pathname === '/admin/students' ? 'active' : ''}>
-                <i className="fas fa-user-graduate"></i>
-                <span>Students</span>
-              </Link>
-              <Link to="/admin/courses" className={location.pathname === '/admin/courses' ? 'active' : ''}>
-                <i className="fas fa-book"></i>
-                <span>Courses</span>
-              </Link>
+              <div className={`menu-parent${menuOpen ? ' open' : ''}`}> 
+                <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
+                  <FaLayerGroup style={{ marginRight: 8 }} />
+                  <span>Menu</span>
+                  <FaAngleDown className={`menu-arrow${menuOpen ? ' rotated' : ''}`} size={14} style={{ marginLeft: 'auto' }} />
+                </button>
+                {menuOpen && (
+                  <div className="submenu">
+                    <Link to="/admin/courses" className={location.pathname === '/admin/courses' ? 'active' : ''}>
+                      <FaBook /> <span>Courses</span>
+                    </Link>
+                    <Link to="/admin/classes" className={location.pathname === '/admin/classes' ? 'active' : ''}>
+                      <FaChalkboardTeacher /> <span>Classes</span>
+                    </Link>
+                    <Link to="/admin/stream" className={location.pathname === '/admin/stream' ? 'active' : ''}>
+                      <FaStream /> <span>Stream</span>
+                    </Link>
+                    <Link to="/admin/subjects" className={location.pathname === '/admin/subjects' ? 'active' : ''}>
+                      <FaBookOpen /> <span>Subjects</span>
+                    </Link>
+                    <Link to="/admin/chapters" className={location.pathname === '/admin/chapters' ? 'active' : ''}>
+                      <FaListAlt /> <span>Chapters</span>
+                    </Link>
+                    <Link to="/admin/topics" className={location.pathname === '/admin/topics' ? 'active' : ''}>
+                      <FaThList /> <span>Topics</span>
+                    </Link>
+                    <Link to="/admin/content" className={location.pathname === '/admin/content' ? 'active' : ''}>
+                      <FaFolderOpen /> <span>Content</span>
+                    </Link>
+                  </div>
+                )}
+              </div>
               <Link to="/admin/exams" className={location.pathname === '/admin/exams' ? 'active' : ''}>
-                <i className="fas fa-file-alt"></i>
+                <FaFileAlt />
                 <span>Exams</span>
               </Link>
               <Link to="/admin/results" className={location.pathname === '/admin/results' ? 'active' : ''}>
-                <i className="fas fa-chart-bar"></i>
+                <FaChartBar />
                 <span>Results</span>
               </Link>
             </div>

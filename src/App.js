@@ -10,6 +10,12 @@ import ForgotPassword from './components/Login/ForgotPassword';
 import LoginForm from './components/Login/LoginForm';
 import RegisterForm from './components/Login/RegisterForm';
 import StudentDashboard from './components/Student/StudentDashboard';
+import StreamManagement from './components/Dashboard/StreamManagement';
+import SubjectsManagement from './components/Dashboard/SubjectsManagement';
+import ChaptersManagement from './components/Dashboard/ChaptersManagement';
+import TopicsManagement from './components/Dashboard/TopicsManagement';
+import ContentManagement from './components/Dashboard/ContentManagement';
+import ClassesManagement from './components/Dashboard/ClassesManagement';
 
 function App() {
   return (
@@ -26,6 +32,12 @@ function App() {
           <Route path="/admin/courses" element={<CourseManagement />} />
           <Route path="/admin/exams" element={<ExamManagement />} />
           <Route path="/admin/results" element={<ResultsPlaceholder />} />
+          <Route path="/admin/stream" element={<StreamManagement />} />
+          <Route path="/admin/subjects" element={<SubjectsManagement />} />
+          <Route path="/admin/chapters" element={<ChaptersManagement />} />
+          <Route path="/admin/topics" element={<TopicsManagement />} />
+          <Route path="/admin/content" element={<ContentManagement />} />
+          <Route path="/admin/classes" element={<ClassesManagement />} />
           <Route path="/student" element={<StudentDashboard />} />
           <Route path="/student/Course" element={<StudentDashboard />} />
           <Route path="/student/Exam" element={<StudentDashboard />} />
