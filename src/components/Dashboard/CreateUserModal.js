@@ -114,18 +114,27 @@ const CreateUserModal = ({ onClose, editUser, onUpdate }) => {
 
           <div className="form-group">
             <label htmlFor="loginType">Login Type</label>
-            <select
-              id="loginType"
-              name="loginType"
-              value={formData.loginType}
-              onChange={handleChange}
-              required
-              disabled={!!editUser}
-            >
-              <option value="">Select login type</option>
-              <option value="teacher">Teacher</option>
-              <option value="student">Student</option>
-            </select>
+            {editUser ? (
+              <input
+                type="text"
+                id="loginType"
+                name="loginType"
+                value={formData.loginType.charAt(0).toUpperCase() + formData.loginType.slice(1)}
+                readOnly
+              />
+            ) : (
+              <select
+                id="loginType"
+                name="loginType"
+                value={formData.loginType}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select login type</option>
+                <option value="teacher">Teacher</option>
+                <option value="student">Student</option>
+              </select>
+            )}
           </div>
 
           {!editUser && (

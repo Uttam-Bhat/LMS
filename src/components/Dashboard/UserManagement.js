@@ -153,20 +153,18 @@ useEffect(() => {
       setEditUserData(null);
     }}
     editUser={editUserData}
+    onUpdate={async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/admin/users');
+        setUsers(response.data);
+      } catch (err) {
+        console.error('Failed to refresh users:', err);
+      }
+    }}
   />
 )}
 
       </div>
-      {showCreateUserModal && (
-  <CreateUserModal
-    onClose={() => {
-      setShowCreateUserModal(false);
-      setEditUserData(null);  // ✅ Reset user on close
-    }}
-    editUser={editUserData}
-  />
-)}
-
     </DashboardLayout>
   );
 };
