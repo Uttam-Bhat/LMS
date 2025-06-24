@@ -17,18 +17,41 @@ const LoginForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log('Login attempt with:', formData);
+
+    try {
+      const response = await axios.post('http://localhost:3000/api/login', {
+        email: formData.email,
+        password: formData.password
+      });
+
+      const user = response.data.user;
+
+      alert(`Welcome ${user.fullname}!`);
+
+      // Role-based redirection
+      if (user.user_type === 'admin') {
+        navigate('/admin-dashboard');
+      }else if (user.user_type === 'student') {
+        navigate('/student-dashboard');
+      } else {
+        alert('Unknown user type');
+      }
+
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.message || 'Login failed');
+    }
   };
+
 
   return (
     <div className="login-container">
       <p className="create-account-text">
         New to the platform? <a href="#" onClick={(e) => { e.preventDefault(); navigate('/register'); }}>Create an account</a>
       </p>
-      <form onSubmit={handleSubmit} className="login-form">
+      <form onSubmit={handleLogin} className="login-form">
         <div className="form-header">
           <h2>Welcome Back!</h2>
           <p>Please sign in to continue</p>
