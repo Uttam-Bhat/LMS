@@ -17,7 +17,7 @@ const [error, setError] = useState(null);
 useEffect(() => {
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/user/register');
+      const response = await axios.get('http://localhost:3000/api/admin/users');
       setUsers(response.data); // Expecting array of user objects
       setLoading(false);
     } catch (err) {
@@ -39,7 +39,7 @@ useEffect(() => {
 
   const filteredUsers = users.filter(user => {
     const matchesFilter = activeFilter === 'all' || user.role === activeFilter;
-    const matchesSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch = user.fullname.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
@@ -111,10 +111,10 @@ useEffect(() => {
                   </td>
                   <td>{user.email}</td>
                   <td>
-                    <span className={`role-badge ${user.role}`}>
-                      {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                    </span>
-                  </td>
+                <span className={`role-badge ${user.role || 'unknown'}`}>
+                     {user.user_type ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Unknown'}
+              </span>
+            </td>
                   <td>
                     <div className="action-buttons">
                       <button className="edit-btn" title="Edit user">
