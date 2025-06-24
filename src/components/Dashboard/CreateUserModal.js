@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import './CreateUserModal.css';
 
 const CreateUserModal = ({ onClose }) => {
   const [formData, setFormData] = useState({
+    fullName:'',
     username: '',
     email: '',
     password: '',
@@ -36,6 +37,19 @@ const CreateUserModal = ({ onClose }) => {
         </div>
 
         <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="fullName">Full Name</label>
+            <input
+              type="text"
+              id="fullName"
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
+              placeholder="Enter Full Name"
+              required
+            />
+          </div>
+
           <div className="form-group">
             <label htmlFor="username">Username</label>
             <input
