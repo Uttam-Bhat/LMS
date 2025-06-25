@@ -34,13 +34,46 @@ useEffect(() => {
 
   fetchTeachers();
 }, []);
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Form submitted:', formData);
-    onClose();
-  };
 
+    // Convert yyyy-mm-dd to dd-mm-yyyy
+    const formatDate = (dateStr) => {
+      if (!dateStr) return '';
+      const [yyyy, mm, dd] = dateStr.split('-');
+      return `${dd}-${mm}-${yyyy}`;
+    };
+
+    const payload = {
+      coursename: formData.name,
+      course_type: formData.courseType,
+      ass_teacher: formData.teacher,
+      start_date: formatDate(formData.startDate),
+      end_date: formatDate(formData.endDate),
+      des: formData.description
+    };
+
+    try {
+      const response = await axios.post('http://localhost:3000/api/admin/course', payload);
+      console.log('Course created:', response.data);
+      alert('Course created successfully!');
+      // Map backend response to UI structure if needed
+      const newCourse = {
+        id: response.data.courseId || Date.now(),
+        name: payload.coursename,
+        teacher: teachers.find(t => t.id == payload.ass_teacher)?.fullname || '',
+        students: 0,
+        completion: 0,
+        status: 'active',
+        ...payload
+      };
+      onCourseAdded && onCourseAdded(newCourse); // update UI
+      onClose();
+    } catch (error) {
+      console.error('Failed to create course:', error);
+      alert('Course creation failed. Check console for details.');
+    }
+  };
   return (
     <div className="modal-overlay">
       <div className="create-course-modal">
@@ -58,7 +91,7 @@ useEffect(() => {
               type="text"
               id="courseName"
               name="name"
-              value={formData.name}
+             value={formData.name}  
               onChange={handleChange}
               placeholder="Enter course name"
               required
