@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import './CreateCourseModal.css';
 
-const CreateCourseModal = ({ onClose }) => {
+const CreateCourseModal = ({ onClose, onCourseAdded }) => {
+  const [teachers, setTeachers] = useState([]);
   const [formData, setFormData] = useState({
-    courseName: '',
-    courseType: '',
+    name: '',
     teacher: '',
+    description: '',
+    courseType: '',
     startDate: '',
-    endDate: '',
-    description: ''
+    endDate: ''
   });
 
   const handleChange = (e) => {
@@ -19,7 +21,19 @@ const CreateCourseModal = ({ onClose }) => {
       [name]: value
     }));
   };
+useEffect(() => {
+  const fetchTeachers = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/admin/teachers');
+      setTeachers(response.data);
+      console.log("Fetched data:", response.data);
+    } catch (error) {
+      console.error('Failed to fetch teachers:', error);
+    }
+  };
 
+  fetchTeachers();
+}, []);
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle form submission here
@@ -43,8 +57,8 @@ const CreateCourseModal = ({ onClose }) => {
             <input
               type="text"
               id="courseName"
-              name="courseName"
-              value={formData.courseName}
+              name="name"
+              value={formData.name}
               onChange={handleChange}
               placeholder="Enter course name"
               required
@@ -70,17 +84,19 @@ const CreateCourseModal = ({ onClose }) => {
           <div className="form-group">
             <label htmlFor="teacher">Assign Teacher</label>
             <select
-              id="teacher"
-              name="teacher"
-              value={formData.teacher}
-              onChange={handleChange}
-              required
+            id="teacher"
+            name="teacher"
+            value={formData.teacher}
+            onChange={handleChange}
+            required
             >
-              <option value="">Select teacher</option>
-              <option value="1">John Doe</option>
-              <option value="2">Jane Smith</option>
-              <option value="3">Mike Johnson</option>
-            </select>
+            <option value="">Select teacher</option>
+           {teachers.map(teacher => (
+            <option key={teacher.id} value={teacher.id}>
+            {teacher.fullname}
+          </option>
+          ))}
+      </select>
           </div>
 
           <div className="form-group">

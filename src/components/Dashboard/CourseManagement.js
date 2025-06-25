@@ -1,59 +1,21 @@
-import React, { useState } from 'react';
-import DashboardLayout from './DashboardLayout';
-import CreateCourseModal from './CreateCourseModal';
-import EditCourseModal from './EditCourseModal';
+import { useState } from 'react';
 import AddUserToCourseModal from './AddUserToCourseModal';
-import CourseReportModal from './CourseReportModal';
-import DeleteCourseModal from './DeleteCourseModal';
 import './CourseManagement.css';
-import { FaPlus, FaEdit, FaTrashAlt, FaUserPlus, FaChartLine } from 'react-icons/fa';
+import CourseReportModal from './CourseReportModal';
+import CreateCourseModal from './CreateCourseModal';
+import DashboardLayout from './DashboardLayout';
+import DeleteCourseModal from './DeleteCourseModal';
+import EditCourseModal from './EditCourseModal';
+
+import { FaChartLine, FaEdit, FaPlus, FaTrashAlt, FaUserPlus } from 'react-icons/fa';
 
 const CourseManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateCourseModal, setShowCreateCourseModal] = useState(false);
   const [modalType, setModalType] = useState(null); // 'edit' | 'report' | 'addUser' | 'delete'
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [courses, setCourses] = useState([]); 
   
-  // Sample data - replace with actual data from your backend
-  const [courses, setCourses] = useState([
-    {
-      id: 1,
-      name: 'Introduction to Computer Science',
-      teacher: 'John Doe',
-      students: 45,
-      completion: 75,
-      status: 'active',
-      courseType: 'certified',
-      startDate: '2024-01-01',
-      endDate: '2024-06-30',
-      description: 'Learn the fundamentals of computer science and programming.'
-    },
-    {
-      id: 2,
-      name: 'Advanced Mathematics',
-      teacher: 'Jane Smith',
-      students: 32,
-      completion: 60,
-      status: 'active',
-      courseType: 'professional',
-      startDate: '2024-01-15',
-      endDate: '2024-07-15',
-      description: 'Advanced mathematical concepts and problem-solving techniques.'
-    },
-    {
-      id: 3,
-      name: 'Physics 101',
-      teacher: 'Mike Johnson',
-      students: 28,
-      completion: 90,
-      status: 'completed',
-      courseType: 'non-certified',
-      startDate: '2023-09-01',
-      endDate: '2024-01-31',
-      description: 'Basic physics principles and laboratory experiments.'
-    }
-  ]);
-
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -216,9 +178,13 @@ const CourseManagement = () => {
         </div>
 
         {showCreateCourseModal && (
-          <CreateCourseModal onClose={() => setShowCreateCourseModal(false)} />
-        )}
-
+  <CreateCourseModal 
+    onClose={() => setShowCreateCourseModal(false)} 
+    onCourseAdded={(newCourse) => {
+      setCourses(prev => [...prev, newCourse]);
+    }}
+  />
+)}
         {/* Edit Course Modal */}
         {modalType === 'edit' && selectedCourse && (
           <EditCourseModal 
