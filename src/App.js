@@ -16,6 +16,8 @@ import ChaptersManagement from './components/Dashboard/ChaptersManagement';
 import TopicsManagement from './components/Dashboard/TopicsManagement';
 import ContentManagement from './components/Dashboard/ContentManagement';
 import ClassesManagement from './components/Dashboard/ClassesManagement';
+import AvailableCourses from './components/Student/AvailableCourses';
+import MyCourses from './components/Student/MyCourses';
 
 function App() {
   return (
@@ -44,6 +46,8 @@ function App() {
           <Route path="/student/Notifications" element={<StudentDashboard />} />
           <Route path="/student/Result" element={<StudentDashboard />} />
           <Route path="/student/Logout" element={<StudentDashboard />} />
+          <Route path="/student/available-courses" element={<AvailableCourses />} />
+          <Route path="/student/my-courses" element={<MyCourses />} />
         </Routes>
       </div>
     </Router>

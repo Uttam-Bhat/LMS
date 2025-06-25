@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import AddUserToCourseModal from './AddUserToCourseModal';
 import './CourseManagement.css';
 import CourseReportModal from './CourseReportModal';
@@ -6,7 +7,6 @@ import CreateCourseModal from './CreateCourseModal';
 import DashboardLayout from './DashboardLayout';
 import DeleteCourseModal from './DeleteCourseModal';
 import EditCourseModal from './EditCourseModal';
-import axios from 'axios';
 
 import { FaChartLine, FaEdit, FaPlus, FaTrashAlt, FaUserPlus } from 'react-icons/fa';
 
@@ -16,7 +16,7 @@ const CourseManagement = () => {
   const [modalType, setModalType] = useState(null); // 'edit' | 'report' | 'addUser' | 'delete'
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [courses, setCourses] = useState([]); 
-  
+   const [totalCourses, setTotalCourses] = useState(0);
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -45,7 +45,15 @@ const CourseManagement = () => {
       )
     );
   };
-
+const fetchCourseCount = async () => {
+  try {
+    const response = await axios.get('http://localhost:3000/api/admin/courses');
+    setTotalCourses(response.data.length); // assuming response.data is an array of courses
+  } catch (error) {
+    console.error('Failed to fetch total courses:', error);
+  }
+};
+fetchCourseCount();
   const handleCourseDelete = (courseId) => {
     setCourses(prevCourses => prevCourses.filter(course => course.id !== courseId));
   };
@@ -102,7 +110,7 @@ const CourseManagement = () => {
             </div>
             <div className="stat-content">
               <h3>Active Courses</h3>
-              <p>12</p>
+              <p>{totalCourses}</p>
             </div>
           </div>
           <div className="stat-card">

@@ -14,6 +14,7 @@ const AdminDashboard = () => {
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [showCreateExamModal, setShowCreateExamModal] = useState(false);
   const [showViewReportsModal, setShowViewReportsModal] = useState(false);
+  const [totalCourses, setTotalCourses] = useState(0);
   const [totalUsers, setTotalUsers] = useState(0);
   const navigate = useNavigate();
 useEffect(() => {
@@ -27,7 +28,18 @@ useEffect(() => {
   };
 
   fetchUserCount();
+  const fetchCourseCount = async () => {
+  try {
+    const response = await axios.get('http://localhost:3000/api/admin/courses');
+    setTotalCourses(response.data.length); // assuming response.data is an array of courses
+  } catch (error) {
+    console.error('Failed to fetch total courses:', error);
+  }
+};
+fetchCourseCount();
 }, []);
+
+
   return (
     <DashboardLayout>
       <div className="dashboard-welcome">
@@ -46,7 +58,7 @@ useEffect(() => {
             <i className="fas fa-book"></i>
             <div className="stat-content">
               <h3>Active Courses</h3>
-              <p>12</p>
+              <p>{totalCourses}</p>
             </div>
           </div>
           <div className="stat-card">

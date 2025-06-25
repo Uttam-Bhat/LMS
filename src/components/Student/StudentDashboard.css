@@ -361,4 +361,61 @@
 
 .quick-action-btn:hover {
   background: #1664d9;
+}
+
+.menu-parent {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-toggle {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0.875rem 1.5rem;
+  color: #666;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+  text-align: left;
+}
+
+.menu-toggle.active,
+.menu-toggle:hover {
+  background-color: #f0f2f5;
+  color: #1877f2;
+  border-left-color: #1877f2;
+}
+
+.submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding-left: 2.2rem;
+  background: none;
+}
+
+.submenu a {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 0 0.7rem 0.5rem;
+  color: #2563eb;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+  background: none;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.submenu a.active,
+.submenu a:hover {
+  background-color: #f0f2f5;
+  color: #1877f2;
+  border-left-color: #1877f2;
 } 
