@@ -135,7 +135,7 @@ useEffect(() => {
                       <button className="edit-btn" title="Edit user" onClick={() => { setEditUserData(user); setShowCreateUserModal(true); }}>
                         <FaPencilAlt />
                       </button>
-                      <button className="delete-btn" title="Delete user" onClick={() => setEditUser(user)}>
+                      <button className="delete-btn" title="Delete user" onClick={() => handleDeleteUser(user.id)}>
                         <FaTrashAlt />
                       </button>
                     </div>
