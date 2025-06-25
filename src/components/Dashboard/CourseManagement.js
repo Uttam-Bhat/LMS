@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AddUserToCourseModal from './AddUserToCourseModal';
 import './CourseManagement.css';
 import CourseReportModal from './CourseReportModal';
@@ -6,6 +6,7 @@ import CreateCourseModal from './CreateCourseModal';
 import DashboardLayout from './DashboardLayout';
 import DeleteCourseModal from './DeleteCourseModal';
 import EditCourseModal from './EditCourseModal';
+import axios from 'axios';
 
 import { FaChartLine, FaEdit, FaPlus, FaTrashAlt, FaUserPlus } from 'react-icons/fa';
 
@@ -55,6 +56,27 @@ const CourseManagement = () => {
     // For now, we'll just show an alert
     alert(`${students.length} student(s) added to ${selectedCourse.name}`);
   };
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/admin/courses');
+        // Map backend fields to UI structure
+        const mapped = response.data.map(course => ({
+          id: course.courseId || course.id,
+          name: course.coursename,
+          teacher: course.ass_teacher,
+          students: course.students || 0,
+          completion: course.completion || 0,
+          status: 'active',
+        }));
+        setCourses(mapped);
+      } catch (error) {
+        console.error('Failed to fetch courses:', error);
+      }
+    };
+    fetchCourses();
+  }, []);
 
   return (
     <DashboardLayout>

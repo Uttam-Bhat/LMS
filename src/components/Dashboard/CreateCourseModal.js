@@ -117,19 +117,19 @@ useEffect(() => {
           <div className="form-group">
             <label htmlFor="teacher">Assign Teacher</label>
             <select
-            id="teacher"
-            name="teacher"
-            value={formData.teacher}
-            onChange={handleChange}
-            required
-            >
-            <option value="">Select teacher</option>
-           {teachers.map(teacher => (
-            <option key={teacher.id} value={teacher.id}>
-            {teacher.fullname}
-          </option>
-          ))}
-      </select>
+  id="teacher"
+  name="teacher"
+  value={formData.teacher}
+  onChange={handleChange}
+  required
+>
+  <option value="">Select teacher</option>
+  {teachers.map(teacher => (
+    <option key={teacher.id || teacher._id} value={teacher.id || teacher._id}>
+      {teacher.fullname || teacher.name}
+    </option>
+  ))}
+</select>
           </div>
 
           <div className="form-group">
