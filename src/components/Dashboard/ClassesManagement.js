@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
 
@@ -7,8 +7,8 @@ const ClassesManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const classes = [
-    { id: 1, name: 'I PUC', description: 'First Year Pre-University', created: '6/5/2025' },
-    { id: 2, name: 'II PUC', description: 'Second Year Pre-University', created: '6/5/2025' },
+    { id: 1, name: 'I PUC', description: 'First Year Pre-University',section:'A', created: '6/5/2025' },
+    { id: 2, name: 'II PUC', description: 'Second Year Pre-University',section:'B', created: '6/5/2025' },
   ];
   const filtered = classes.filter(s => s.name.toLowerCase().includes(search.toLowerCase()));
   return (
@@ -26,13 +26,14 @@ const ClassesManagement = () => {
         <div className="stream-table-container">
           <table className="stream-table">
             <thead>
-              <tr><th>Name</th><th>Description</th><th>Created</th><th>Action</th></tr>
+              <tr><th>Name</th><th>Description</th><th>Section</th><th>Created</th><th>Action</th></tr>
             </thead>
             <tbody>
               {filtered.map(s => (
                 <tr key={s.id}>
                   <td>{s.name}</td>
                   <td>{s.description}</td>
+                  <td>{s.section}</td>
                   <td>{s.created}</td>
                   <td>
                     <div className="stream-action-buttons">
