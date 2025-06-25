@@ -46,6 +46,9 @@ const CreateUserModal = ({ onClose, editUser, onUpdate }) => {
         user_type: formData.loginType,
          password: formData.password, 
       };
+      
+      console.log('Sending payload:', payload);
+      
       if (editUser) {
         await axios.put(`http://localhost:3000/api/admin/edit/${editUser.id}`, payload);
         alert('User updated successfully');
@@ -56,8 +59,15 @@ const CreateUserModal = ({ onClose, editUser, onUpdate }) => {
       onUpdate(); // Refresh user list
       onClose();  // Close modal
     } catch (error) {
-      console.error('Error updating user:', error.response?.data || error.message);
-      alert('Failed to update user');
+      console.error('Error:', error.response?.data || error.message);
+      console.error('Error status:', error.response?.status);
+      console.error('Error details:', error.response);
+      
+      if (editUser) {
+        alert(`Failed to update user: ${error.response?.data?.message || error.message}`);
+      } else {
+        alert(`Failed to add user: ${error.response?.data?.message || error.message}`);
+      }
     }
   };
   return (
