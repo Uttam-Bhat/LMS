@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DashboardLayout from './DashboardLayout';
 import CreateCourseModal from './CreateCourseModal';
-import CreateUserModal from './CreateUserModal';
 import CreateExamModal from './CreateExamModal';
+import CreateUserModal from './CreateUserModal';
+import DashboardLayout from './DashboardLayout';
 import ViewReportsModal from './ViewReportsModal';
+
 import './Dashboard.css';
 
 const AdminDashboard = () => {
@@ -12,8 +14,20 @@ const AdminDashboard = () => {
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [showCreateExamModal, setShowCreateExamModal] = useState(false);
   const [showViewReportsModal, setShowViewReportsModal] = useState(false);
+  const [totalUsers, setTotalUsers] = useState(0);
   const navigate = useNavigate();
+useEffect(() => {
+  const fetchUserCount = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/admin/users');
+      setTotalUsers(response.data.length); // assuming it returns array of users
+    } catch (error) {
+      console.error('Failed to fetch total users:', error);
+    }
+  };
 
+  fetchUserCount();
+}, []);
   return (
     <DashboardLayout>
       <div className="dashboard-welcome">
@@ -25,7 +39,7 @@ const AdminDashboard = () => {
             <i className="fas fa-users"></i>
             <div className="stat-content">
               <h3>Total Users</h3>
-              <p>250</p>
+              <p>{totalUsers}</p>
             </div>
           </div>
           <div className="stat-card">

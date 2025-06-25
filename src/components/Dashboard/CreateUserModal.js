@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import './CreateUserModal.css';
-const CreateUserModal = ({ onClose, editUser, onUpdate }) => {
+const CreateUserModal = ({ onClose = () => {}, editUser = null, onUpdate = () => {} }) => {
   const [formData, setFormData] = useState({
     fullname:'',
     username: '',
@@ -46,7 +46,9 @@ const CreateUserModal = ({ onClose, editUser, onUpdate }) => {
         user_type: formData.loginType,
          password: formData.password, 
       };
-      
+      if (!editUser) {
+        payload.password = formData.password;
+}
       console.log('Sending payload:', payload);
       
       if (editUser) {
@@ -91,7 +93,7 @@ const CreateUserModal = ({ onClose, editUser, onUpdate }) => {
               onChange={handleChange}
               placeholder="Enter Full Name"
               required
-              readOnly={!!editUser && false}
+              readOnly={false}
             />
           </div>
 
@@ -105,7 +107,7 @@ const CreateUserModal = ({ onClose, editUser, onUpdate }) => {
               onChange={handleChange}
               placeholder="Enter username"
               required
-              readOnly={!!editUser && false}
+              readOnly={false}
             />
           </div>
 
