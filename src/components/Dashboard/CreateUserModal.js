@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import './CreateUserModal.css';
 const CreateUserModal = ({ onClose, editUser, onUpdate }) => {
@@ -44,6 +44,7 @@ const CreateUserModal = ({ onClose, editUser, onUpdate }) => {
         username: formData.username,
         email: formData.email,
         user_type: formData.loginType,
+         password: formData.password, 
       };
       if (editUser) {
         await axios.put(`http://localhost:3000/api/admin/edit/${editUser.id}`, payload);

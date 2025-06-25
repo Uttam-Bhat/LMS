@@ -40,7 +40,7 @@ useEffect(() => {
   };
 
   const filteredUsers = users.filter(user => {
-    const matchesFilter = activeFilter === 'all' || user.role === activeFilter;
+    const matchesFilter = activeFilter === 'all' || user.user_type === activeFilter;
     const matchesSearch = user.fullname.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
