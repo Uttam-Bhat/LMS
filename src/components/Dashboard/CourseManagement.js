@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import CreateCourseModal from './CreateCourseModal';
+import EditCourseModal from './EditCourseModal';
+import AddUserToCourseModal from './AddUserToCourseModal';
+import CourseReportModal from './CourseReportModal';
+import DeleteCourseModal from './DeleteCourseModal';
 import './CourseManagement.css';
 import { FaPlus, FaEdit, FaTrashAlt, FaUserPlus, FaChartLine } from 'react-icons/fa';
 
@@ -11,14 +15,18 @@ const CourseManagement = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
   
   // Sample data - replace with actual data from your backend
-  const courses = [
+  const [courses, setCourses] = useState([
     {
       id: 1,
       name: 'Introduction to Computer Science',
       teacher: 'John Doe',
       students: 45,
       completion: 75,
-      status: 'active'
+      status: 'active',
+      courseType: 'certified',
+      startDate: '2024-01-01',
+      endDate: '2024-06-30',
+      description: 'Learn the fundamentals of computer science and programming.'
     },
     {
       id: 2,
@@ -26,7 +34,11 @@ const CourseManagement = () => {
       teacher: 'Jane Smith',
       students: 32,
       completion: 60,
-      status: 'active'
+      status: 'active',
+      courseType: 'professional',
+      startDate: '2024-01-15',
+      endDate: '2024-07-15',
+      description: 'Advanced mathematical concepts and problem-solving techniques.'
     },
     {
       id: 3,
@@ -34,9 +46,13 @@ const CourseManagement = () => {
       teacher: 'Mike Johnson',
       students: 28,
       completion: 90,
-      status: 'completed'
+      status: 'completed',
+      courseType: 'non-certified',
+      startDate: '2023-09-01',
+      endDate: '2024-01-31',
+      description: 'Basic physics principles and laboratory experiments.'
     }
-  ];
+  ]);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
@@ -51,9 +67,31 @@ const CourseManagement = () => {
     setModalType(type);
     setSelectedCourse(course);
   };
+  
   const closeModal = () => {
     setModalType(null);
     setSelectedCourse(null);
+  };
+
+  const handleCourseUpdate = (updatedData) => {
+    setCourses(prevCourses => 
+      prevCourses.map(course => 
+        course.id === selectedCourse.id 
+          ? { ...course, ...updatedData }
+          : course
+      )
+    );
+  };
+
+  const handleCourseDelete = (courseId) => {
+    setCourses(prevCourses => prevCourses.filter(course => course.id !== courseId));
+  };
+
+  const handleAddStudents = (students) => {
+    console.log('Students added to course:', students);
+    // Here you would typically update the backend
+    // For now, we'll just show an alert
+    alert(`${students.length} student(s) added to ${selectedCourse.name}`);
   };
 
   return (
@@ -180,31 +218,40 @@ const CourseManagement = () => {
         {showCreateCourseModal && (
           <CreateCourseModal onClose={() => setShowCreateCourseModal(false)} />
         )}
-        {/* Action Modals */}
-        {modalType && selectedCourse && (
-          <div className="modal-overlay">
-            <div className="create-course-modal">
-              <div className="modal-header">
-                <h2>
-                  {modalType === 'edit' && 'Edit Course'}
-                  {modalType === 'report' && 'Course Report'}
-                  {modalType === 'addUser' && 'Add User to Course'}
-                  {modalType === 'delete' && 'Delete Course'}
-                </h2>
-                <button className="close-button" onClick={closeModal}>×</button>
-              </div>
-              <div style={{ padding: '1rem 0' }}>
-                {modalType === 'edit' && <p>Edit course: {selectedCourse.name}</p>}
-                {modalType === 'report' && <p>Report for course: {selectedCourse.name}</p>}
-                {modalType === 'addUser' && <p>Add user to course: {selectedCourse.name}</p>}
-                {modalType === 'delete' && <p>Are you sure you want to delete course: {selectedCourse.name}?</p>}
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="cancel-btn" onClick={closeModal}>Close</button>
-                {modalType === 'delete' && <button type="button" className="create-btn" onClick={closeModal}>Delete</button>}
-              </div>
-            </div>
-          </div>
+
+        {/* Edit Course Modal */}
+        {modalType === 'edit' && selectedCourse && (
+          <EditCourseModal 
+            onClose={closeModal}
+            course={selectedCourse}
+            onUpdate={handleCourseUpdate}
+          />
+        )}
+
+        {/* Add User to Course Modal */}
+        {modalType === 'addUser' && selectedCourse && (
+          <AddUserToCourseModal 
+            onClose={closeModal}
+            course={selectedCourse}
+            onUpdate={handleAddStudents}
+          />
+        )}
+
+        {/* Course Report Modal */}
+        {modalType === 'report' && selectedCourse && (
+          <CourseReportModal 
+            onClose={closeModal}
+            course={selectedCourse}
+          />
+        )}
+
+        {/* Delete Course Modal */}
+        {modalType === 'delete' && selectedCourse && (
+          <DeleteCourseModal 
+            onClose={closeModal}
+            course={selectedCourse}
+            onDelete={handleCourseDelete}
+          />
         )}
       </div>
     </DashboardLayout>
