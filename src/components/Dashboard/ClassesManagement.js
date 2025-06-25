@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
 
@@ -7,27 +8,73 @@ const ClassesManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [form, setForm] = useState({ name: '', description: '', section: '', created: '' });
-  const classes = [
-    { id: 1, name: 'I PUC', description: 'First Year Pre-University', section: 'A', created: '6/5/2025' },
-    { id: 2, name: 'II PUC', description: 'Second Year Pre-University', section: 'B', created: '6/5/2025' },
-  ];
-  const filtered = classes.filter(s => s.name.toLowerCase().includes(search.toLowerCase()));
-
-  const openModal = (item) => {
+  const [classes, setClasses] = useState([]);
+  const [statusMessage, setStatusMessage] = useState('');
+const openModal = (item) => {
     setEditItem(item);
     setForm(item ? { name: item.name, description: item.description, section: item.section, created: item.created } : { name: '', description: '', section: '', created: '' });
     setShowModal(true);
+    setStatusMessage('');
   };
+  useEffect(() => {
+  const fetchClasses = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/api/admin/classes");
+      setClasses(response.data);
+    } catch (error) {
+      console.error("Failed to fetch classes:", error);
+    }
+  };
+  fetchClasses();
+}, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    // Save logic here (API or state update)
-    setShowModal(false);
+  const handleSave = async () => {
+  // Basic validation
+  if (!form.name || !form.description || !form.section || !form.created) {
+    alert('Please fill in all fields');
+    return;
+  }
+
+  try {
+    const payload = {
+      name: form.name,
+      description: form.description,
+      section: form.section,
+      created: form.created, // should be in yyyy-mm-dd
+    };
+    console.log(payload);
+    // ✅ Make sure the URL matches your backend exactly
+    const response = await axios.post('http://localhost:3000/api/admin/classes', payload);
+    if (response.status === 201 || response.status === 200) {
+      alert('Class added successfully');
+      setShowModal(false);
+    } else {
+      alert('Failed to add class');
+    }
+  } catch (error) {
+    console.error('Failed to add class:', error);
+    alert('Failed to add class. Please check console.');
+  }
+};
+
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/admin/classes/${id}`);
+      setClasses(prev => prev.filter(cls => cls.id !== id));
+      setStatusMessage('Class deleted successfully.');
+    } catch (error) {
+      console.error('Error deleting class:', error);
+      setStatusMessage('Failed to delete class.');
+    }
   };
+
+  const filtered = classes.filter(s => s.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <DashboardLayout>
@@ -41,6 +88,7 @@ const ClassesManagement = () => {
             <input type="text" placeholder="Search classes..." value={search} onChange={e => setSearch(e.target.value)} />
           </div>
         </div>
+        {statusMessage && <p className="status-message">{statusMessage}</p>}
         <div className="stream-table-container">
           <table className="stream-table">
             <thead>
@@ -56,7 +104,7 @@ const ClassesManagement = () => {
                   <td>
                     <div className="stream-action-buttons">
                       <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
-                      <button className="stream-delete-btn">Delete</button>
+                      <button className="stream-delete-btn" onClick={() => handleDelete(s.id)}>Delete</button>
                     </div>
                   </td>
                 </tr>
@@ -64,6 +112,7 @@ const ClassesManagement = () => {
             </tbody>
           </table>
         </div>
+
         {showModal && (
           <div className="stream-modal-overlay">
             <div className="stream-modal">
@@ -78,20 +127,23 @@ const ClassesManagement = () => {
                   value={form.name}
                   onChange={handleInputChange}
                   style={{ fontWeight: 500 }}
+                  required
                 />
                 <input
                   name="description"
                   placeholder="Description"
                   value={form.description}
                   onChange={handleInputChange}
+                  required
                 />
                 <input
                   name="section"
                   placeholder="Section (e.g. A, B, C)"
                   value={form.section}
                   onChange={handleInputChange}
+                  required
                 />
-                <label style={{fontWeight: 500}}>Created Date</label>
+                <label style={{ fontWeight: 500 }}>Created Date</label>
                 <input
                   type="date"
                   name="created"
@@ -110,4 +162,5 @@ const ClassesManagement = () => {
     </DashboardLayout>
   );
 };
-export default ClassesManagement; 
+
+export default ClassesManagement;
