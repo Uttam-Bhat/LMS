@@ -6,11 +6,21 @@ const ContentManagement = () => {
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
+  const [form, setForm] = useState({ name: '', description: '', created: '' });
   const contents = [
     { id: 1, name: 'Syllabus', description: 'Syllabus PDF', created: '6/5/2025' },
     { id: 2, name: 'Lecture Notes', description: 'Notes for Algebra', created: '6/5/2025' },
   ];
   const filtered = contents.filter(s => s.name.toLowerCase().includes(search.toLowerCase()));
+  const openModal = (item) => {
+    setEditItem(item);
+    setForm(item ? { name: item.name, description: item.description, created: item.created } : { name: '', description: '', created: '' });
+    setShowModal(true);
+  };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setForm(prevForm => ({ ...prevForm, [name]: value }));
+  };
   return (
     <DashboardLayout>
       <div className="stream-management">
@@ -36,7 +46,7 @@ const ContentManagement = () => {
                   <td>{s.created}</td>
                   <td>
                     <div className="stream-action-buttons">
-                      <button className="stream-edit-btn" onClick={() => { setEditItem(s); setShowModal(true); }}>Edit</button>
+                      <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
                       <button className="stream-delete-btn">Delete</button>
                     </div>
                   </td>
@@ -53,8 +63,26 @@ const ContentManagement = () => {
                 <button className="stream-close-btn" onClick={() => setShowModal(false)}>×</button>
               </div>
               <div>
-                <input placeholder="Name" defaultValue={editItem?.name || ''} />
-                <input placeholder="Description" defaultValue={editItem?.description || ''} />
+                <input
+                  name="name"
+                  placeholder="Name"
+                  value={form.name}
+                  onChange={handleInputChange}
+                />
+                <input
+                  name="description"
+                  placeholder="Description"
+                  value={form.description}
+                  onChange={handleInputChange}
+                />
+                <label style={{fontWeight: 500}}>Created Date</label>
+                <input
+                  type="date"
+                  name="created"
+                  value={form.created}
+                  onChange={handleInputChange}
+                  required
+                />
                 <button className="add-stream-btn" onClick={() => setShowModal(false)}>{editItem ? 'Save' : 'Add'}</button>
               </div>
             </div>

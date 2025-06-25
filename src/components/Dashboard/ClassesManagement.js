@@ -6,7 +6,7 @@ const ClassesManagement = () => {
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
-  const [form, setForm] = useState({ name: '', description: '', section: '' });
+  const [form, setForm] = useState({ name: '', description: '', section: '', created: '' });
   const classes = [
     { id: 1, name: 'I PUC', description: 'First Year Pre-University', section: 'A', created: '6/5/2025' },
     { id: 2, name: 'II PUC', description: 'Second Year Pre-University', section: 'B', created: '6/5/2025' },
@@ -15,7 +15,7 @@ const ClassesManagement = () => {
 
   const openModal = (item) => {
     setEditItem(item);
-    setForm(item ? { name: item.name, description: item.description, section: item.section } : { name: '', description: '', section: '' });
+    setForm(item ? { name: item.name, description: item.description, section: item.section, created: item.created } : { name: '', description: '', section: '', created: '' });
     setShowModal(true);
   };
 
@@ -90,6 +90,14 @@ const ClassesManagement = () => {
                   placeholder="Section (e.g. A, B, C)"
                   value={form.section}
                   onChange={handleInputChange}
+                />
+                <label style={{fontWeight: 500}}>Created Date</label>
+                <input
+                  type="date"
+                  name="created"
+                  value={form.created}
+                  onChange={handleInputChange}
+                  required
                 />
                 <button className="add-stream-btn" style={{ marginTop: '0.5rem' }} onClick={handleSave}>
                   {editItem ? 'Save Changes' : 'Add Class'}
