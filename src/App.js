@@ -10,7 +10,6 @@ import StreamManagement from './components/Dashboard/StreamManagement';
 import StudentsManagement from './components/Dashboard/StudentsManagement';
 import SubjectsManagement from './components/Dashboard/SubjectsManagement';
 import TeachersManagement from './components/Dashboard/TeachersManagement';
-import TopicsManagement from './components/Dashboard/TopicsManagement';
 import UserManagement from './components/Dashboard/UserManagement';
 import ForgotPassword from './components/Login/ForgotPassword';
 import LoginForm from './components/Login/LoginForm';
@@ -38,7 +37,6 @@ function App() {
           <Route path="/admin/stream" element={<StreamManagement />} />
           <Route path="/admin/subjects" element={<SubjectsManagement />} />
           <Route path="/admin/chapters" element={<ChaptersManagement />} />
-          <Route path="/admin/topics" element={<TopicsManagement />} />
           <Route path="/admin/content" element={<ContentManagement />} />
           <Route path="/admin/classes" element={<ClassesManagement />} />
           <Route path="/student" element={<StudentDashboard />} />

@@ -20,12 +20,6 @@ const CourseManagement = () => {
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
   };
-
-  const filteredCourses = courses.filter(course =>
-    course.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    course.teacher.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   const openModal = (type, course) => {
     setModalType(type);
     setSelectedCourse(course);
@@ -39,7 +33,7 @@ const CourseManagement = () => {
   const handleCourseUpdate = (updatedData) => {
     setCourses(prevCourses => 
       prevCourses.map(course => 
-        course.id === selectedCourse.id 
+        course.courseId === selectedCourse.courseId 
           ? { ...course, ...updatedData }
           : course
       )
@@ -55,14 +49,14 @@ const fetchCourseCount = async () => {
 };
 fetchCourseCount();
   const handleCourseDelete = (courseId) => {
-    setCourses(prevCourses => prevCourses.filter(course => course.id !== courseId));
+    setCourses(prevCourses => prevCourses.filter(course => course.courseId !== courseId));
   };
 
   const handleAddStudents = (students) => {
     console.log('Students added to course:', students);
     // Here you would typically update the backend
     // For now, we'll just show an alert
-    alert(`${students.length} student(s) added to ${selectedCourse.name}`);
+    alert(`${students.length} student(s) added to ${selectedCourse.coursename}`);
   };
 
   useEffect(() => {
@@ -71,9 +65,13 @@ fetchCourseCount();
         const response = await axios.get('http://localhost:3000/api/course/display');
         // Map backend fields to UI structure
         const mapped = response.data.map(course => ({
-          id: course.courseId || course.id,
-          name: course.coursename,
-          teacher: course.ass_teacher,
+          courseId: course.courseId,
+          coursename: course.coursename || '',
+          course_type: course.course_type || '',
+          ass_teacher: course.ass_teacher || '',
+          start_date: course.start_date || '',
+          end_date: course.end_date || '',
+          des: course.des || '',
           students: course.students || 0,
           completion: course.completion || 0,
           status: 'active',
@@ -85,6 +83,11 @@ fetchCourseCount();
     };
     fetchCourses();
   }, []);
+
+  const filteredCourses = courses.filter(course =>
+    (course.coursename || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (course.ass_teacher || '').toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <DashboardLayout>
@@ -162,9 +165,9 @@ fetchCourseCount();
 
           <div className="courses-grid">
             {filteredCourses.map(course => (
-              <div key={course.id} className="course-card">
+              <div key={course.courseId} className="course-card">
                 <div className="course-header">
-                  <h3>{course.name}</h3>
+                  <h3>{course.coursename}</h3>
                   <span className={`status-badge ${course.status}`}>
                     {course.status.charAt(0).toUpperCase() + course.status.slice(1)}
                   </span>
@@ -172,7 +175,7 @@ fetchCourseCount();
                 <div className="course-info">
                   <div className="info-item">
                     <i className="fas fa-chalkboard-teacher"></i>
-                    <span>{course.teacher}</span>
+                    <span>{course.ass_teacher}</span>
                   </div>
                   <div className="info-item">
                     <i className="fas fa-users"></i>
@@ -246,7 +249,7 @@ fetchCourseCount();
           <DeleteCourseModal 
             onClose={closeModal}
             course={selectedCourse}
-            onDelete={handleCourseDelete}
+            onDelete={(courseId) => setCourses(prev => prev.filter(course => course.courseId !== courseId))}
           />
         )}
       </div>

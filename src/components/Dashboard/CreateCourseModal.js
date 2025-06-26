@@ -6,12 +6,12 @@ import './CreateCourseModal.css';
 const CreateCourseModal = ({ onClose, onCourseAdded }) => {
   const [teachers, setTeachers] = useState([]);
   const [formData, setFormData] = useState({
-    name: '',
-    teacher: '',
-    description: '',
-    courseType: '',
-    startDate: '',
-    endDate: ''
+    coursename: '',
+    course_type: '',
+    ass_teacher: '',
+    start_date: '',
+    end_date: '',
+    des: ''
   });
 
   const handleChange = (e) => {
@@ -21,51 +21,57 @@ const CreateCourseModal = ({ onClose, onCourseAdded }) => {
       [name]: value
     }));
   };
-useEffect(() => {
-  const fetchTeachers = async () => {
-    try {
-      const response = await axios.get('http://localhost:3000/api/course/teachers');
-      setTeachers(response.data);
-      console.log("Fetched data:", response.data);
-    } catch (error) {
-      console.error('Failed to fetch teachers:', error);
-    }
+
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/course/teachers');
+        setTeachers(response.data);
+        console.log("Fetched data:", response.data);
+      } catch (error) {
+        console.error('Failed to fetch teachers:', error);
+      }
+    };
+
+    fetchTeachers();
+  }, []);
+
+  const formatDateForBackend = (dateStr) => {
+    if (!dateStr) return '';
+    const [yyyy, mm, dd] = dateStr.split('-');
+    return `${dd}-${mm}-${yyyy}`;
   };
 
-  fetchTeachers();
-}, []);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Convert yyyy-mm-dd to dd-mm-yyyy
-    const formatDate = (dateStr) => {
-      if (!dateStr) return '';
-      const [yyyy, mm, dd] = dateStr.split('-');
-      return `${dd}-${mm}-${yyyy}`;
+    const payload = {
+      coursename: formData.coursename,
+      course_type: formData.course_type,
+      ass_teacher: formData.ass_teacher,
+      start_date: formatDateForBackend(formData.start_date),
+      end_date: formatDateForBackend(formData.end_date),
+      des: formData.des
     };
 
-    const payload = {
-      coursename: formData.name,
-      course_type: formData.courseType,
-      ass_teacher: formData.teacher,
-      start_date: formatDate(formData.startDate),
-      end_date: formatDate(formData.endDate),
-      des: formData.description
-    };
-console.log(payload);
+    console.log(payload);
+
     try {
       const response = await axios.post('http://localhost:3000/api/course/add', payload);
       console.log('Course created:', response.data);
       alert('Course created successfully!');
       // Map backend response to UI structure if needed
       const newCourse = {
-        id: response.data.courseId || Date.now(),
-        name: payload.coursename,
-        teacher: teachers.find(t => t.id == payload.ass_teacher)?.fullname || '',
+        courseId: response.data.courseId || Date.now(),
+        coursename: payload.coursename,
+        course_type: payload.course_type,
+        ass_teacher: payload.ass_teacher,
+        start_date: payload.start_date,
+        end_date: payload.end_date,
+        des: payload.des,
         students: 0,
         completion: 0,
-        status: 'active',
-        ...payload
+        status: 'active'
       };
       onCourseAdded && onCourseAdded(newCourse); // update UI
       onClose();
@@ -74,6 +80,7 @@ console.log(payload);
       alert('Course creation failed. Check console for details.');
     }
   };
+
   return (
     <div className="modal-overlay">
       <div className="create-course-modal">
@@ -86,12 +93,12 @@ console.log(payload);
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="courseName">Course Name</label>
+            <label htmlFor="coursename">Course Name</label>
             <input
               type="text"
-              id="courseName"
-              name="name"
-             value={formData.name}  
+              id="coursename"
+              name="coursename"
+              value={formData.coursename}
               onChange={handleChange}
               placeholder="Enter course name"
               required
@@ -99,11 +106,11 @@ console.log(payload);
           </div>
 
           <div className="form-group">
-            <label htmlFor="courseType">Course Type</label>
+            <label htmlFor="course_type">Course Type</label>
             <select
-              id="courseType"
-              name="courseType"
-              value={formData.courseType}
+              id="course_type"
+              name="course_type"
+              value={formData.course_type}
               onChange={handleChange}
               required
             >
@@ -115,44 +122,44 @@ console.log(payload);
           </div>
 
           <div className="form-group">
-            <label htmlFor="teacher">Assign Teacher</label>
+            <label htmlFor="ass_teacher">Assign Teacher</label>
             <select
-  id="teacher"
-  name="teacher"
-  value={formData.teacher}
-  onChange={handleChange}
-  required
->
-  <option value="">Select teacher</option>
-  {teachers.map(teacher => (
-    <option key={teacher.id || teacher._id} value={teacher.id || teacher._id}>
-      {teacher.fullname || teacher.name}
-    </option>
-  ))}
-</select>
+              id="ass_teacher"
+              name="ass_teacher"
+              value={formData.ass_teacher}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select teacher</option>
+              {teachers.map(teacher => (
+                <option key={teacher.id || teacher._id} value={teacher.id || teacher._id}>
+                  {teacher.fullname || teacher.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="form-group">
             <label>Course Duration</label>
             <div className="date-inputs">
               <div className="form-group">
-                <label htmlFor="startDate">Start Date</label>
+                <label htmlFor="start_date">Start Date</label>
                 <input
                   type="date"
-                  id="startDate"
-                  name="startDate"
-                  value={formData.startDate}
+                  id="start_date"
+                  name="start_date"
+                  value={formData.start_date}
                   onChange={handleChange}
                   required
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="endDate">End Date</label>
+                <label htmlFor="end_date">End Date</label>
                 <input
                   type="date"
-                  id="endDate"
-                  name="endDate"
-                  value={formData.endDate}
+                  id="end_date"
+                  name="end_date"
+                  value={formData.end_date}
                   onChange={handleChange}
                   required
                 />
@@ -161,12 +168,12 @@ console.log(payload);
           </div>
 
           <div className="form-group">
-            <label htmlFor="description">Course Description</label>
+            <label htmlFor="des">Course Description</label>
             <input
               type="text"
-              id="description"
-              name="description"
-              value={formData.description}
+              id="des"
+              name="des"
+              value={formData.des}
               onChange={handleChange}
               placeholder="Enter course description"
               required

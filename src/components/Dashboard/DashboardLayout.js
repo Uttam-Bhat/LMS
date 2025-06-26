@@ -113,9 +113,6 @@ const DashboardLayout = ({ children }) => {
                     <Link to="/admin/chapters" className={location.pathname === '/admin/chapters' ? 'active' : ''}>
                       <FaListAlt /> <span>Chapters</span>
                     </Link>
-                    <Link to="/admin/topics" className={location.pathname === '/admin/topics' ? 'active' : ''}>
-                      <FaThList /> <span>Topics</span>
-                    </Link>
                     <Link to="/admin/content" className={location.pathname === '/admin/content' ? 'active' : ''}>
                       <FaFolderOpen /> <span>Content</span>
                     </Link>

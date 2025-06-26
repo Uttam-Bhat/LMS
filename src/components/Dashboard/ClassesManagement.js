@@ -11,15 +11,29 @@ const ClassesManagement = () => {
   const [classes, setClasses] = useState([]);
   const [statusMessage, setStatusMessage] = useState('');
 
+  // Utility to convert yyyy-MM-dd to dd-MM-yyyy for backend
+  const formatDateForBackend = (dateStr) => {
+    if (!dateStr) return '';
+    const [yyyy, mm, dd] = dateStr.split('-');
+    return `${dd}-${mm}-${yyyy}`;
+  };
+  // Utility to convert dd-MM-yyyy to yyyy-MM-dd for input
+  const formatDateForInput = (dateStr) => {
+    if (!dateStr) return '';
+    const [dd, mm, yyyy] = dateStr.split('-');
+    if (yyyy && mm && dd) return `${yyyy}-${mm}-${dd}`;
+    return dateStr;
+  };
+
   const openModal = (item) => {
     setEditItem(item);
     setForm(
       item
         ? {
-            class_name: item.class_name,
-            des: item.des,
-            section: item.section,
-            cdate: item.cdate,
+            class_name: item.class_name || '',
+            des: item.des || '',
+            section: item.section || '',
+            cdate: formatDateForInput(item.cdate || ''),
           }
         : { class_name: '', des: '', section: '', cdate: '' }
     );
@@ -37,7 +51,7 @@ const ClassesManagement = () => {
       class_name: form.class_name,
       des: form.des,
       section: form.section,
-      cdate: form.cdate,
+      cdate: formatDateForBackend(form.cdate),
     };
 
     try {
@@ -90,7 +104,16 @@ const ClassesManagement = () => {
     const fetchClasses = async () => {
       try {
         const response = await axios.get('http://localhost:3000/api/class/display');
-        setClasses(response.data);
+        // Ensure every class object has a cls_id property and map start_date/end_date
+        const dataWithIds = (response.data || []).map((cls, idx) => ({
+          ...cls,
+          cls_id: cls.cls_id || cls.id || cls._id || idx + 1, // fallback to id/_id or index
+          start_date: cls.start_date || '',
+          end_date: cls.end_date || '',
+          des: cls.des || '',
+          cdate: cls.cdate || '',
+        }));
+        setClasses(dataWithIds);
       } catch (error) {
         console.error('Failed to fetch classes:', error);
       }
