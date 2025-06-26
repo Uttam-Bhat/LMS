@@ -107,7 +107,7 @@ const StudentLayout = ({ children }) => {
                 <i className="fas fa-chalkboard-teacher"></i>
                 <span>Exam</span>
               </Link>
-              <Link to="/student/Notifications" className={location.pathname === '/student/Notifications' ? 'active' : ''}>
+              <Link to="/student/notifications" className={location.pathname === '/student/notifications' ? 'active' : ''}>
                 <i className="fa-solid fa-bell"></i>
                 <span>Notifications</span>
               </Link>

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Course from './Course';
 import Exam from './Exam';
 import StudentLayout from './StudentLayout';
 import styles from './StudentDashboard.module.css';

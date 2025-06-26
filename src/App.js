@@ -1,23 +1,24 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import AdminDashboard from './components/Dashboard/AdminDashboard';
+import ChaptersManagement from './components/Dashboard/ChaptersManagement';
+import ClassesManagement from './components/Dashboard/ClassesManagement';
+import ContentManagement from './components/Dashboard/ContentManagement';
 import CourseManagement from './components/Dashboard/CourseManagement';
 import ExamManagement from './components/Dashboard/ExamManagement';
 import ResultsPlaceholder from './components/Dashboard/ResultsPlaceholder';
+import StreamManagement from './components/Dashboard/StreamManagement';
 import StudentsManagement from './components/Dashboard/StudentsManagement';
+import SubjectsManagement from './components/Dashboard/SubjectsManagement';
 import TeachersManagement from './components/Dashboard/TeachersManagement';
+import TopicsManagement from './components/Dashboard/TopicsManagement';
 import UserManagement from './components/Dashboard/UserManagement';
 import ForgotPassword from './components/Login/ForgotPassword';
 import LoginForm from './components/Login/LoginForm';
 import RegisterForm from './components/Login/RegisterForm';
-import StudentDashboard from './components/Student/StudentDashboard';
-import StreamManagement from './components/Dashboard/StreamManagement';
-import SubjectsManagement from './components/Dashboard/SubjectsManagement';
-import ChaptersManagement from './components/Dashboard/ChaptersManagement';
-import TopicsManagement from './components/Dashboard/TopicsManagement';
-import ContentManagement from './components/Dashboard/ContentManagement';
-import ClassesManagement from './components/Dashboard/ClassesManagement';
 import AvailableCourses from './components/Student/AvailableCourses';
 import MyCourses from './components/Student/MyCourses';
+import RegisterExam from './components/Student/RegisterExam';
+import StudentDashboard from './components/Student/StudentDashboard';
 
 function App() {
   return (
@@ -41,13 +42,13 @@ function App() {
           <Route path="/admin/content" element={<ContentManagement />} />
           <Route path="/admin/classes" element={<ClassesManagement />} />
           <Route path="/student" element={<StudentDashboard />} />
-          <Route path="/student/Course" element={<StudentDashboard />} />
-          <Route path="/student/Exam" element={<StudentDashboard />} />
-          <Route path="/student/Notifications" element={<StudentDashboard />} />
-          <Route path="/student/Result" element={<StudentDashboard />} />
+          <Route path="/student/exam" element={<RegisterExam />} />
+          <Route path="/student/notifications" element={<StudentDashboard />} />
+          <Route path="/student/result" element={<StudentDashboard />} />
           <Route path="/student/Logout" element={<StudentDashboard />} />
           <Route path="/student/available-courses" element={<AvailableCourses />} />
           <Route path="/student/my-courses" element={<MyCourses />} />
+          
         </Routes>
       </div>
     </Router>
