@@ -24,7 +24,7 @@ const CreateCourseModal = ({ onClose, onCourseAdded }) => {
 useEffect(() => {
   const fetchTeachers = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/admin/teachers');
+      const response = await axios.get('http://localhost:3000/api/course/teachers');
       setTeachers(response.data);
       console.log("Fetched data:", response.data);
     } catch (error) {
@@ -52,9 +52,9 @@ useEffect(() => {
       end_date: formatDate(formData.endDate),
       des: formData.description
     };
-
+console.log(payload);
     try {
-      const response = await axios.post('http://localhost:3000/api/admin/course', payload);
+      const response = await axios.post('http://localhost:3000/api/course/add', payload);
       console.log('Course created:', response.data);
       alert('Course created successfully!');
       // Map backend response to UI structure if needed
