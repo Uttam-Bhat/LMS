@@ -17,6 +17,7 @@ const CourseManagement = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [courses, setCourses] = useState([]); 
    const [totalCourses, setTotalCourses] = useState(0);
+   const [teachers, setTeachers] = useState([]);
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -24,7 +25,20 @@ const CourseManagement = () => {
     setModalType(type);
     setSelectedCourse(course);
   };
-  
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/course/teachers');
+        setTeachers(response.data);
+        console.log("Fetched data:", response.data);
+      } catch (error) {
+        console.error('Failed to fetch teachers:', error);
+      }
+    };
+
+    fetchTeachers();
+  }, []);
+
   const closeModal = () => {
     setModalType(null);
     setSelectedCourse(null);
@@ -122,7 +136,7 @@ fetchCourseCount();
             </div>
             <div className="stat-content">
               <h3>Total Teachers</h3>
-              <p>24</p>
+              <p>{teachers.length}</p>
             </div>
           </div>
           <div className="stat-card">

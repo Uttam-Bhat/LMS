@@ -30,7 +30,7 @@ useEffect(() => {
   fetchUserCount();
   const fetchCourseCount = async () => {
   try {
-    const response = await axios.get('http://localhost:3000/api/admin/courses');
+    const response = await axios.get('http://localhost:3000/api/course/display');
     setTotalCourses(response.data.length); // assuming response.data is an array of courses
   } catch (error) {
     console.error('Failed to fetch total courses:', error);
