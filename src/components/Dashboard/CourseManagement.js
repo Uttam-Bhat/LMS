@@ -103,6 +103,13 @@ fetchCourseCount();
     (course.ass_teacher || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  useEffect(() => {
+    if (teachers.length && courses.length) {
+      console.log('Teachers:', teachers);
+      console.log('Courses:', courses);
+    }
+  }, [teachers, courses]);
+
   return (
     <DashboardLayout>
       <div className="course-management">
@@ -189,7 +196,14 @@ fetchCourseCount();
                 <div className="course-info">
                   <div className="info-item">
                     <i className="fas fa-chalkboard-teacher"></i>
-                    <span>{course.ass_teacher}</span>
+                    <span>{
+                      (() => {
+                        const teacher = teachers.find(
+                          t => String(t.id || t._id) === String(course.ass_teacher)
+                        );
+                        return teacher?.fullname || teacher?.name || course.ass_teacher;
+                      })()
+                    }</span>
                   </div>
                   <div className="info-item">
                     <i className="fas fa-users"></i>
