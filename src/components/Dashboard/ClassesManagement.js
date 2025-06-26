@@ -7,65 +7,71 @@ const ClassesManagement = () => {
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
-  const [form, setForm] = useState({ name: '', description: '', section: '', created: '' });
+  const [form, setForm] = useState({ class_name: '', description: '', section: '', created: '' });
   const [classes, setClasses] = useState([]);
   const [statusMessage, setStatusMessage] = useState('');
-const openModal = (item) => {
+
+  const openModal = (item) => {
     setEditItem(item);
-    setForm(item ? { name: item.name, description: item.description, section: item.section, created: item.created } : { name: '', description: '', section: '', created: '' });
+    setForm(item ? { class_name: item.class_name, description: item.description, section: item.section, created: item.created } : { class_name: '', description: '', section: '', created: '' });
     setShowModal(true);
     setStatusMessage('');
   };
-  useEffect(() => {
-  const fetchClasses = async () => {
+
+  const handleSave = async () => {
+    if (!form.class_name || !form.description || !form.section || !form.created) {
+      alert('Please fill in all fields');
+      return;
+    }
     try {
-      const response = await axios.get("http://localhost:3000/api/admin/classes");
-      setClasses(response.data);
+      const payload = {
+        class_name: form.class_name,
+        description: form.description,
+        section: form.section,
+        cdate: form.created,
+      };
+      console.log(payload);
+      const response = await axios.post('http://localhost:3000/api/admin/class', payload);
+      if (response.status === 201 || response.status === 200) {
+        setClasses(prev => [
+          ...prev,
+          { ...payload, created: form.created, id: response.data.id || Date.now() }
+        ]);
+        alert('Class added successfully');
+        setShowModal(false);
+      } else {
+        alert('Failed to add class');
+      }
     } catch (error) {
-      console.error("Failed to fetch classes:", error);
+      if (error.response) {
+        alert('Failed to add class: ' + JSON.stringify(error.response.data));
+      } else {
+        alert('Failed to add class. Please check console.');
+      }
+      console.error('Failed to add class:', error);
     }
   };
-  fetchClasses();
-}, []);
+  
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/admin/class");
+        setClasses(response.data);
+      } catch (error) {
+        console.error("Failed to fetch classes:", error);
+      }
+    };
+    fetchClasses();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = async () => {
-  // Basic validation
-  if (!form.name || !form.description || !form.section || !form.created) {
-    alert('Please fill in all fields');
-    return;
-  }
-
-  try {
-    const payload = {
-      name: form.name,
-      description: form.description,
-      section: form.section,
-      created: form.created, // should be in yyyy-mm-dd
-    };
-    console.log(payload);
-    // ✅ Make sure the URL matches your backend exactly
-    const response = await axios.post('http://localhost:3000/api/admin/classes', payload);
-    if (response.status === 201 || response.status === 200) {
-      alert('Class added successfully');
-      setShowModal(false);
-    } else {
-      alert('Failed to add class');
-    }
-  } catch (error) {
-    console.error('Failed to add class:', error);
-    alert('Failed to add class. Please check console.');
-  }
-};
-
-
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/api/admin/classes/${id}`);
+      await axios.delete(`http://localhost:3000/api/admin/class/${id}`);
       setClasses(prev => prev.filter(cls => cls.id !== id));
       setStatusMessage('Class deleted successfully.');
     } catch (error) {
@@ -74,7 +80,7 @@ const openModal = (item) => {
     }
   };
 
-  const filtered = classes.filter(s => s.name.toLowerCase().includes(search.toLowerCase()));
+  const filtered = classes.filter(s => s.class_name && s.class_name.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <DashboardLayout>
@@ -92,12 +98,12 @@ const openModal = (item) => {
         <div className="stream-table-container">
           <table className="stream-table">
             <thead>
-              <tr><th>Name</th><th>Description</th><th>Section</th><th>Created</th><th>Action</th></tr>
+              <tr><th>Class Name</th><th>Description</th><th>Section</th><th>Created</th><th>Action</th></tr>
             </thead>
             <tbody>
               {filtered.map(s => (
                 <tr key={s.id}>
-                  <td>{s.name}</td>
+                  <td>{s.class_name}</td>
                   <td>{s.description}</td>
                   <td>{s.section}</td>
                   <td>{s.created}</td>
@@ -122,9 +128,9 @@ const openModal = (item) => {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <input
-                  name="name"
+                  name="class_name"
                   placeholder="Class Name"
-                  value={form.name}
+                  value={form.class_name}
                   onChange={handleInputChange}
                   style={{ fontWeight: 500 }}
                   required
