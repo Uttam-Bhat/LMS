@@ -20,6 +20,7 @@
   position: relative;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .modal-header {
@@ -69,7 +70,7 @@
 .form-group input,
 .form-group select,
 .form-group textarea {
-  width: 100%;
+  width: 95%;
   padding: 0.5rem 0.75rem;
   border: 1px solid #e1e1e1;
   border-radius: 6px;
