@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
-import axios from 'axios';
 
 const StreamManagement = () => {
   const [search, setSearch] = useState('');
@@ -9,11 +9,7 @@ const StreamManagement = () => {
   const [editItem, setEditItem] = useState(null);
   const [form, setForm] = useState({ name: '', description: '', created: '', classId: '' });
   const [classes, setClasses] = useState([]);
-  const streams = [
-    { id: 1, name: 'Science', description: 'Science Stream', created: '6/5/2025', classId: '1', className: 'Class 10A' },
-    { id: 2, name: 'Commerce', description: 'Commerce Stream', created: '6/5/2025', classId: '2', className: 'Class 9B' },
-  ];
-  const filtered = streams.filter(s => s.name.toLowerCase().includes(search.toLowerCase()));
+  const [streamList, setStreamList] = useState([]);
 
   useEffect(() => {
     // Fetch classes for dropdown
@@ -22,33 +18,84 @@ const StreamManagement = () => {
         const response = await axios.get('http://localhost:3000/api/class/display');
         setClasses(response.data);
       } catch (error) {
+        console.error('Error fetching classes', error);
         setClasses([]);
       }
     };
+
+    const fetchStreams = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/stream/display');
+        setStreamList(response.data);
+      } catch (error) {
+        console.error('Error fetching streams', error);
+        setStreamList([]);
+      }
+    };
+
     fetchClasses();
+    fetchStreams();
   }, []);
 
   const openModal = (item) => {
     setEditItem(item);
-    setForm(item ? { name: item.name, description: item.description, created: item.created, classId: item.classId || '' } : { name: '', description: '', created: '', classId: '' });
+    setForm(item ? {
+      name: item.name,
+      description: item.description,
+      created: item.created,
+      classId: item.classId || ''
+    } : { name: '', description: '', created: '', classId: '' });
     setShowModal(true);
   };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
   };
+
+  const handleAddStream = async () => {
+    try {
+      await axios.post('http://localhost:3000/api/stream/add', {
+        sname: form.name,
+        des: form.description,
+        cdate: form.created,
+        cls_id: form.classId
+      });
+      setShowModal(false);
+      setForm({ name: '', description: '', created: '', classId: '' });
+
+      // Refresh stream list after adding
+      const response = await axios.get('http://localhost:3000/api/stream/display');
+      setStreamList(response.data);
+    } catch (error) {
+      console.error('Failed to add stream:', error);
+      alert('Failed to add stream. Please try again.');
+    }
+  };
+
+  const filtered = streamList.filter(s => 
+  (s.name || s.sname || '').toLowerCase().includes(search.toLowerCase())
+);
+
   return (
     <DashboardLayout>
       <div className="stream-management">
         <div className="stream-header">
           <h1>Manage Streams</h1>
-          <button className="add-stream-btn" onClick={() => { setShowModal(true); setEditItem(null); }}>Add Stream</button>
+          <button className="add-stream-btn" onClick={() => { setShowModal(true); setEditItem(null); }}>
+            Add Stream
+          </button>
         </div>
-        <div className="stream-filters">
-          <div className="stream-search-box">
-            <input type="text" placeholder="Search streams..." value={search} onChange={e => setSearch(e.target.value)} />
-          </div>
+
+        <div className="stream-search-box input">
+          <input
+            type="text"
+            placeholder="Search streams..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
         </div>
+
         <div className="stream-table-container">
           <table className="stream-table">
             <thead>
@@ -57,16 +104,16 @@ const StreamManagement = () => {
             <tbody>
               {filtered.map(s => (
                 <tr key={s.id}>
-                  <td>{s.name}</td>
-                  <td>{s.description}</td>
+                  <td>{s.name || s.sname}</td>
+                  <td>{s.description || s.des}</td>
                   <td>
-                    <div style={{display:'flex',alignItems:'center',gap:8}}>
-                      <div style={{background:'#e8f0fe',color:'#2563eb',fontWeight:600,padding:'2px 10px',borderRadius:8,fontSize:'0.98rem'}}>
-                        {s.className || 'N/A'}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ background: '#e8f0fe', color: '#2563eb', fontWeight: 600, padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem' }}>
+                        {s.className || s.class_name || 'N/A'}
                       </div>
                     </div>
                   </td>
-                  <td>{s.created}</td>
+                  <td>{s.created || s.cdate}</td>
                   <td>
                     <div className="stream-action-buttons">
                       <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
@@ -78,6 +125,7 @@ const StreamManagement = () => {
             </tbody>
           </table>
         </div>
+
         {showModal && (
           <div className="stream-modal-overlay">
             <div className="stream-modal">
@@ -98,8 +146,7 @@ const StreamManagement = () => {
                   value={form.description}
                   onChange={handleInputChange}
                 />
-                {/* Class Dropdown */}
-                <label style={{fontWeight: 500, marginBottom: 4}}>Class</label>
+                <label style={{ fontWeight: 500, marginBottom: 4 }}>Class</label>
                 <select
                   name="classId"
                   value={form.classId}
@@ -122,7 +169,7 @@ const StreamManagement = () => {
                     <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
                   ))}
                 </select>
-                <label style={{fontWeight: 500}}>Created Date</label>
+                <label style={{ fontWeight: 500 }}>Created Date</label>
                 <input
                   type="date"
                   name="created"
@@ -130,7 +177,9 @@ const StreamManagement = () => {
                   onChange={handleInputChange}
                   required
                 />
-                <button className="add-stream-btn" onClick={() => setShowModal(false)}>{editItem ? 'Save' : 'Add'}</button>
+                <button className="add-stream-btn" onClick={handleAddStream}>
+                  {editItem ? 'Save' : 'Add'}
+                </button>
               </div>
             </div>
           </div>
@@ -139,4 +188,5 @@ const StreamManagement = () => {
     </DashboardLayout>
   );
 };
-export default StreamManagement; 
+
+export default StreamManagement;
