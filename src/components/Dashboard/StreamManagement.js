@@ -38,16 +38,34 @@ const StreamManagement = () => {
   }, []);
 
   const openModal = (item) => {
+    const itemClassName = item.className || item.class_name || '';
+  
+    // Find matching class by name (case-insensitive)
+    const matchingClass = classes.find(cls => 
+      cls.class_name.toLowerCase() === itemClassName.toLowerCase()
+    );
+  
+    const clsId = matchingClass ? matchingClass.cls_id.toString() : '';
+  
     setEditItem(item);
-    setForm(item ? {
-      name: item.name,
-      description: item.description,
-      created: item.created,
-      classId: item.classId || ''
-    } : { name: '', description: '', created: '', classId: '' });
+    setForm({
+      name: item.name || item.sname || '',
+      description: item.description || item.des || '',
+      created: formatDateForInput(item.created || item.cdate),
+      classId: clsId
+    });
+  
     setShowModal(true);
   };
-
+  
+  // helper: format date to yyyy-mm-dd for <input type="date">
+  const formatDateForInput = (dateStr) => {
+    if (!dateStr) return '';
+    const parts = dateStr.includes('-') ? dateStr.split('-') : [];
+    if (parts.length === 3 && parts[0].length === 4) return dateStr; // already yyyy-mm-dd
+    if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`; // dd-mm-yyyy to yyyy-mm-dd
+    return '';
+  };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
@@ -55,16 +73,30 @@ const StreamManagement = () => {
 
   const handleAddStream = async () => {
     try {
+      const selectedClass = classes.find(cls => cls.cls_id === parseInt(form.classId));
+  
+      if (!selectedClass) {
+        alert("Invalid class selected.");
+        return;
+      }
+  
+      // Format the date to dd-mm-yyyy
+      const formatDate = (dateStr) => {
+        const [yyyy, mm, dd] = dateStr.split('-');
+        return `${dd}-${mm}-${yyyy}`;
+      };
+  
       await axios.post('http://localhost:3000/api/stream/add', {
         sname: form.name,
         des: form.description,
-        cdate: form.created,
-        cls_id: form.classId
+        cdate: formatDate(form.created),
+        class_name: selectedClass.class_name
       });
+  
       setShowModal(false);
       setForm({ name: '', description: '', created: '', classId: '' });
-
-      // Refresh stream list after adding
+  
+      // Refresh stream list
       const response = await axios.get('http://localhost:3000/api/stream/display');
       setStreamList(response.data);
     } catch (error) {
@@ -72,7 +104,61 @@ const StreamManagement = () => {
       alert('Failed to add stream. Please try again.');
     }
   };
-
+  const handleDeleteStream = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this stream?')) return;
+  
+    try {
+      await axios.delete(`http://localhost:3000/api/stream/delete/${id}`);
+  
+      // Refresh stream list
+      const response = await axios.get('http://localhost:3000/api/stream/display');
+      setStreamList(response.data);
+    } catch (error) {
+      console.error('Failed to delete stream:', error);
+      alert('Failed to delete stream.');
+    }
+  };
+  const handleSubmitStream = async () => {
+    const selectedClass = classes.find(cls => cls.cls_id === parseInt(form.classId));
+    if (!selectedClass) {
+      alert("Invalid class selected.");
+      return;
+    }
+  
+    const payload = {
+      sname: form.name,
+      des: form.description,
+      cdate: formatDateForAPI(form.created),
+      class_name: selectedClass.class_name
+    };
+  
+    try {
+      if (editItem) {
+        // Edit mode
+        await axios.put(`http://localhost:3000/api/stream/edit/${editItem.sid}`, payload);
+      } else {
+        // Add mode
+        await axios.post('http://localhost:3000/api/stream/add', payload);
+      }
+  
+      setShowModal(false);
+      setForm({ name: '', description: '', created: '', classId: '' });
+      setEditItem(null);
+  
+      // Refresh list
+      const response = await axios.get('http://localhost:3000/api/stream/display');
+      setStreamList(response.data);
+    } catch (error) {
+      console.error(editItem ? 'Failed to update stream:' : 'Failed to add stream:', error);
+      alert(`Failed to ${editItem ? 'update' : 'add'} stream. Please try again.`);
+    }
+  };
+  
+  // helper: convert yyyy-mm-dd to dd-mm-yyyy
+  const formatDateForAPI = (dateStr) => {
+    const [yyyy, mm, dd] = dateStr.split('-');
+    return `${dd}-${mm}-${yyyy}`;
+  };
   const filtered = streamList.filter(s => 
   (s.name || s.sname || '').toLowerCase().includes(search.toLowerCase())
 );
@@ -102,26 +188,26 @@ const StreamManagement = () => {
               <tr><th>Name</th><th>Description</th><th>Class</th><th>Created</th><th>Action</th></tr>
             </thead>
             <tbody>
-              {filtered.map(s => (
-                <tr key={s.id}>
-                  <td>{s.name || s.sname}</td>
-                  <td>{s.description || s.des}</td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{ background: '#e8f0fe', color: '#2563eb', fontWeight: 600, padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem' }}>
-                        {s.className || s.class_name || 'N/A'}
-                      </div>
-                    </div>
-                  </td>
-                  <td>{s.created || s.cdate}</td>
-                  <td>
-                    <div className="stream-action-buttons">
-                      <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
-                      <button className="stream-delete-btn">Delete</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+            {filtered.map(s => (
+  <tr key={s.id || s.sid}>
+    <td>{s.name || s.sname}</td>
+    <td>{s.description || s.des}</td>
+    <td>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ background: '#e8f0fe', color: '#2563eb', fontWeight: 600, padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem' }}>
+          {s.className || s.class_name || 'N/A'}
+        </div>
+      </div>
+    </td>
+    <td>{s.created || s.cdate}</td>
+    <td>
+      <div className="stream-action-buttons">
+        <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
+        <button className="stream-delete-btn" onClick={() => handleDeleteStream(s.id || s.sid)}>Delete</button>
+      </div>
+    </td>
+  </tr>
+))}
             </tbody>
           </table>
         </div>
@@ -177,9 +263,9 @@ const StreamManagement = () => {
                   onChange={handleInputChange}
                   required
                 />
-                <button className="add-stream-btn" onClick={handleAddStream}>
-                  {editItem ? 'Save' : 'Add'}
-                </button>
+                <button className="add-stream-btn" onClick={handleSubmitStream}>
+               {editItem ? 'Save Changes' : 'Add Stream'}
+            </button>       
               </div>
             </div>
           </div>
