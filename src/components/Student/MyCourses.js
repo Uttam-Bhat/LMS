@@ -149,7 +149,7 @@ const MyCourses = () => {
                 </div>
                 <div className="course-actions">
                   <button
-                    className="action-btn view"
+                    className="student-action-btn view"
                     title={course.status === 'Active' ? 'Continue Course' : 'View Course'}
                     onClick={() => alert('View course details')}
                   >

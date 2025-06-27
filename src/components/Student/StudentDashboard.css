@@ -422,7 +422,7 @@
 
 /* StudentDashboard.css - Add/override styles for student course actions */
 
-.action-btn {
+.student-action-btn {
   min-width: 100px;
   height: 38px;
   border-radius: 8px;
@@ -438,34 +438,34 @@
   margin-right: 0.5rem;
 }
 
-.action-btn.apply {
+.student-action-btn.apply {
   background: #1877f2;
   color: #fff;
 }
-.action-btn.apply:disabled,
-.action-btn.apply[disabled] {
+.student-action-btn.apply:disabled,
+.student-action-btn.apply[disabled] {
   background: #b3cdfa;
   color: #fff;
   cursor: not-allowed;
   opacity: 0.7;
 }
-.action-btn.apply:hover:not(:disabled) {
+.student-action-btn.apply:hover:not(:disabled) {
   background: #1664d9;
   color: #fff;
 }
 
-.action-btn.view {
+.student-action-btn.view {
   background: #e7f0fe;
   color: #1877f2;
 }
-.action-btn.view:hover {
+.student-action-btn.view:hover {
   background: #1877f2;
   color: #fff;
 }
 
 /* Make course card buttons full width on mobile */
 @media (max-width: 600px) {
-  .action-btn {
+  .student-action-btn {
     width: 100%;
     margin-bottom: 0.5rem;
   }

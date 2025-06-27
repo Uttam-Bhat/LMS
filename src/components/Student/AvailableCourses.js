@@ -80,7 +80,7 @@ const AvailableCourses = () => {
                 </div>
                 <div className="course-actions">
                   <button
-                    className="action-btn apply"
+                    className="student-action-btn apply"
                     title="Apply for course"
                     onClick={() => handleApply(course.id)}
                     disabled={applied.includes(course.id)}
@@ -88,7 +88,7 @@ const AvailableCourses = () => {
                     {applied.includes(course.id) ? 'Applied' : 'Apply'}
                   </button>
                   <button
-                    className="action-btn view"
+                    className="student-action-btn view"
                     title="View course details"
                     onClick={() => alert('View course details')}
                   >
