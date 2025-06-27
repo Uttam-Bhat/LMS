@@ -18,6 +18,7 @@ import AvailableCourses from './components/Student/AvailableCourses';
 import MyCourses from './components/Student/MyCourses';
 import RegisterExam from './components/Student/RegisterExam';
 import StudentDashboard from './components/Student/StudentDashboard';
+import Notification from './components/Student/Notification';
 
 function App() {
   return (
@@ -41,7 +42,7 @@ function App() {
           <Route path="/admin/classes" element={<ClassesManagement />} />
           <Route path="/student" element={<StudentDashboard />} />
           <Route path="/student/exam" element={<RegisterExam />} />
-          <Route path="/student/notifications" element={<StudentDashboard />} />
+          <Route path="/student/notifications" element={<Notification />} />
           <Route path="/student/result" element={<StudentDashboard />} />
           <Route path="/student/Logout" element={<StudentDashboard />} />
           <Route path="/student/available-courses" element={<AvailableCourses />} />

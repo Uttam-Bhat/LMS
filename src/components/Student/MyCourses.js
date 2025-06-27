@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import StudentLayout from './StudentLayout';
+import './StudentDashboard.css';
 
 const mockEnrolledCourses = [
   {
@@ -28,110 +29,133 @@ const mockEnrolledCourses = [
 
 const MyCourses = () => {
   const [search, setSearch] = useState('');
-  const filteredCourses = mockEnrolledCourses.filter(course =>
-    course.name.toLowerCase().includes(search.toLowerCase()) ||
-    course.description.toLowerCase().includes(search.toLowerCase()) ||
-    course.teacher.toLowerCase().includes(search.toLowerCase())
-  );
+  const [view, setView] = useState('all'); // all | active | completed
+
+  // Stats
+  const totalCourses = mockEnrolledCourses.length;
+  const activeCourses = mockEnrolledCourses.filter(c => c.status === 'Active').length;
+  const completedCourses = mockEnrolledCourses.filter(c => c.status === 'Completed').length;
+
+  // Filtering
+  const filteredCourses = mockEnrolledCourses.filter(course => {
+    const matchesSearch =
+      course.name.toLowerCase().includes(search.toLowerCase()) ||
+      course.description.toLowerCase().includes(search.toLowerCase()) ||
+      course.teacher.toLowerCase().includes(search.toLowerCase());
+    const matchesView =
+      view === 'all' ||
+      (view === 'active' && course.status === 'Active') ||
+      (view === 'completed' && course.status === 'Completed');
+    return matchesSearch && matchesView;
+  });
 
   return (
     <StudentLayout>
-      <div style={{padding: '2.5rem 2rem', background: '#f6f8fb', minHeight: '100vh'}}>
-        {/* Header Section */}
-        <div style={{display: 'flex', alignItems: 'center', gap: 16, marginBottom: 4}}>
-          <img src="https://img.icons8.com/fluency/48/000000/classroom.png" alt="My Course" style={{width: 36, height: 36}} />
-          <div>
-            <div style={{fontSize: '2rem', fontWeight: 700, color: '#2563eb', letterSpacing: 0.5, lineHeight: 1}}>My Course</div>
-            <div style={{color: '#377dff', fontSize: '1.05rem', fontWeight: 400, marginTop: 2}}>Manage and track your enrolled courses</div>
+      <div className="dashboard-main-content">
+        {/* Header */}
+        <div className="page-header">
+          <div className="header-content">
+            <h1>My Courses</h1>
+            <p>Manage and track your enrolled courses</p>
           </div>
         </div>
-        {/* Search Bar */}
-        <div style={{margin: '1.5rem 0 2.2rem 0'}}>
-          <div style={{position: 'relative', width: '100%', maxWidth: 900}}>
-            <span style={{position: 'absolute', left: 18, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 22}}>
-              <i className="fas fa-search"></i>
-            </span>
+
+        {/* Stats Cards */}
+        <div className="course-stats">
+          <div className="stat-card">
+            <div className="stat-icon active">
+              <i className="fas fa-book"></i>
+            </div>
+            <div className="stat-content">
+              <h3>Total Enrolled</h3>
+              <p>{totalCourses}</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon teachers">
+              <i className="fas fa-play-circle"></i>
+            </div>
+            <div className="stat-content">
+              <h3>Active</h3>
+              <p>{activeCourses}</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon completion">
+              <i className="fas fa-check-circle"></i>
+            </div>
+            <div className="stat-content">
+              <h3>Completed</h3>
+              <p>{completedCourses}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Search and View Options */}
+        <div className="courses-header">
+          <div className="search-box">
+            <i className="fas fa-search"></i>
             <input
               type="text"
+              placeholder="Search courses..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search courses by title, description, or instructor"
-              style={{
-                width: '100%',
-                padding: '0.9rem 1.2rem 0.9rem 3.2rem',
-                border: '1.5px solid #e2e8f0',
-                borderRadius: 12,
-                fontSize: '1.08rem',
-                background: '#fff',
-                color: '#222',
-                outline: 'none',
-                boxShadow: 'none',
-                transition: 'border 0.2s',
-              }}
             />
           </div>
+          <div className="view-options">
+            <button className={`view-btn${view === 'all' ? ' active' : ''}`} onClick={() => setView('all')}>All</button>
+            <button className={`view-btn${view === 'active' ? ' active' : ''}`} onClick={() => setView('active')}>Active</button>
+            <button className={`view-btn${view === 'completed' ? ' active' : ''}`} onClick={() => setView('completed')}>Completed</button>
+          </div>
         </div>
-        {/* Course List */}
-        <div style={{display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'flex-start'}}>
+
+        {/* Courses Grid */}
+        <div className="courses-grid">
           {filteredCourses.length === 0 ? (
             <div style={{color: '#6b7a90', fontSize: '1.1rem'}}>No courses found.</div>
           ) : (
             filteredCourses.map(course => (
-              <div
-                key={course.id}
-                style={{
-                  background: '#fff',
-                  borderRadius: '16px',
-                  minWidth: 320,
-                  maxWidth: 350,
-                  flex: '1 1 320px',
-                  padding: '1.7rem 1.3rem',
-                  boxShadow: '0 4px 16px rgba(30,34,90,0.09)',
-                  marginBottom: '2rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  transition: 'box-shadow 0.2s',
-                  position: 'relative',
-                }}
-              >
-                <img
-                  src={course.image}
-                  alt={course.name}
-                  style={{ width: 64, height: 64, borderRadius: 12, marginBottom: 18, boxShadow: '0 2px 8px #e0e7ef' }}
-                />
-                <div style={{fontWeight: 700, fontSize: '1.22rem', marginBottom: 6, color: '#2563eb', textAlign: 'center'}}>{course.name}</div>
-                <div style={{color: '#6b7a90', fontSize: '1.01rem', marginBottom: 10, textAlign: 'center'}}>{course.description}</div>
-                <div style={{color: '#2563eb', fontSize: '0.97rem', marginBottom: 6, fontWeight: 500}}>Teacher: {course.teacher}</div>
-                <div style={{color: course.status === 'Active' ? '#1dbf73' : '#a259ff', fontWeight: 600, fontSize: '0.97rem', marginBottom: 8}}>{course.status}</div>
-                <div style={{display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: 8, fontSize: '0.97rem'}}>
-                  <span style={{color: '#888'}}>Start: <b>{course.startDate}</b></span>
-                  <span style={{color: '#888'}}>End: <b>{course.endDate}</b></span>
+              <div key={course.id} className="course-card">
+                <div className="course-header">
+                  <h3>{course.name}</h3>
+                  <span className={`status-badge ${course.status.toLowerCase()}`}>{course.status}</span>
                 </div>
-                <div style={{width: '100%', marginBottom: 12}}>
-                  <div style={{height: 8, background: '#e8eaf6', borderRadius: 6, overflow: 'hidden'}}>
-                    <div style={{width: `${course.progress}%`, height: '100%', background: course.progress === 100 ? '#1dbf73' : '#2563eb', transition: 'width 0.4s'}}></div>
+                <div className="course-info">
+                  <div className="info-item">
+                    <i className="fas fa-chalkboard-teacher"></i>
+                    <span>{course.teacher}</span>
                   </div>
-                  <div style={{fontSize: '0.93rem', color: '#666', marginTop: 2, textAlign: 'right'}}>{course.progress}% complete</div>
+                  <div className="info-item">
+                    <i className="fas fa-info-circle"></i>
+                    <span>{course.description}</span>
+                  </div>
+                  <div className="info-item">
+                    <i className="fas fa-calendar-alt"></i>
+                    <span>Start: {course.startDate}</span>
+                  </div>
+                  <div className="info-item">
+                    <i className="fas fa-calendar-check"></i>
+                    <span>End: {course.endDate}</span>
+                  </div>
                 </div>
-                <button
-                  style={{
-                    marginTop: 10,
-                    background: course.status === 'Active' ? '#2563eb' : '#a259ff',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: 8,
-                    padding: '0.7rem 1.3rem',
-                    fontWeight: 600,
-                    fontSize: '1rem',
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 8px #e0e7ef',
-                    transition: 'background 0.2s',
-                  }}
-                  onClick={() => alert('View course details')}
-                >
-                  {course.status === 'Active' ? 'Continue' : 'View'}
-                </button>
+                <div className="completion-bar">
+                  <div className="completion-track">
+                    <div 
+                      className="completion-fill" 
+                      style={{ width: `${course.progress}%` }}
+                    ></div>
+                  </div>
+                  <span className="completion-text">{course.progress}% Completed</span>
+                </div>
+                <div className="course-actions">
+                  <button
+                    className="action-btn view"
+                    title={course.status === 'Active' ? 'Continue Course' : 'View Course'}
+                    onClick={() => alert('View course details')}
+                  >
+                    {course.status === 'Active' ? 'Continue' : 'View'}
+                  </button>
+                </div>
               </div>
             ))
           )}

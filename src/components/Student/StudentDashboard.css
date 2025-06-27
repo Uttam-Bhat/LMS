@@ -418,4 +418,144 @@
   background-color: #f0f2f5;
   color: #1877f2;
   border-left-color: #1877f2;
+}
+
+/* StudentDashboard.css - Add/override styles for student course actions */
+
+.action-btn {
+  min-width: 100px;
+  height: 38px;
+  border-radius: 8px;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.5rem 1.2rem;
+  margin-right: 0.5rem;
+}
+
+.action-btn.apply {
+  background: #1877f2;
+  color: #fff;
+}
+.action-btn.apply:disabled,
+.action-btn.apply[disabled] {
+  background: #b3cdfa;
+  color: #fff;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.action-btn.apply:hover:not(:disabled) {
+  background: #1664d9;
+  color: #fff;
+}
+
+.action-btn.view {
+  background: #e7f0fe;
+  color: #1877f2;
+}
+.action-btn.view:hover {
+  background: #1877f2;
+  color: #fff;
+}
+
+/* Make course card buttons full width on mobile */
+@media (max-width: 600px) {
+  .action-btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  .course-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Notification Page Styles */
+.notification-page {
+  padding: 2rem 0;
+}
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-top: 1.5rem;
+}
+.notification-card {
+  display: flex;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(30,34,90,0.06);
+  padding: 1.2rem 1.5rem;
+  gap: 1.2rem;
+  transition: box-shadow 0.18s, background 0.18s;
+  border-left: 5px solid #1877f2;
+}
+.notification-card.teacher {
+  border-left-color: #2e7d32;
+}
+.notification-card.admin {
+  border-left-color: #1877f2;
+}
+.notification-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 2px 8px #e0e7ef;
+}
+.notification-content {
+  flex: 1;
+}
+.notification-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
+}
+.notification-sender {
+  font-weight: 600;
+  color: #1877f2;
+  font-size: 1.05rem;
+}
+.notification-card.teacher .notification-sender {
+  color: #2e7d32;
+}
+.notification-time {
+  color: #888;
+  font-size: 0.93rem;
+  font-weight: 400;
+}
+.notification-message {
+  color: #222;
+  font-size: 1.01rem;
+  margin-top: 0.1rem;
+}
+.no-notifications {
+  color: #6b7a90;
+  font-size: 1.1rem;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.dashboard-main-content {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(30,34,90,0.06);
+  padding: 2rem;
+  margin: 2rem 0;
+  min-height: 80vh;
+}
+
+@media (max-width: 600px) {
+  .dashboard-main-content {
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 8px;
+  }
 } 

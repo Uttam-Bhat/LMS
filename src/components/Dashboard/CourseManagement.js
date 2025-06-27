@@ -18,24 +18,50 @@ const CourseManagement = () => {
   const [courses, setCourses] = useState([]); 
    const [totalCourses, setTotalCourses] = useState(0);
    const [teachers, setTeachers] = useState([]);
+
+  const fetchTeachers = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/course/teachers');
+      setTeachers(response.data);
+      console.log("Fetched data:", response.data);
+    } catch (error) {
+      console.error('Failed to fetch teachers:', error);
+    }
+  };
+
+  const fetchCourses = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/course/display');
+      // Map backend fields to UI structure
+      const mapped = response.data.map(course => ({
+        courseId: course.courseId,
+        coursename: course.coursename || '',
+        course_type: course.course_type || '',
+        ass_teacher: course.ass_teacher || '',
+        start_date: course.start_date || '',
+        end_date: course.end_date || '',
+        des: course.des || '',
+        students: course.students || 0,
+        completion: course.completion || 0,
+        status: 'active',
+      }));
+      setCourses(mapped);
+      setTotalCourses(mapped.length); // Update total courses count
+    } catch (error) {
+      console.error('Failed to fetch courses:', error);
+    }
+  };
+
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
   };
+
   const openModal = (type, course) => {
     setModalType(type);
     setSelectedCourse(course);
   };
-  useEffect(() => {
-    const fetchTeachers = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/api/course/teachers');
-        setTeachers(response.data);
-        console.log("Fetched data:", response.data);
-      } catch (error) {
-        console.error('Failed to fetch teachers:', error);
-      }
-    };
 
+  useEffect(() => {
     fetchTeachers();
   }, []);
 
@@ -44,26 +70,31 @@ const CourseManagement = () => {
     setSelectedCourse(null);
   };
 
-  const handleCourseUpdate = (updatedData) => {
-    setCourses(prevCourses => 
-      prevCourses.map(course => 
-        course.courseId === selectedCourse.courseId 
-          ? { ...course, ...updatedData }
-          : course
-      )
-    );
+  const handleCourseUpdate = async (updatedData) => {
+    try {
+      // Update the course in the backend
+      const response = await axios.put(`http://localhost:3000/api/course/edit/${updatedData.courseId}`, updatedData);
+      
+      if (response.status === 200) {
+        // Refresh both courses and teachers data to ensure everything is in sync
+        await Promise.all([fetchCourses(), fetchTeachers()]);
+        
+        alert('Course updated successfully!');
+      }
+    } catch (error) {
+      console.error('Failed to update course:', error);
+      alert('Failed to update course. Please try again.');
+    }
   };
-const fetchCourseCount = async () => {
-  try {
-    const response = await axios.get('http://localhost:3000/api/course/display');
-    setTotalCourses(response.data.length); // assuming response.data is an array of courses
-  } catch (error) {
-    console.error('Failed to fetch total courses:', error);
-  }
-};
-fetchCourseCount();
-  const handleCourseDelete = (courseId) => {
-    setCourses(prevCourses => prevCourses.filter(course => course.courseId !== courseId));
+
+  const handleCourseDelete = async (courseId) => {
+    try {
+      // The actual deletion is handled in DeleteCourseModal
+      // Here we just refresh the courses data
+      await fetchCourses();
+    } catch (error) {
+      console.error('Failed to refresh courses after deletion:', error);
+    }
   };
 
   const handleAddStudents = (students) => {
@@ -74,34 +105,24 @@ fetchCourseCount();
   };
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/api/course/display');
-        // Map backend fields to UI structure
-        const mapped = response.data.map(course => ({
-          courseId: course.courseId,
-          coursename: course.coursename || '',
-          course_type: course.course_type || '',
-          ass_teacher: course.ass_teacher || '',
-          start_date: course.start_date || '',
-          end_date: course.end_date || '',
-          des: course.des || '',
-          students: course.students || 0,
-          completion: course.completion || 0,
-          status: 'active',
-        }));
-        setCourses(mapped);
-      } catch (error) {
-        console.error('Failed to fetch courses:', error);
-      }
-    };
     fetchCourses();
   }, []);
 
-  const filteredCourses = courses.filter(course =>
-    (course.coursename || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (course.ass_teacher || '').toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredCourses = courses.filter(course => {
+    const courseName = (course.coursename || '').toLowerCase();
+    const teacherId = (course.ass_teacher || '').toLowerCase();
+    const teacherName = (() => {
+      const teacher = teachers.find(
+        t => String(t.id || t._id) === String(course.ass_teacher)
+      );
+      return (teacher?.fullname || teacher?.name || '').toLowerCase();
+    })();
+    const searchTerm = searchQuery.toLowerCase();
+    
+    return courseName.includes(searchTerm) || 
+           teacherId.includes(searchTerm) || 
+           teacherName.includes(searchTerm);
+  });
 
   useEffect(() => {
     if (teachers.length && courses.length) {
@@ -241,8 +262,8 @@ fetchCourseCount();
         {showCreateCourseModal && (
   <CreateCourseModal 
     onClose={() => setShowCreateCourseModal(false)} 
-    onCourseAdded={(newCourse) => {
-      setCourses(prev => [...prev, newCourse]);
+    onCourseAdded={async (newCourse) => {
+      await fetchCourses(); // Refresh courses data
     }}
   />
 )}
@@ -277,7 +298,7 @@ fetchCourseCount();
           <DeleteCourseModal 
             onClose={closeModal}
             course={selectedCourse}
-            onDelete={(courseId) => setCourses(prev => prev.filter(course => course.courseId !== courseId))}
+            onDelete={handleCourseDelete}
           />
         )}
       </div>

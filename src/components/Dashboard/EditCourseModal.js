@@ -62,7 +62,7 @@ const EditCourseModal = ({ onClose, course, onUpdate }) => {
     return dateStr;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.courseId) {
       alert('Error: Course ID is missing. Cannot update this course.');
@@ -73,13 +73,20 @@ const EditCourseModal = ({ onClose, course, onUpdate }) => {
       start_date: formatDateForBackend(formData.start_date),
       end_date: formatDateForBackend(formData.end_date)
     };
-    // Handle form submission here
+    
     try {
-      onUpdate && onUpdate(payload);
-      alert('Course updated successfully!');
-      onClose();
+      // Call the backend API to update the course
+      const response = await axios.put(`http://localhost:3000/api/course/edit/${formData.courseId}`, payload);
+      
+      if (response.status === 200) {
+        // Call the onUpdate callback to update the parent component
+        onUpdate && onUpdate(payload);
+        alert('Course updated successfully!');
+        onClose();
+      }
     } catch (error) {
-      alert('Failed to update course.');
+      console.error('Failed to update course:', error);
+      alert('Failed to update course. Please try again.');
     }
   };
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './StudentDashboard.css';
-import { FaChevronRight, FaChevronDown, FaBookOpen, FaListAlt } from 'react-icons/fa';
+import { FaChevronRight, FaChevronDown, FaBookOpen, FaListAlt, FaBook, FaBell, FaChalkboardTeacher, FaChartBar, FaFolderOpen } from 'react-icons/fa';
 
 const StudentLayout = ({ children }) => {
   const navigate = useNavigate();
@@ -54,7 +54,7 @@ const StudentLayout = ({ children }) => {
           <div className="create-course-modal">
             <div className="modal-header">
               <h2>Profile</h2>
-              <button className="close-button" onClick={() => setShowProfileModal(false)}>×</button>
+              <button className="close-button" onClick={() => setShowProfileModal(false)}>&times;</button>
             </div>
             <div style={{ padding: '1rem 0' }}>
               <p>This is your profile information. (Customize as needed.)</p>
@@ -68,7 +68,7 @@ const StudentLayout = ({ children }) => {
           <div className="create-course-modal">
             <div className="modal-header">
               <h2>Settings</h2>
-              <button className="close-button" onClick={() => setShowSettingsModal(false)}>×</button>
+              <button className="close-button" onClick={() => setShowSettingsModal(false)}>&times;</button>
             </div>
             <div style={{ padding: '1rem 0' }}>
               <p>Settings content goes here. (Customize as needed.)</p>
@@ -103,21 +103,21 @@ const StudentLayout = ({ children }) => {
                   </div>
                 )}
               </div>
+              <Link to="/student/materials" className={location.pathname === '/student/materials' ? 'active' : ''}>
+                <FaFolderOpen style={{marginRight:6}} />
+                <span>Materials</span>
+              </Link>
               <Link to="/student/exam" className={location.pathname === '/student/exam' ? 'active' : ''}>
-                <i className="fas fa-chalkboard-teacher"></i>
+                <FaChalkboardTeacher style={{marginRight:6}} />
                 <span>Exam</span>
               </Link>
               <Link to="/student/notifications" className={location.pathname === '/student/notifications' ? 'active' : ''}>
-                <i className="fa-solid fa-bell"></i>
+                <FaBell style={{marginRight:6}} />
                 <span>Notifications</span>
               </Link>
               <Link to="/student/result" className={location.pathname === '/student/result' ? 'active' : ''}>
-                <i className="fa-solid fa-square-poll-vertical"></i>
+                <FaChartBar style={{marginRight:6}} />
                 <span>Result</span>
-              </Link>
-              <Link to="/student/Logout" className={location.pathname === '/student/Logout' ? 'active' : ''}>
-                <i className="fa-solid fa-right-from-bracket"></i>
-                <span>Logout</span>
               </Link>
             </div>
           </nav>
