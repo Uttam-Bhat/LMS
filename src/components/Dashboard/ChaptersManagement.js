@@ -1,85 +1,233 @@
-import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
-import axios from 'axios';
 
 const ChaptersManagement = () => {
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
-  const [form, setForm] = useState({ name: '', description: '', created: '', subjectId: '' });
+  const [form, setForm] = useState({ ch_name: '', des: '', cdate: '', su_name: '' });
   const [subjects, setSubjects] = useState([]);
-  const chapters = [
-    { id: 1, name: 'Chapter 1', description: 'Intro', created: '6/5/2025', subjectId: '1', subjectName: 'Mathematics' },
-    { id: 2, name: 'Chapter 2', description: 'Advanced', created: '6/5/2025', subjectId: '2', subjectName: 'Physics' },
-  ];
-  const filtered = chapters.filter(s => s.name.toLowerCase().includes(search.toLowerCase()));
+  const [chapters, setChapters] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch subjects for dropdown
-    const fetchSubjects = async () => {
+    const loadData = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get('http://localhost:3000/api/subject/display');
-        setSubjects(response.data);
+        await fetchSubjects();
+        await fetchChapters();
       } catch (error) {
-        setSubjects([]);
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchSubjects();
+    loadData();
   }, []);
 
+  const fetchSubjects = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/subject/display');
+      console.log('Fetched subjects:', response.data);
+      setSubjects(response.data);
+    } catch (error) {
+      console.error('Failed to fetch subjects:', error);
+      setSubjects([]);
+    }
+  };
+
+  const fetchChapters = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/chapter/display');
+      console.log('Fetched chapters:', response.data);
+      setChapters(response.data);
+    } catch (error) {
+      console.error('Failed to fetch chapters:', error);
+      setChapters([]);
+    }
+  };
+
   const openModal = (item) => {
+    if (subjects.length === 0) {
+      alert('Please wait for subjects to load before editing.');
+      return;
+    }
+    
+    console.log('Opening modal for item:', item);
+    console.log('Available subjects:', subjects);
+    
     setEditItem(item);
-    setForm(item ? { name: item.name, description: item.description, created: item.created, subjectId: item.subjectId || '' } : { name: '', description: '', created: '', subjectId: '' });
+    
+    // Find the matching subject
+    let subjectMatch = subjects.find(s => s.su_name === item.su_name);
+    
+    // If not found by exact name, try case-insensitive match
+    if (!subjectMatch) {
+      subjectMatch = subjects.find(s => 
+        s.su_name && item.su_name && 
+        s.su_name.toLowerCase() === item.su_name.toLowerCase()
+      );
+    }
+    
+    console.log('Found subject match:', subjectMatch);
+    
+    // Convert date from dd-mm-yyyy to yyyy-mm-dd for the date input
+    const formatDateForInput = (dateStr) => {
+      if (!dateStr) return '';
+      // Check if date is already in yyyy-mm-dd format
+      if (dateStr.includes('-') && dateStr.split('-')[0].length === 4) {
+        return dateStr;
+      }
+      // Convert from dd-mm-yyyy to yyyy-mm-dd
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        const [dd, mm, yyyy] = parts;
+        return `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
+      }
+      return dateStr;
+    };
+
+    const formattedDate = formatDateForInput(item.cdate);
+    console.log('Original date:', item.cdate, 'Formatted date:', formattedDate);
+
+    setForm({
+      ch_name: item.ch_name || '',
+      des: item.des || '',
+      cdate: formattedDate,
+      su_name: subjectMatch ? subjectMatch.su_name : '',
+    });
     setShowModal(true);
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setForm(prevForm => ({ ...prevForm, [name]: value }));
+    setForm(prev => ({ ...prev, [name]: value }));
   };
+
+  const handleAddOrUpdate = async () => {
+    // Convert yyyy-mm-dd to dd-mm-yyyy
+    const formatDateForAPI = (dateStr) => {
+      if (!dateStr) return '';
+      const [yyyy, mm, dd] = dateStr.split('-');
+      return `${dd}-${mm}-${yyyy}`;
+    };
+    
+    const payload = {
+      ch_name: form.ch_name,
+      des: form.des,
+      cdate: formatDateForAPI(form.cdate),
+      su_name: form.su_name,
+    };
+
+    try {
+      if (editItem) {
+        // Edit mode
+        await axios.put(`http://localhost:3000/api/chapter/edit/${editItem.ch_id || editItem.id}`, payload);
+      } else {
+        // Add mode
+        await axios.post('http://localhost:3000/api/chapter/add', payload);
+      }
+      fetchChapters();
+      setShowModal(false);
+      setForm({ ch_name: '', des: '', cdate: '', su_name: '' });
+      setEditItem(null);
+    } catch (err) {
+      console.error('Error saving chapter:', err);
+      alert('Failed to save chapter. Please try again.');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      console.log('Deleting chapter with ID:', id);
+      await axios.delete(`http://localhost:3000/api/chapter/delete/${id}`);
+      fetchChapters();
+    } catch (err) {
+      console.error('Error deleting chapter:', err);
+      alert('Failed to delete chapter. Please try again.');
+    }
+  };
+
+  const filteredChapters = chapters.filter(s =>
+    s.ch_name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <DashboardLayout>
       <div className="stream-management">
         <div className="stream-header">
           <h1>Manage Chapters</h1>
-          <button className="add-stream-btn" onClick={() => { setShowModal(true); setEditItem(null); }}>Add Chapter</button>
+          <button className="add-stream-btn" onClick={() => {
+            if (subjects.length === 0) {
+              alert('Please wait for subjects to load before adding a chapter.');
+              return;
+            }
+            setShowModal(true);
+            setEditItem(null);
+            setForm({ ch_name: '', des: '', cdate: '', su_name: '' });
+          }}>
+            Add Chapter
+          </button>
         </div>
+
         <div className="stream-filters">
           <div className="stream-search-box">
-            <input type="text" placeholder="Search chapters..." value={search} onChange={e => setSearch(e.target.value)} />
+            <input
+              type="text"
+              placeholder="Search chapters..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
           </div>
         </div>
+
         <div className="stream-table-container">
-          <table className="stream-table">
-            <thead>
-              <tr><th>Name</th><th>Description</th><th>Subject</th><th>Created</th><th>Action</th></tr>
-            </thead>
-            <tbody>
-              {filtered.map(s => (
-                <tr key={s.id}>
-                  <td>{s.name}</td>
-                  <td>{s.description}</td>
-                  <td>
-                    <div style={{display:'flex',alignItems:'center',gap:8}}>
-                      <div style={{background:'#e8f0fe',color:'#2563eb',fontWeight:600,padding:'2px 10px',borderRadius:8,fontSize:'0.98rem'}}>
-                        {s.subjectName || 'N/A'}
-                      </div>
-                    </div>
-                  </td>
-                  <td>{s.created}</td>
-                  <td>
-                    <div className="stream-action-buttons">
-                      <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
-                      <button className="stream-delete-btn">Delete</button>
-                    </div>
-                  </td>
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '2rem' }}>
+              <p>Loading chapters...</p>
+            </div>
+          ) : (
+            <table className="stream-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Subject</th>
+                  <th>Created</th>
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredChapters.map(s => (
+                  <tr key={s._id || s.id}>
+                    <td>{s.ch_name}</td>
+                    <td>{s.des}</td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{
+                          background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
+                          padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem'
+                        }}>
+                          {s.su_name || 'N/A'}
+                        </div>
+                      </div>
+                    </td>
+                    <td>{s.cdate}</td>
+                    <td>
+                      <div className="stream-action-buttons">
+                        <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
+                        <button className="stream-delete-btn" onClick={() => handleDelete(s.ch_id || s.id)}>Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
+
         {showModal && (
           <div className="stream-modal-overlay">
             <div className="stream-modal">
@@ -89,22 +237,22 @@ const ChaptersManagement = () => {
               </div>
               <div>
                 <input
-                  name="name"
-                  placeholder="Name"
-                  value={form.name}
+                  name="ch_name"
+                  placeholder="Chapter Name"
+                  value={form.ch_name}
                   onChange={handleInputChange}
                 />
                 <input
-                  name="description"
+                  name="des"
                   placeholder="Description"
-                  value={form.description}
+                  value={form.des}
                   onChange={handleInputChange}
                 />
-                {/* Subject Dropdown */}
-                <label style={{fontWeight: 500, marginBottom: 4}}>Subject</label>
+
+                <label style={{ fontWeight: 500, marginBottom: 4 }}>Subject</label>
                 <select
-                  name="subjectId"
-                  value={form.subjectId}
+                  name="su_name"
+                  value={form.su_name}
                   onChange={handleInputChange}
                   style={{
                     width: '100%',
@@ -121,18 +269,24 @@ const ChaptersManagement = () => {
                 >
                   <option value="">Select Subject</option>
                   {subjects.map(subject => (
-                    <option key={subject.id || subject._id} value={subject.id || subject._id}>{subject.name}</option>
+                    <option key={subject.su_id} value={subject.su_name}>
+                      {subject.su_name}
+                    </option>
                   ))}
                 </select>
-                <label style={{fontWeight: 500}}>Created Date</label>
+
+                <label style={{ fontWeight: 500 }}>Created Date</label>
                 <input
                   type="date"
-                  name="created"
-                  value={form.created}
+                  name="cdate"
+                  value={form.cdate}
                   onChange={handleInputChange}
                   required
                 />
-                <button className="add-stream-btn" onClick={() => setShowModal(false)}>{editItem ? 'Save' : 'Add'}</button>
+
+                <button className="add-stream-btn" onClick={handleAddOrUpdate}>
+                  {editItem ? 'Save Changes' : 'Add Chapter'}
+                </button>
               </div>
             </div>
           </div>
@@ -141,4 +295,5 @@ const ChaptersManagement = () => {
     </DashboardLayout>
   );
 };
+
 export default ChaptersManagement; 

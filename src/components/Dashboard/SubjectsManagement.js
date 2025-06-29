@@ -10,15 +10,27 @@ const SubjectsManagement = () => {
   const [form, setForm] = useState({ name: '', description: '', created: '', streamId: '' });
   const [streams, setStreams] = useState([]);
   const [subjects, setSubjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchStreams();
-    fetchSubjects();
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        await fetchStreams();
+        await fetchSubjects();
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
   }, []);
 
   const fetchStreams = async () => {
     try {
       const response = await axios.get('http://localhost:3000/api/stream/display');
+      console.log('Fetched streams:', response.data);
       setStreams(response.data);
     } catch (error) {
       console.error('Failed to fetch streams:', error);
@@ -29,6 +41,7 @@ const SubjectsManagement = () => {
   const fetchSubjects = async () => {
     try {
       const response = await axios.get('http://localhost:3000/api/subject/display');
+      console.log('Fetched subjects:', response.data);
       setSubjects(response.data);
     } catch (error) {
       console.error('Failed to fetch subjects:', error);
@@ -37,12 +50,57 @@ const SubjectsManagement = () => {
   };
 
   const openModal = (item) => {
+    if (streams.length === 0) {
+      alert('Please wait for streams to load before editing.');
+      return;
+    }
+    
+    console.log('Opening modal for item:', item);
+    console.log('Available streams:', streams);
+    
     setEditItem(item);
-    const streamMatch = streams.find(s => s.sname === item.sname);
+    
+    // Find the matching stream - try multiple approaches
+    let streamMatch = streams.find(s => s.sname === item.sname);
+    
+    // If not found by exact name, try case-insensitive match
+    if (!streamMatch) {
+      streamMatch = streams.find(s => 
+        s.sname && item.sname && 
+        s.sname.toLowerCase() === item.sname.toLowerCase()
+      );
+    }
+    
+    // If still not found, try matching by stream ID if available
+    if (!streamMatch && item.streamId) {
+      streamMatch = streams.find(s => s.sid === item.streamId);
+    }
+    
+    console.log('Found stream match:', streamMatch);
+    
+    // Convert date from dd-mm-yyyy to yyyy-mm-dd for the date input
+    const formatDateForInput = (dateStr) => {
+      if (!dateStr) return '';
+      // Check if date is already in yyyy-mm-dd format
+      if (dateStr.includes('-') && dateStr.split('-')[0].length === 4) {
+        return dateStr;
+      }
+      // Convert from dd-mm-yyyy to yyyy-mm-dd
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        const [dd, mm, yyyy] = parts;
+        return `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
+      }
+      return dateStr;
+    };
+
+    const formattedDate = formatDateForInput(item.cdate);
+    console.log('Original date:', item.cdate, 'Formatted date:', formattedDate);
+
     setForm({
-      name: item.su_name,
-      description: item.des,
-      created: item.cdate,
+      name: item.su_name || '',
+      description: item.des || '',
+      created: formattedDate,
       streamId: streamMatch ? streamMatch.sid.toString() : '',
     });
     setShowModal(true);
@@ -87,10 +145,12 @@ const SubjectsManagement = () => {
 
   const handleDelete = async (id) => {
     try {
+      console.log('Deleting subject with ID:', id);
       await axios.delete(`http://localhost:3000/api/subject/delete/${id}`);
       fetchSubjects();
     } catch (err) {
       console.error('Error deleting subject:', err);
+      alert('Failed to delete subject. Please try again.');
     }
   };
 
@@ -104,6 +164,10 @@ const SubjectsManagement = () => {
         <div className="stream-header">
           <h1>Manage Subjects</h1>
           <button className="add-stream-btn" onClick={() => {
+            if (streams.length === 0) {
+              alert('Please wait for streams to load before adding a subject.');
+              return;
+            }
             setShowModal(true);
             setEditItem(null);
             setForm({ name: '', description: '', created: '', streamId: '' });
@@ -124,42 +188,48 @@ const SubjectsManagement = () => {
         </div>
 
         <div className="stream-table-container">
-          <table className="stream-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Stream</th>
-                <th>Created</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredSubjects.map(s => (
-                <tr key={s._id || s.id}>
-                  <td>{s.su_name}</td>
-                  <td>{s.des}</td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{
-                        background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
-                        padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem'
-                      }}>
-                        {s.sname || 'N/A'}
-                      </div>
-                    </div>
-                  </td>
-                  <td>{s.cdate}</td>
-                  <td>
-                    <div className="stream-action-buttons">
-                      <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
-                      <button className="stream-delete-btn" onClick={() => handleDelete(s.su_id)}>Delete</button>
-                    </div>
-                  </td>
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '2rem' }}>
+              <p>Loading subjects...</p>
+            </div>
+          ) : (
+            <table className="stream-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Stream</th>
+                  <th>Created</th>
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredSubjects.map(s => (
+                  <tr key={s._id || s.id}>
+                    <td>{s.su_name}</td>
+                    <td>{s.des}</td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{
+                          background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
+                          padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem'
+                        }}>
+                          {s.sname || 'N/A'}
+                        </div>
+                      </div>
+                    </td>
+                    <td>{s.cdate}</td>
+                    <td>
+                      <div className="stream-action-buttons">
+                        <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
+                        <button className="stream-delete-btn" onClick={() => handleDelete(s.su_id || s.id)}>Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
 
         {showModal && (
