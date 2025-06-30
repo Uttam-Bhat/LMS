@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import {
   FaAngleDown, FaHome, FaUsers, FaBook, FaChalkboardTeacher, FaUserGraduate, FaFileAlt,
-  FaChartBar, FaStream, FaLayerGroup, FaListAlt, FaBookOpen, FaThList, FaFolderOpen, FaBars
+  FaChartBar, FaStream, FaLayerGroup, FaListAlt, FaBookOpen, FaThList, FaFolderOpen
 } from 'react-icons/fa';
 import './Dashboard.css';
 
@@ -12,7 +12,6 @@ const DashboardLayout = ({ children }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const submenuPaths = ['/admin/courses', '/admin/classes', '/admin/stream', '/admin/subjects', '/admin/chapters', '/admin/content'];
   const [menuOpen, setMenuOpen] = useState(submenuPaths.includes(location.pathname));
@@ -51,14 +50,13 @@ const DashboardLayout = ({ children }) => {
       </header>
 
       <div className="dashboard-content">
-        {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>}
-        <aside className={`dashboard-sidebar${sidebarOpen ? ' open' : ''}`}>
+        <aside className="dashboard-sidebar">
           <nav className="sidebar-nav">
             <div className="nav-section">
-              <Link to="/admin" className={location.pathname === '/admin' ? 'active' : ''} onClick={() => setSidebarOpen(false)}>
+              <Link to="/admin" className={location.pathname === '/admin' ? 'active' : ''}>
                 <FaHome /><span>Dashboard</span>
               </Link>
-              <Link to="/admin/users" className={location.pathname === '/admin/users' ? 'active' : ''} onClick={() => setSidebarOpen(false)}>
+              <Link to="/admin/users" className={location.pathname === '/admin/users' ? 'active' : ''}>
                 <FaUsers /><span>User Management</span>
               </Link>
 
@@ -71,30 +69,27 @@ const DashboardLayout = ({ children }) => {
 
                 {menuOpen && (
                   <div className="submenu">
-                    <Link to="/admin/courses" className={location.pathname.includes('/admin/courses') ? 'active' : ''} onClick={() => setSidebarOpen(false)}><FaBook /><span>Courses</span></Link>
-                    <Link to="/admin/classes" className={location.pathname.includes('/admin/classes') ? 'active' : ''} onClick={() => setSidebarOpen(false)}><FaChalkboardTeacher /><span>Classes</span></Link>
-                    <Link to="/admin/stream" className={location.pathname.includes('/admin/stream') ? 'active' : ''} onClick={() => setSidebarOpen(false)}><FaStream /><span>Stream</span></Link>
-                    <Link to="/admin/subjects" className={location.pathname.includes('/admin/subjects') ? 'active' : ''} onClick={() => setSidebarOpen(false)}><FaBookOpen /><span>Subjects</span></Link>
-                    <Link to="/admin/chapters" className={location.pathname.includes('/admin/chapters') ? 'active' : ''} onClick={() => setSidebarOpen(false)}><FaListAlt /><span>Chapters</span></Link>
-                    <Link to="/admin/content" className={location.pathname.includes('/admin/content') ? 'active' : ''} onClick={() => setSidebarOpen(false)}><FaFolderOpen /><span>Content</span></Link>
+                    <Link to="/admin/courses" className={location.pathname.includes('/admin/courses') ? 'active' : ''}><FaBook /><span>Courses</span></Link>
+                    <Link to="/admin/classes" className={location.pathname.includes('/admin/classes') ? 'active' : ''}><FaChalkboardTeacher /><span>Classes</span></Link>
+                    <Link to="/admin/stream" className={location.pathname.includes('/admin/stream') ? 'active' : ''}><FaStream /><span>Stream</span></Link>
+                    <Link to="/admin/subjects" className={location.pathname.includes('/admin/subjects') ? 'active' : ''}><FaBookOpen /><span>Subjects</span></Link>
+                    <Link to="/admin/chapters" className={location.pathname.includes('/admin/chapters') ? 'active' : ''}><FaListAlt /><span>Chapters</span></Link>
+                    <Link to="/admin/content" className={location.pathname.includes('/admin/content') ? 'active' : ''}><FaFolderOpen /><span>Content</span></Link>
                   </div>
                 )}
               </div>
 
-              <Link to="/admin/exams" className={location.pathname === '/admin/exams' ? 'active' : ''} onClick={() => setSidebarOpen(false)}>
+              <Link to="/admin/exams" className={location.pathname === '/admin/exams' ? 'active' : ''}>
                 <FaFileAlt /><span>Exams</span>
               </Link>
-              <Link to="/admin/results" className={location.pathname === '/admin/results' ? 'active' : ''} onClick={() => setSidebarOpen(false)}>
+              <Link to="/admin/results" className={location.pathname === '/admin/results' ? 'active' : ''}>
                 <FaChartBar /><span>Results</span>
               </Link>
             </div>
           </nav>
         </aside>
+
         <main className="dashboard-main">
-          {/* Hamburger button at the top of main content, only on mobile */}
-          <button className="hamburger-btn" onClick={() => setSidebarOpen(true)}>
-            <FaBars />
-          </button>
           {children}
         </main>
       </div>
