@@ -1,26 +1,42 @@
-import React, { useState } from 'react';
-import StudentLayout from './StudentLayout';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import './StudentDashboard.css';
-
-const mockCourses = [
-  { id: 1, name: 'Mathematics', description: 'Basic Math Course', teacher: 'Mr. Smith' },
-  { id: 2, name: 'Physics', description: 'Intro to Physics', teacher: 'Ms. Johnson' },
-  { id: 3, name: 'Chemistry', description: 'Organic Chemistry', teacher: 'Dr. Brown' },
-];
+import StudentLayout from './StudentLayout';
 
 const AvailableCourses = () => {
+  const [courses, setCourses] = useState([]);
   const [applied, setApplied] = useState([]);
   const [search, setSearch] = useState('');
-  const [view, setView] = useState('all'); // all | active | completed
+  const [view, setView] = useState('all');
 
-  // Filtering
-  const filteredCourses = mockCourses.filter(course => {
+  // ✅ Fetch course data once on component mount
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/course/display');
+        const formattedCourses = response.data.map(course => ({
+          id: course._id,
+          name: course.name || course.coursename || 'Untitled',
+          description: course.description || course.desc || '',
+          teacher: course.teacher || course.instructor || 'Unknown',
+        }));
+        setCourses(formattedCourses);
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
+  // ✅ Filter based on search and view
+  const filteredCourses = courses.filter(course => {
     const matchesSearch =
-      course.name.toLowerCase().includes(search.toLowerCase()) ||
-      course.teacher.toLowerCase().includes(search.toLowerCase()) ||
-      course.description.toLowerCase().includes(search.toLowerCase());
-    // For demo, all courses are 'active' (no completed logic)
-    const matchesView = view === 'all' || (view === 'active');
+      (course.name || '').toLowerCase().includes(search.toLowerCase()) ||
+      (course.teacher || '').toLowerCase().includes(search.toLowerCase()) ||
+      (course.description || '').toLowerCase().includes(search.toLowerCase());
+
+    const matchesView = view === 'all' || view === 'active'; // Add logic if you handle status
     return matchesSearch && matchesView;
   });
 
@@ -60,7 +76,7 @@ const AvailableCourses = () => {
         {/* Courses Grid */}
         <div className="courses-grid">
           {filteredCourses.length === 0 ? (
-            <div style={{color: '#6b7a90', fontSize: '1.1rem'}}>No courses found.</div>
+            <div style={{ color: '#6b7a90', fontSize: '1.1rem' }}>No courses found.</div>
           ) : (
             filteredCourses.map(course => (
               <div key={course.id} className="course-card">
@@ -71,7 +87,7 @@ const AvailableCourses = () => {
                 <div className="course-info">
                   <div className="info-item">
                     <i className="fas fa-chalkboard-teacher"></i>
-                    <span>{course.teacher}</span>
+                    <span>{course.ass_teacher}</span>
                   </div>
                   <div className="info-item">
                     <i className="fas fa-info-circle"></i>
@@ -104,4 +120,4 @@ const AvailableCourses = () => {
   );
 };
 
-export default AvailableCourses; 
+export default AvailableCourses;
