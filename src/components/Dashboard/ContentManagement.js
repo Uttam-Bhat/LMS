@@ -1,12 +1,15 @@
-import { useState } from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
 
 const ContentManagement = () => {
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [association, setAssociation] = useState('chapter');
-  const [chapter, setChapter] = useState('');
+  const [association, setAssociation] = useState('course');
+  const [courses, setCourses] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [selectedAssociationId, setSelectedAssociationId] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [contentType, setContentType] = useState('Video');
@@ -15,6 +18,23 @@ const ContentManagement = () => {
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (association === 'course') {
+          const res = await axios.get('http://localhost:3000/api/course/display');
+          setCourses(res.data);
+        } else {
+          const res = await axios.get('http://localhost:3000/api/subject/display');
+          setSubjects(res.data);
+        }
+      } catch (err) {
+        console.error('Error fetching data:', err);
+      }
+    };
+    fetchData();
+  }, [association]);
 
   return (
     <DashboardLayout>
@@ -62,8 +82,17 @@ const ContentManagement = () => {
                 </div>
                 <div style={{width: '100%'}}>
                   <label style={{fontWeight: 600, marginBottom: 2, display: 'block', fontSize: 13}}>Select {association.charAt(0).toUpperCase() + association.slice(1)}</label>
-                  <select style={{width: '100%', padding: '0.45rem 0.7rem', border: '1px solid #e1e1e1', borderRadius: 6, fontSize: 13, marginBottom: 0}}>
+                  <select value={selectedAssociationId} onChange={e => setSelectedAssociationId(e.target.value)} style={{width: '100%', padding: '0.45rem 0.7rem', border: '1px solid #e1e1e1', borderRadius: 6, fontSize: 13, marginBottom: 0}}>
                     <option value="">Select {association}</option>
+                    {association === 'course' ? (
+                      courses.map(course => (
+                        <option key={course.courseId} value={course.courseId}>{course.coursename}</option>
+                      ))
+                    ) : (
+                      subjects.map(sub => (
+                        <option key={sub.su_id} value={sub.su_id}>{sub.su_name}</option>
+                      ))
+                    )}
                   </select>
                 </div>
                 <div style={{width: '100%'}}>
@@ -106,4 +135,4 @@ const ContentManagement = () => {
     </DashboardLayout>
   );
 };
-export default ContentManagement; 
+export default ContentManagement;
