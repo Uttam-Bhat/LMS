@@ -148,7 +148,7 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
           <h2>{template ? 'Edit Exam Template' : 'Create Exam Template'}</h2>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
-        <form onSubmit={e => { e.preventDefault(); onClose(); }}>
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Template Name</label>
             <input
