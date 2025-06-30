@@ -11,16 +11,24 @@ const emptyQuestion = {
   correct: ''
 };
 
-const CreateTemplateModal = ({ onClose, template }) => {
+const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
   const [form, setForm] = useState({
-    name: template?.title || '',
-    subject: template?.subject || '',
-    questions: template?.questionList?.length
-      ? template.questionList
+    name: template?.t_name || '',
+    subject: template?.su_name || '',
+    questions: template?.questions?.length
+      ? template.questions.map(q => ({
+          text: q.question || q.text || '',
+          optionA: q.op_a || q.optionA || '',
+          optionB: q.op_b || q.optionB || '',
+          optionC: q.op_c || q.optionC || '',
+          optionD: q.op_d || q.optionD || '',
+          correct: q.ans || q.correct || ''
+        }))
       : [{ ...emptyQuestion }]
   });
 
   const [subjects, setSubjects] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -34,6 +42,41 @@ const CreateTemplateModal = ({ onClose, template }) => {
 
     fetchSubjects();
   }, []);
+
+  useEffect(() => {
+    const fetchTemplateDetails = async () => {
+      if (template && template.t_id) {
+        setLoading(true);
+        try {
+          const res = await axios.get(`http://localhost:3000/api/question/by-template/${template.t_id}`);
+          const questions = Array.isArray(res.data)
+            ? res.data
+            : Array.isArray(res.data.questions)
+              ? res.data.questions
+              : [];
+          setForm({
+            name: template.t_name || '',
+            subject: template.su_name || '',
+            questions: questions.map(q => ({
+              text: q.question || q.text || '',
+              optionA: q.op_a || q.optionA || '',
+              optionB: q.op_b || q.optionB || '',
+              optionC: q.op_c || q.optionC || '',
+              optionD: q.op_d || q.optionD || '',
+              correct: q.ans || q.correct || ''
+            }))
+          });
+        } catch (error) {
+          console.error('Error fetching template details:', error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    if (template && template.t_id) {
+      fetchTemplateDetails();
+    }
+  }, [template]);
 
   const handleQuestionChange = (idx, field, value) => {
     const updated = form.questions.map((q, i) =>
@@ -82,12 +125,18 @@ const CreateTemplateModal = ({ onClose, template }) => {
     };
 
     try {
-      const res = await axios.post('http://localhost:3000/api/question/add', payload);
-      alert('Template created successfully!');
+      if (template && template.t_id) {
+        await axios.put(`http://localhost:3000/api/question/edit/${template.t_id}`, payload);
+        alert('Template updated successfully!');
+      } else {
+        await axios.post('http://localhost:3000/api/question/add', payload);
+        alert('Template created successfully!');
+      }
+      if (refreshTemplates) await refreshTemplates();
       onClose();
     } catch (error) {
-      console.error('Error creating template:', error);
-      alert('Failed to create template.');
+      console.error('Error saving template:', error);
+      alert('Failed to save template.');
     }
   };
 
