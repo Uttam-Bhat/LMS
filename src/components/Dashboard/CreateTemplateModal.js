@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './CreateCourseModal.css';
 
 const emptyQuestion = { text: '', optionA: '', optionB: '', optionC: '', optionD: '', correct: '' };
@@ -52,11 +52,11 @@ const CreateTemplateModal = ({ onClose, template }) => {
                 <div className="form-group">
                   <input type="text" placeholder="Question text" value={q.text} onChange={e => handleQuestionChange(idx, 'text', e.target.value)} required />
                 </div>
-                <div className="form-group" style={{ display: 'flex', gap: 8 }}>
-                  <input type="text" placeholder="Option A" value={q.optionA} onChange={e => handleQuestionChange(idx, 'optionA', e.target.value)} required />
-                  <input type="text" placeholder="Option B" value={q.optionB} onChange={e => handleQuestionChange(idx, 'optionB', e.target.value)} required />
-                  <input type="text" placeholder="Option C" value={q.optionC} onChange={e => handleQuestionChange(idx, 'optionC', e.target.value)} required />
-                  <input type="text" placeholder="Option D" value={q.optionD} onChange={e => handleQuestionChange(idx, 'optionD', e.target.value)} required />
+                <div className="input-form" >
+                  <input type="text" className='input-option' placeholder="Option A" value={q.optionA} onChange={e => handleQuestionChange(idx, 'optionA', e.target.value)} required />
+                  <input type="text" className='input-option' placeholder="Option B" value={q.optionB} onChange={e => handleQuestionChange(idx, 'optionB', e.target.value)} required />
+                  <input type="text" className='input-option' placeholder="Option C" value={q.optionC} onChange={e => handleQuestionChange(idx, 'optionC', e.target.value)} required />
+                  <input type="text" className='input-option' placeholder="Option D" value={q.optionD} onChange={e => handleQuestionChange(idx, 'optionD', e.target.value)} required />
                 </div>
                 <div className="form-group">
                   <label>Correct Answer</label>

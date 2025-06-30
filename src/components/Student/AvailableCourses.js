@@ -8,17 +8,19 @@ const AvailableCourses = () => {
   const [applied, setApplied] = useState([]);
   const [search, setSearch] = useState('');
   const [view, setView] = useState('all');
+  const [teachers, setTeachers] = useState([]);
 
-  // ✅ Fetch course data once on component mount
+  // ✅ Fetch courses from backend
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         const response = await axios.get('http://localhost:3000/api/course/display');
         const formattedCourses = response.data.map(course => ({
-          id: course._id,
-          name: course.name || course.coursename || 'Untitled',
-          description: course.description || course.desc || '',
-          teacher: course.teacher || course.instructor || 'Unknown',
+          id: course.courseId,
+          name: course.coursename || 'Untitled',
+          description: course.des || 'No description available',
+          course_type: course.course_type || 'N/A',
+          teacherId: course.ass_teacher ?? null, // use null if undefined
         }));
         setCourses(formattedCourses);
       } catch (error) {
@@ -29,14 +31,31 @@ const AvailableCourses = () => {
     fetchCourses();
   }, []);
 
-  // ✅ Filter based on search and view
+  // ✅ Fetch teachers from backend
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/course/teachers');
+        setTeachers(response.data);
+      } catch (error) {
+        console.error('Failed to fetch teachers:', error);
+      }
+    };
+
+    fetchTeachers();
+  }, []);
+
+  // ✅ Filter courses
   const filteredCourses = courses.filter(course => {
+    const teacher = teachers.find(t => String(t.id) === String(course.teacherId));
+    const teacherName = teacher?.fullname || '';
+
     const matchesSearch =
       (course.name || '').toLowerCase().includes(search.toLowerCase()) ||
-      (course.teacher || '').toLowerCase().includes(search.toLowerCase()) ||
+      (teacherName || '').toLowerCase().includes(search.toLowerCase()) ||
       (course.description || '').toLowerCase().includes(search.toLowerCase());
 
-    const matchesView = view === 'all' || view === 'active'; // Add logic if you handle status
+    const matchesView = view === 'all' || view === 'active';
     return matchesSearch && matchesView;
   });
 
@@ -78,41 +97,50 @@ const AvailableCourses = () => {
           {filteredCourses.length === 0 ? (
             <div style={{ color: '#6b7a90', fontSize: '1.1rem' }}>No courses found.</div>
           ) : (
-            filteredCourses.map(course => (
-              <div key={course.id} className="course-card">
-                <div className="course-header">
-                  <h3>{course.name}</h3>
-                  <span className="status-badge active">Active</span>
-                </div>
-                <div className="course-info">
-                  <div className="info-item">
-                    <i className="fas fa-chalkboard-teacher"></i>
-                    <span>{course.ass_teacher}</span>
+            filteredCourses.map(course => {
+              const teacher = teachers.find(t => String(t.id) === String(course.teacherId));
+              const teacherName = teacher?.fullname || 'Not Assigned';
+
+              return (
+                <div key={course.id} className="course-card">
+                  <div className="course-header">
+                    <h3>{course.name}</h3>
+                    <span className="status-badge active">Active</span>
                   </div>
-                  <div className="info-item">
-                    <i className="fas fa-info-circle"></i>
-                    <span>{course.description}</span>
+                  <div className="course-info">
+                    <div className="info-item">
+                      <i className="fas fa-chalkboard-teacher"></i>
+                      <span>{teacherName}</span>
+                    </div>
+                    <div className="info-item">
+                      <i className="fas fa-layer-group"></i>
+                      <span>{course.course_type}</span>
+                    </div>
+                    <div className="info-item">
+                      <i className="fas fa-info-circle"></i>
+                      <span>{course.description}</span>
+                    </div>
+                  </div>
+                  <div className="course-actions">
+                    <button
+                      className="student-action-btn apply"
+                      title="Apply for course"
+                      onClick={() => handleApply(course.id)}
+                      disabled={applied.includes(course.id)}
+                    >
+                      {applied.includes(course.id) ? 'Applied' : 'Apply'}
+                    </button>
+                    <button
+                      className="student-action-btn view"
+                      title="View course details"
+                      onClick={() => alert('View course details')}
+                    >
+                      View
+                    </button>
                   </div>
                 </div>
-                <div className="course-actions">
-                  <button
-                    className="student-action-btn apply"
-                    title="Apply for course"
-                    onClick={() => handleApply(course.id)}
-                    disabled={applied.includes(course.id)}
-                  >
-                    {applied.includes(course.id) ? 'Applied' : 'Apply'}
-                  </button>
-                  <button
-                    className="student-action-btn view"
-                    title="View course details"
-                    onClick={() => alert('View course details')}
-                  >
-                    View
-                  </button>
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>

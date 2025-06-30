@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
 
@@ -51,18 +51,12 @@ const ContentManagement = () => {
               <form style={{display: 'flex', flexDirection: 'column', gap: 8, width: '100%', boxSizing: 'border-box', height: 'auto'}}>
                 <div style={{width: '100%'}}>
                   <label style={{fontWeight: 600, marginBottom: 2, display: 'block', fontSize: 13}}>Content Association</label>
-                  <div style={{display: 'flex', gap: 8, marginBottom: 0, flexWrap: 'wrap'}}>
+                  <div style={{display: 'flex', gap: 8, marginTop:2, flexWrap: 'Wrap'}}>
                     <label style={{display: 'flex', alignItems: 'center', gap: 3, fontSize: 12}}>
-                      <input type="radio" name="association" value="course" checked={association === 'course'} onChange={() => setAssociation('course')} /> Course
+                      <input type="radio" style={{marginBottom:2}} name="association" value="course" checked={association === 'course'} onChange={() => setAssociation('course')} /> Course
                     </label>
                     <label style={{display: 'flex', alignItems: 'center', gap: 3, fontSize: 12}}>
-                      <input type="radio" name="association" value="subject" checked={association === 'subject'} onChange={() => setAssociation('subject')} /> Subject
-                    </label>
-                    <label style={{display: 'flex', alignItems: 'center', gap: 3, fontSize: 12}}>
-                      <input type="radio" name="association" value="chapter" checked={association === 'chapter'} onChange={() => setAssociation('chapter')} /> Chapter
-                    </label>
-                    <label style={{display: 'flex', alignItems: 'center', gap: 3, fontSize: 12}}>
-                      <input type="radio" name="association" value="topic" checked={association === 'topic'} onChange={() => setAssociation('topic')} /> Topic
+                      <input type="radio" style={{marginBottom:2}} name="association" value="subject" checked={association === 'subject'} onChange={() => setAssociation('subject')} /> Subject
                     </label>
                   </div>
                 </div>
@@ -74,11 +68,11 @@ const ContentManagement = () => {
                 </div>
                 <div style={{width: '100%'}}>
                   <label style={{fontWeight: 600, marginBottom: 2, display: 'block', fontSize: 13}}>Title *</label>
-                  <input type="text" style={{width: '100%', padding: '0.45rem 0.7rem', border: '1px solid #e1e1e1', borderRadius: 6, fontSize: 13}} value={title} onChange={e => setTitle(e.target.value)} required />
+                  <input type="text" style={{width: '95%', padding: '0.45rem 0.7rem', border: '1px solid #e1e1e1', borderRadius: 6, fontSize: 13}} value={title} onChange={e => setTitle(e.target.value)} required />
                 </div>
                 <div style={{width: '100%'}}>
                   <label style={{fontWeight: 600, marginBottom: 2, display: 'block', fontSize: 13}}>Description</label>
-                  <textarea style={{width: '100%', minHeight: 40, padding: '0.45rem 0.7rem', border: '1px solid #e1e1e1', borderRadius: 6, fontSize: 13, resize: 'vertical'}} value={description} onChange={e => setDescription(e.target.value)} />
+                  <textarea style={{width: '95%', minHeight: 40, padding: '0.45rem 0.7rem', border: '1px solid #e1e1e1', borderRadius: 6, fontSize: 13, resize: 'vertical'}} value={description} onChange={e => setDescription(e.target.value)} />
                 </div>
                 <div style={{width: '100%'}}>
                   <label style={{fontWeight: 600, marginBottom: 2, display: 'block', fontSize: 13}}>Content Type *</label>

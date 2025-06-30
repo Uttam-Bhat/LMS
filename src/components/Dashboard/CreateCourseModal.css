@@ -157,3 +157,7 @@
   background: #ccc;
   cursor: not-allowed;
 } 
+.input-form{
+  display: grid;
+  gap: 8px;
+}
