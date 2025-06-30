@@ -27,7 +27,6 @@ const CreateTemplateModal = ({ onClose, template }) => {
       try {
         const response = await axios.get('http://localhost:3000/api/subject/display');
         setSubjects(response.data);
-        console.log("Fetched subjects:", response.data);
       } catch (error) {
         console.error('Error fetching subjects:', error);
       }
@@ -54,6 +53,44 @@ const CreateTemplateModal = ({ onClose, template }) => {
     });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!form.name.trim() || !form.subject.trim()) {
+      alert('Template name and subject are required.');
+      return;
+    }
+
+    for (let q of form.questions) {
+      if (!q.text || !q.optionA || !q.optionB || !q.optionC || !q.optionD || !q.correct) {
+        alert('All fields in each question are required.');
+        return;
+      }
+    }
+
+    const payload = {
+      t_name: form.name,
+      su_name: form.subject,
+      questions: form.questions.map(q => ({
+        question: q.text,
+        op_a: q.optionA,
+        op_b: q.optionB,
+        op_c: q.optionC,
+        op_d: q.optionD,
+        ans: q.correct
+      }))
+    };
+
+    try {
+      const res = await axios.post('http://localhost:3000/api/question/add', payload);
+      alert('Template created successfully!');
+      onClose();
+    } catch (error) {
+      console.error('Error creating template:', error);
+      alert('Failed to create template.');
+    }
+  };
+
   return (
     <div className="modal-overlay">
       <div className="create-course-modal" style={{ maxWidth: 700 }}>
@@ -61,7 +98,7 @@ const CreateTemplateModal = ({ onClose, template }) => {
           <h2>{template ? 'Edit Exam Template' : 'Create Exam Template'}</h2>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
-        <form onSubmit={e => { e.preventDefault(); onClose(); }}>
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Template Name</label>
             <input
