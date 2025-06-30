@@ -35,6 +35,7 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
       try {
         const response = await axios.get('http://localhost:3000/api/subject/display');
         setSubjects(response.data);
+        console.log("Fetched subjects:", response.data);
       } catch (error) {
         console.error('Error fetching subjects:', error);
       }
@@ -147,7 +148,7 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
           <h2>{template ? 'Edit Exam Template' : 'Create Exam Template'}</h2>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={e => { e.preventDefault(); onClose(); }}>
           <div className="form-group">
             <label>Template Name</label>
             <input

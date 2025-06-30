@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import './CreateCourseModal.css';
 
 const examTypes = [
@@ -48,6 +48,19 @@ const CreateExamModal = ({ onClose }) => {
           <div className="form-group">
             <label>Duration</label>
             <input type="text" value={form.duration} onChange={e => setForm({ ...form, duration: e.target.value })} placeholder="e.g. 2 hours" required />
+          </div>
+          <div className="form-group">
+            <label>Exam Type</label>
+            <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} required>
+              <option value="">Select type</option>
+              {examTypes.map(type => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Number of Questions</label>
+            <input type="number" min="1" value={form.numQuestions} onChange={e => setForm({ ...form, numQuestions: e.target.value })} required />
           </div>
           <div className="form-group">
             <label>Question Template</label>

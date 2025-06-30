@@ -1,56 +1,53 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import {
-  FaClock,
-  FaEdit,
+import React, { useState } from 'react';
+import DashboardLayout from './DashboardLayout';
+import './ExamManagement.css';
+import { 
+  FaPlus, 
+  FaEdit, 
+  FaTrashAlt, 
+  FaUpload, 
   FaFileAlt,
-  FaPlus,
-  FaTrashAlt,
-  FaUpload
+  FaQuestionCircle,
+  FaClock
 } from 'react-icons/fa';
 import CreateExamModal from './CreateExamModal';
 import CreateTemplateModal from './CreateTemplateModal';
-import DashboardLayout from './DashboardLayout';
-import './ExamManagement.css';
 
 const ExamManagement = () => {
   const [showCreateExamModal, setShowCreateExamModal] = useState(false);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [editTemplate, setEditTemplate] = useState(null);
-  const [templates, setTemplates] = useState([]);
+  // Sample data - replace with actual data from your backend
+  const [templates, setTemplates] = useState([
+    { id: 1, title: 'Mid-term Template', subject: 'Computer Science', questions: 30, status: 'active', questionList: [] },
+    { id: 2, title: 'Final Exam Template', subject: 'Mathematics', questions: 50, status: 'draft', questionList: [] },
+  ]);
+
+  const questionSets = [
+    { id: 1, title: 'Programming Basics', count: 100, type: 'Multiple Choice' },
+    { id: 2, title: 'Data Structures', count: 75, type: 'Mixed' },
+  ];
+
+  const schedules = [
+    { 
+      id: 1, 
+      title: 'Mid-term Examination', 
+      date: '2024-04-15', 
+      time: '09:00 AM',
+      duration: '2 hours',
+      status: 'upcoming'
+    },
+    { 
+      id: 2, 
+      title: 'Final Examination', 
+      date: '2024-05-20', 
+      time: '10:00 AM',
+      duration: '3 hours',
+      status: 'draft'
+    },
+  ];
+
   const fileInputRef = React.useRef();
-
-useEffect(() => {
-  const fetchTemplates = async () => {
-    try {
-      const response = await axios.get('http://localhost:3000/api/template/display');
-      const templatesData = response.data;
-      // Fetch question count for each template
-      const templatesWithCounts = await Promise.all(
-        templatesData.map(async (template) => {
-          try {
-            const res = await axios.get(`http://localhost:3000/api/question/by-template/${template.t_id}`);
-            // Robustly extract questions array from API response
-            const questions = Array.isArray(res.data)
-              ? res.data
-              : Array.isArray(res.data.questions)
-                ? res.data.questions
-                : [];
-            return { ...template, questions };
-          } catch (err) {
-            console.error(`Failed to fetch questions for template ${template.t_id}`, err);
-            return { ...template, questions: [] };
-          }
-        })
-      );
-      setTemplates(templatesWithCounts);
-    } catch (error) {
-      console.error('Error fetching templates:', error);
-    }
-  };
-
-  fetchTemplates();
-}, []);
 
   const handleCreateTemplate = () => {
     setEditTemplate(null);
@@ -60,18 +57,7 @@ useEffect(() => {
     setEditTemplate(template);
     setShowTemplateModal(true);
   };
-const handleDeleteTemplate = async (t_id) => {
-  if (!window.confirm('Are you sure you want to delete this template?')) return;
-  try {
-    await axios.delete(`http://localhost:3000/api/template/delete/${t_id}`);
-    alert('Template deleted successfully');
-    // Remove template from local state
-    setTemplates(prevTemplates => prevTemplates.filter(template => template.t_id !== t_id));
-  } catch (error) {
-    console.error('Failed to delete template:', error);
-    alert('Error deleting template');
-  }
-};
+
   return (
     <DashboardLayout>
       <div className="exam-management">
@@ -102,18 +88,18 @@ const handleDeleteTemplate = async (t_id) => {
             </div>
             <div className="template-list">
               {templates.map(template => (
-                <div key={template.t_id} className="template-item">
+                <div key={template.id} className="template-item">
                   <div className="item-info">
-                    <span className="item-title">{template.t_name}</span>
+                    <span className="item-title">{template.title}</span>
                     <span className="item-details">
-                     {template.su_name} • {template.questions?.length || 0} questions
+                      {template.subject} • {template.questions} questions
                     </span>
                   </div>
                   <div className="item-actions">
                     <button className="action-btn edit" title="Edit template" onClick={() => handleEditTemplate(template)}>
                       <FaEdit />
                     </button>
-                    <button className="action-btn delete" title="Delete template" onClick={() => handleDeleteTemplate(template.t_id)}>
+                    <button className="action-btn delete" title="Delete template">
                       <FaTrashAlt />
                     </button>
                   </div>
@@ -134,6 +120,8 @@ const handleDeleteTemplate = async (t_id) => {
                 ref={fileInputRef}
                 style={{ display: 'none' }}
                 onChange={e => {
+                  // You can handle the file upload here
+                  // For now, just log the file name
                   if (e.target.files && e.target.files[0]) {
                     alert('Selected file: ' + e.target.files[0].name);
                   }
@@ -147,6 +135,24 @@ const handleDeleteTemplate = async (t_id) => {
                   Drag and drop question files here or click to browse
                 </p>
               </div>
+              {questionSets.map(set => (
+                <div key={set.id} className="question-set">
+                  <div className="item-info">
+                    <span className="item-title">{set.title}</span>
+                    <span className="item-details">
+                      {set.count} questions • {set.type}
+                    </span>
+                  </div>
+                  <div className="item-actions">
+                    <button className="action-btn edit" title="Edit questions">
+                      <FaQuestionCircle />
+                    </button>
+                    <button className="action-btn delete" title="Delete set">
+                      <FaTrashAlt />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -159,23 +165,24 @@ const handleDeleteTemplate = async (t_id) => {
               </button>
             </div>
             <div className="schedule-list">
-              {/* Static Example Schedules */}
-              <div className="schedule-item">
-                <div className="item-info">
-                  <span className="item-title">Mid-term Examination</span>
-                  <span className="item-details">
-                    2024-04-15 • 09:00 AM • 2 hours
-                  </span>
+              {schedules.map(schedule => (
+                <div key={schedule.id} className="schedule-item">
+                  <div className="item-info">
+                    <span className="item-title">{schedule.title}</span>
+                    <span className="item-details">
+                      {schedule.date} • {schedule.time} • {schedule.duration}
+                    </span>
+                  </div>
+                  <div className="item-actions">
+                    <button className="action-btn edit" title="Edit schedule">
+                      <FaEdit />
+                    </button>
+                    <button className="action-btn delete" title="Delete schedule">
+                      <FaTrashAlt />
+                    </button>
+                  </div>
                 </div>
-                <div className="item-actions">
-                  <button className="action-btn edit" title="Edit schedule">
-                    <FaEdit />
-                  </button>
-                  <button className="action-btn delete" title="Delete schedule">
-                    <FaTrashAlt />
-                  </button>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -184,4 +191,4 @@ const handleDeleteTemplate = async (t_id) => {
   );
 };
 
-export default ExamManagement;
+export default ExamManagement; 
