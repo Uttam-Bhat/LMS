@@ -198,4 +198,66 @@
 .delete-btn:hover {
   background: #f21818;
   color: white;
+}
+
+@media (max-width: 900px) {
+  .user-management {
+    padding: 1rem 0.5rem;
+  }
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .add-user-btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+  }
+  .user-filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  .search-box {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  .filter-buttons {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-start;
+  }
+  .users-table-container {
+    overflow-x: auto;
+    border-radius: 8px;
+  }
+  .users-table {
+    min-width: 600px;
+    font-size: 0.95rem;
+  }
+  .users-table th, .users-table td {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .user-management {
+    padding: 0.5rem 0.25rem;
+  }
+  .page-header h1 {
+    font-size: 1.1rem;
+  }
+  .add-user-btn {
+    font-size: 0.95rem;
+    padding: 0.5rem 0.5rem;
+  }
+  .users-table {
+    min-width: 400px;
+    font-size: 0.9rem;
+  }
+  .users-table th, .users-table td {
+    padding: 0.5rem;
+  }
 } 
