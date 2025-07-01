@@ -90,11 +90,26 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
     setForm({ ...form, questions: [...form.questions, { ...emptyQuestion }] });
   };
 
-  const removeQuestion = (idx) => {
-    setForm({
-      ...form,
-      questions: form.questions.filter((_, i) => i !== idx)
-    });
+  const removeQuestion = async (idx) => {
+    const question = form.questions[idx];
+    if ((question.q_id || question.id) && template && template.t_id) {
+      try {
+        await axios.delete(`http://localhost:3000/api/question/delete-template/${question.q_id || question.id}`);
+        setForm({
+          ...form,
+          questions: form.questions.filter((_, i) => i !== idx)
+        });
+        alert('Question deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting question:', error);
+        alert('Failed to delete question.');
+      }
+    } else {
+      setForm({
+        ...form,
+        questions: form.questions.filter((_, i) => i !== idx)
+      });
+    }
   };
 
   const handleSubmit = async (e) => {

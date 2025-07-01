@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from './DashboardLayout';
 import './ExamManagement.css';
 import { 
@@ -12,16 +12,15 @@ import {
 } from 'react-icons/fa';
 import CreateExamModal from './CreateExamModal';
 import CreateTemplateModal from './CreateTemplateModal';
+import axios from 'axios';
 
 const ExamManagement = () => {
   const [showCreateExamModal, setShowCreateExamModal] = useState(false);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [editTemplate, setEditTemplate] = useState(null);
-  // Sample data - replace with actual data from your backend
-  const [templates, setTemplates] = useState([
-    { id: 1, title: 'Mid-term Template', subject: 'Computer Science', questions: 30, status: 'active', questionList: [] },
-    { id: 2, title: 'Final Exam Template', subject: 'Mathematics', questions: 50, status: 'draft', questionList: [] },
-  ]);
+  const [templates, setTemplates] = useState([]);
+  const [exams, setExams] = useState([]);
+  const [editExam, setEditExam] = useState(null);
 
   const questionSets = [
     { id: 1, title: 'Programming Basics', count: 100, type: 'Multiple Choice' },
@@ -49,6 +48,45 @@ const ExamManagement = () => {
 
   const fileInputRef = React.useRef();
 
+  useEffect(() => {
+    refreshTemplates();
+    refreshExams();
+  }, []);
+
+  const refreshTemplates = async () => {
+    try {
+      const templatesRes = await axios.get('http://localhost:3000/api/template/list');
+      const templatesData = Array.isArray(templatesRes.data) ? templatesRes.data : [];
+      // Fetch questions for each template
+      const fetchedTemplates = await Promise.all(
+        templatesData.map(async (template) => {
+          const res = await axios.get(`http://localhost:3000/api/question/by-template/${template.t_id}`);
+          const questions = Array.isArray(res.data) ? res.data : [];
+          return {
+            ...template,
+            id: template.t_id,
+            title: template.t_name,
+            subject: template.su_name,
+            questions: questions.length,
+            questionList: questions
+          };
+        })
+      );
+      setTemplates(fetchedTemplates.filter(Boolean));
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+    }
+  };
+
+  const refreshExams = async () => {
+    try {
+      const res = await axios.get('http://localhost:3000/api/exam/display');
+      setExams(Array.isArray(res.data) ? res.data : []);
+    } catch (error) {
+      console.error('Error fetching exams:', error);
+    }
+  };
+
   const handleCreateTemplate = () => {
     setEditTemplate(null);
     setShowTemplateModal(true);
@@ -57,24 +95,61 @@ const ExamManagement = () => {
     setEditTemplate(template);
     setShowTemplateModal(true);
   };
+  const handleDeleteTemplate = async (templateId) => {
+    if (!window.confirm('Are you sure you want to delete this template?')) return;
+    try {
+      await axios.delete(`http://localhost:3000/api/question/delete/${templateId}`);
+      await refreshTemplates();
+      alert('Template deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting template:', error);
+      alert('Failed to delete template.');
+    }
+  };
+
+  const handleCreateExam = () => {
+    setEditExam(null);
+    setShowCreateExamModal(true);
+  };
+  const handleEditExam = (exam) => {
+    setEditExam(exam);
+    setShowCreateExamModal(true);
+  };
+  const handleDeleteExam = async (examId) => {
+    if (!window.confirm('Are you sure you want to delete this exam?')) return;
+    try {
+      await axios.delete(`http://localhost:3000/api/exam/delete/${examId}`);
+      await refreshExams();
+      alert('Exam deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting exam:', error);
+      alert('Failed to delete exam.');
+    }
+  };
 
   return (
     <DashboardLayout>
       <div className="exam-management">
         <div className="page-header">
           <h1>Exam Management</h1>
-          <button className="create-exam-btn" onClick={() => setShowCreateExamModal(true)}>
+          <button className="create-exam-btn" onClick={handleCreateExam}>
             <FaPlus />
             Create New Exam
           </button>
         </div>
         {showCreateExamModal && (
-          <CreateExamModal onClose={() => setShowCreateExamModal(false)} />
+          <CreateExamModal 
+            onClose={() => { setShowCreateExamModal(false); setEditExam(null); refreshExams(); }}
+            templates={templates}
+            exam={editExam}
+            refreshExams={refreshExams}
+          />
         )}
         {showTemplateModal && (
           <CreateTemplateModal 
             onClose={() => setShowTemplateModal(false)} 
             template={editTemplate}
+            refreshTemplates={refreshTemplates}
           />
         )}
         <div className="exam-sections">
@@ -99,7 +174,7 @@ const ExamManagement = () => {
                     <button className="action-btn edit" title="Edit template" onClick={() => handleEditTemplate(template)}>
                       <FaEdit />
                     </button>
-                    <button className="action-btn delete" title="Delete template">
+                    <button className="action-btn delete" title="Delete template" onClick={() => handleDeleteTemplate(template.id)}>
                       <FaTrashAlt />
                     </button>
                   </div>
@@ -160,29 +235,33 @@ const ExamManagement = () => {
           <div className="exam-section-card">
             <div className="section-header">
               <h2>Exam Schedules</h2>
-              <button title="Add Schedule">
+              <button title="Add Schedule" onClick={handleCreateExam}>
                 <FaClock />
               </button>
             </div>
             <div className="schedule-list">
-              {schedules.map(schedule => (
-                <div key={schedule.id} className="schedule-item">
-                  <div className="item-info">
-                    <span className="item-title">{schedule.title}</span>
-                    <span className="item-details">
-                      {schedule.date} • {schedule.time} • {schedule.duration}
-                    </span>
+              {exams.length === 0 ? (
+                <div className="no-exams">No exams found.</div>
+              ) : (
+                exams.map(exam => (
+                  <div key={exam.e_id} className="schedule-item">
+                    <div className="item-info">
+                      <span className="item-title">{exam.e_name}</span>
+                      <span className="item-details">
+                        {exam.e_date} • {exam.e_time} • {exam.duration} • Template: {exam.t_name}
+                      </span>
+                    </div>
+                    <div className="item-actions">
+                      <button className="action-btn edit" title="Edit exam" onClick={() => handleEditExam(exam)}>
+                        <FaEdit />
+                      </button>
+                      <button className="action-btn delete" title="Delete exam" onClick={() => handleDeleteExam(exam.e_id)}>
+                        <FaTrashAlt />
+                      </button>
+                    </div>
                   </div>
-                  <div className="item-actions">
-                    <button className="action-btn edit" title="Edit schedule">
-                      <FaEdit />
-                    </button>
-                    <button className="action-btn delete" title="Delete schedule">
-                      <FaTrashAlt />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
