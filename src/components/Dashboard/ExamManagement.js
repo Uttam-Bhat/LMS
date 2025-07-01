@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import DashboardLayout from './DashboardLayout';
-import './ExamManagement.css';
-import { 
-  FaPlus, 
-  FaEdit, 
-  FaTrashAlt, 
-  FaUpload, 
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import {
+  FaClock,
+  FaEdit,
   FaFileAlt,
+  FaPlus,
   FaQuestionCircle,
-  FaClock
+  FaTrashAlt,
+  FaUpload
 } from 'react-icons/fa';
 import CreateExamModal from './CreateExamModal';
 import CreateTemplateModal from './CreateTemplateModal';
-import axios from 'axios';
+import DashboardLayout from './DashboardLayout';
+import './ExamManagement.css';
 
 const ExamManagement = () => {
   const [showCreateExamModal, setShowCreateExamModal] = useState(false);
@@ -90,16 +90,17 @@ const ExamManagement = () => {
     setShowTemplateModal(true);
   };
   const handleDeleteTemplate = async (templateId) => {
-    if (!window.confirm('Are you sure you want to delete this template?')) return;
-    try {
-      await axios.delete(`http://localhost:3000/api/question/delete/${templateId}`);
-      await refreshTemplates();
-      alert('Template deleted successfully!');
-    } catch (error) {
-      console.error('Error deleting template:', error);
-      alert('Failed to delete template.');
-    }
-  };
+  if (!window.confirm('Are you sure you want to delete this template?')) return;
+  try {
+    await axios.delete(`http://localhost:3000/api/question/delete-template/${templateId}`);
+    await refreshTemplates();
+    alert('Template deleted successfully!');
+  } catch (error) {
+    console.error('Error deleting template:', error);
+    alert('Failed to delete template.');
+  }
+};
+
 
   const handleCreateExam = () => {
     setEditExam(null);
@@ -168,9 +169,16 @@ const ExamManagement = () => {
                     <button className="action-btn edit" title="Edit template" onClick={() => handleEditTemplate(template)}>
                       <FaEdit />
                     </button>
-                    <button className="action-btn delete" title="Delete template" onClick={() => handleDeleteTemplate(template.id)}>
-                      <FaTrashAlt />
-                    </button>
+                   <button
+                     className="action-btn delete"
+                      title="Delete template"
+                      onClick={() => {
+                      console.log('Deleting template:', template);
+                      handleDeleteTemplate(template.id);
+                      }}
+                    >
+                   <FaTrashAlt />
+                </button>
                   </div>
                 </div>
               ))}
