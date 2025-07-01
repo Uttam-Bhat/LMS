@@ -59,15 +59,16 @@ const ExamManagement = () => {
       console.log('API /api/question/display response:', templatesRes.data); // Debug log
       const templatesData = Array.isArray(templatesRes.data) ? templatesRes.data : [];
       // Ensure t_id is included and pass all properties
-     const fetchedTemplates = templatesData.map(template => ({
+     const fetchedTemplates = templatesData.map(template => ({ 
         ...template,
         id: template.t_id,
         t_id: template.t_id, // Ensure t_id is present for editing
         title: template.t_name,
         subject: template.su_name,
-        questions: Array.isArray(template.questions) ? template.questions.length : 0,
+        questions: Array.isArray(template.questions) ? template.questions : [], // Always pass the array
         questionList: template.questions || []
       }));
+      
       setTemplates(fetchedTemplates.filter(Boolean));
     } catch (error) {
       console.error('Error fetching templates:', error);
@@ -88,7 +89,21 @@ const ExamManagement = () => {
     setShowTemplateModal(true);
   };
   const handleEditTemplate = (template) => {
-    setEditTemplate(template);
+    // If template is a question object, find the template by t_id
+    const fullTemplate = templates.find(t => t.t_id === (template.t_id || template.id));
+    if (fullTemplate) {
+      setEditTemplate(fullTemplate);
+    } else if (template.questions) {
+      setEditTemplate(template);
+    } else {
+      // fallback: wrap the question as a template with one question
+      setEditTemplate({
+        t_id: template.t_id,
+        t_name: template.t_name,
+        su_name: template.su_name,
+        questions: [template]
+      });
+    }
     setShowTemplateModal(true);
   };
   const handleDeleteTemplate = async (templateId) => {
@@ -159,12 +174,12 @@ const ExamManagement = () => {
               </button>
             </div>
             <div className="template-list">
-              {templates.map(template => (
-                <div key={template.id} className="template-item">
+              {templates.map((template, idx) => (
+                <div key={`template-${template.t_id}-${idx}`} className="template-item">
                   <div className="item-info">
                     <span className="item-title">{template.title}</span>
                     <span className="item-details">
-                      {template.subject} • {template.questions} questions
+                      {template.subject} • {template.questions.length} questions
                     </span>
                   </div>
                   <div className="item-actions">
@@ -214,8 +229,8 @@ const ExamManagement = () => {
                   Drag and drop question files here or click to browse
                 </p>
               </div>
-              {questionSets.map(set => (
-                <div key={set.id} className="question-set">
+              {questionSets.map((set, idx) => (
+                <div key={set.id ? `qset-${set.id}` : `qset-idx-${idx}`} className="question-set">
                   <div className="item-info">
                     <span className="item-title">{set.title}</span>
                     <span className="item-details">
@@ -247,8 +262,8 @@ const ExamManagement = () => {
               {exams.length === 0 ? (
                 <div className="no-exams">No exams found.</div>
               ) : (
-                exams.map(exam => (
-                  <div key={exam.e_id} className="schedule-item">
+                exams.map((exam, idx) => (
+                  <div key={exam.e_id ? `exam-${exam.e_id}` : `exam-idx-${idx}`} className="schedule-item">
                     <div className="item-info">
                       <span className="item-title">{exam.e_name}</span>
                       <span className="item-details">

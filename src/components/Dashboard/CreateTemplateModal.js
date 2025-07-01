@@ -63,98 +63,33 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
   }, []);
 
   useEffect(() => {
-    setHasLoaded(false);
+    if (!template) return;
+    setForm({
+      name: template.t_name || '',
+      subject: template.su_name || '',
+      questions: Array.isArray(template.questions)
+        ? template.questions.map(q => ({
+            q_id: q.q_id,
+            text: q.question || q.text || '',
+            optionA: q.op_a || q.optionA || '',
+            optionB: q.op_b || q.optionB || '',
+            optionC: q.op_c || q.optionC || '',
+            optionD: q.op_d || q.optionD || '',
+            correct: q.ans || q.correct || ''
+          }))
+        : template.questions
+          ? [{
+              q_id: template.questions.q_id,
+              text: template.questions.question || template.questions.text || '',
+              optionA: template.questions.op_a || template.questions.optionA || '',
+              optionB: template.questions.op_b || template.questions.optionB || '',
+              optionC: template.questions.op_c || template.questions.optionC || '',
+              optionD: template.questions.op_d || template.questions.optionD || '',
+              correct: template.questions.ans || template.questions.correct || ''
+            }]
+          : [{ ...emptyQuestion }]
+    });
   }, [template]);
-
-  useEffect(() => {
-    if (isQuestion) return;
-    if (!template || hasLoaded) return;
-    const fetchTemplateDetails = async () => {
-      if (template && template.t_id) {
-        setLoading(true);
-        try {
-          const res = await axios.get('http://localhost:3000/api/question/display');
-          const templates = Array.isArray(res.data) ? res.data : [];
-          const found = templates.find(t => t.t_id === template.t_id);
-          if (found) {
-            setForm({
-              name: found.t_name || '',
-              subject: found.su_name || '',
-              questions: Array.isArray(found.questions)
-                ? found.questions.map(q => ({
-                    q_id: q.q_id,
-                    text: q.question || q.text || '',
-                    optionA: q.op_a || q.optionA || '',
-                    optionB: q.op_b || q.optionB || '',
-                    optionC: q.op_c || q.optionC || '',
-                    optionD: q.op_d || q.optionD || '',
-                    correct: q.ans || q.correct || ''
-                  }))
-                : found.questions
-                  ? [{
-                      q_id: found.questions.q_id,
-                      text: found.questions.question || found.questions.text || '',
-                      optionA: found.questions.op_a || found.questions.optionA || '',
-                      optionB: found.questions.op_b || found.questions.optionB || '',
-                      optionC: found.questions.op_c || found.questions.optionC || '',
-                      optionD: found.questions.op_d || found.questions.optionD || '',
-                      correct: found.questions.ans || found.questions.correct || ''
-                    }]
-                  : [{
-                      q_id: found.q_id,
-                      text: found.question || found.text || '',
-                      optionA: found.op_a || found.optionA || '',
-                      optionB: found.op_b || found.optionB || '',
-                      optionC: found.op_c || found.optionC || '',
-                      optionD: found.op_d || found.optionD || '',
-                      correct: found.ans || found.correct || ''
-                    }]
-            });
-          } else {
-            setForm({
-              name: template.t_name || '',
-              subject: template.su_name || '',
-              questions: template.questions && template.questions.length
-                ? template.questions.map(q => ({
-                    q_id: q.q_id,
-                    text: q.question || q.text || '',
-                    optionA: q.op_a || q.optionA || '',
-                    optionB: q.op_b || q.optionB || '',
-                    optionC: q.op_c || q.optionC || '',
-                    optionD: q.op_d || q.optionD || '',
-                    correct: q.ans || q.correct || ''
-                  }))
-                : [{ ...emptyQuestion }]
-            });
-          }
-          setHasLoaded(true);
-        } catch (error) {
-          console.error('Error fetching template details:', error);
-          setForm({
-            name: template.t_name || '',
-            subject: template.su_name || '',
-            questions: template.questions && template.questions.length
-              ? template.questions.map(q => ({
-                  q_id: q.q_id,
-                  text: q.question || q.text || '',
-                  optionA: q.op_a || q.optionA || '',
-                  optionB: q.op_b || q.optionB || '',
-                  optionC: q.op_c || q.optionC || '',
-                  optionD: q.op_d || q.optionD || '',
-                  correct: q.ans || q.correct || ''
-                }))
-              : [{ ...emptyQuestion }]
-          });
-          setHasLoaded(true);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-    if (template && template.t_id) {
-      fetchTemplateDetails();
-    }
-  }, [template, hasLoaded]);
 
   const handleQuestionChange = (idx, field, value) => {
     const updated = form.questions.map((q, i) =>
@@ -273,12 +208,13 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
           <div className="form-group">
             <label>Questions</label>
             {form.questions.map((q, idx) => (
-              <div key={idx} style={{
-                border: '1px solid #e1e1e1',
-                borderRadius: 8,
-                padding: 16,
-                marginBottom: 16
-              }}>
+              <div key={q.q_id ? `q-${q.q_id}-${idx}` : `new-${idx}`}
+                style={{
+                  border: '1px solid #e1e1e1',
+                  borderRadius: 8,
+                  padding: 16,
+                  marginBottom: 16
+                }}>
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
