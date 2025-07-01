@@ -16,29 +16,57 @@ const AdminDashboard = () => {
   const [showViewReportsModal, setShowViewReportsModal] = useState(false);
   const [totalCourses, setTotalCourses] = useState(0);
   const [totalUsers, setTotalUsers] = useState(0);
+  const [totalExams, setTotalExams] = useState(0);
+  const [templates, setTemplates] = useState([]);
   const navigate = useNavigate();
-useEffect(() => {
-  const fetchUserCount = async () => {
-    try {
-      const response = await axios.get('http://localhost:3000/api/admin/users');
-      setTotalUsers(response.data.length); // assuming it returns array of users
-    } catch (error) {
-      console.error('Failed to fetch total users:', error);
-    }
+
+  useEffect(() => {
+    const fetchUserCount = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/admin/users');
+        setTotalUsers(response.data.length); // assuming it returns array of users
+      } catch (error) {
+        console.error('Failed to fetch total users:', error);
+      }
+    };
+
+    fetchUserCount();
+    const fetchCourseCount = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/course/display');
+        setTotalCourses(response.data.length); // assuming response.data is an array of courses
+      } catch (error) {
+        console.error('Failed to fetch total courses:', error);
+      }
+    };
+    fetchCourseCount();
+    const fetchExamCount = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/exam/display');
+        setTotalExams(Array.isArray(response.data) ? response.data.length : 0);
+      } catch (error) {
+        console.error('Failed to fetch total exams:', error);
+      }
+    };
+    fetchExamCount();
+    // Fetch templates for CreateExamModal
+    const fetchTemplates = async () => {
+      try {
+        const templatesRes = await axios.get('http://localhost:3000/api/template/list');
+        setTemplates(Array.isArray(templatesRes.data) ? templatesRes.data : []);
+      } catch (error) {
+        console.error('Failed to fetch templates:', error);
+      }
+    };
+    fetchTemplates();
+  }, []);
+
+  const handleExamCreated = () => {
+    setShowCreateExamModal(false);
+    // Refresh exam count after creating an exam
+    axios.get('http://localhost:3000/api/exam/display')
+      .then(res => setTotalExams(Array.isArray(res.data) ? res.data.length : 0));
   };
-
-  fetchUserCount();
-  const fetchCourseCount = async () => {
-  try {
-    const response = await axios.get('http://localhost:3000/api/course/display');
-    setTotalCourses(response.data.length); // assuming response.data is an array of courses
-  } catch (error) {
-    console.error('Failed to fetch total courses:', error);
-  }
-};
-fetchCourseCount();
-}, []);
-
 
   return (
     <DashboardLayout>
@@ -65,7 +93,7 @@ fetchCourseCount();
             <i className="fas fa-file-alt"></i>
             <div className="stat-content">
               <h3>Exams Created</h3>
-              <p>45</p>
+              <p>{totalExams}</p>
             </div>
           </div>
           <div className="stat-card">
@@ -142,7 +170,10 @@ fetchCourseCount();
           <CreateUserModal onClose={() => setShowCreateUserModal(false)} />
         )}
         {showCreateExamModal && (
-          <CreateExamModal onClose={() => setShowCreateExamModal(false)} />
+          <CreateExamModal 
+            onClose={handleExamCreated}
+            templates={templates}
+          />
         )}
         {showViewReportsModal && (
           <ViewReportsModal onClose={() => setShowViewReportsModal(false)} />
