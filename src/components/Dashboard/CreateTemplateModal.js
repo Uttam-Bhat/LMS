@@ -13,21 +13,38 @@ const emptyQuestion = {
 
 const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
   console.log('CreateTemplateModal received template:', template);
-  const [form, setForm] = useState({
-    name: template?.t_name || '',
-    subject: template?.su_name || '',
-    questions: template?.questions?.length
-      ? template.questions.map(q => ({
-          text: q.question || q.text || '',
-          optionA: q.op_a || q.optionA || '',
-          optionB: q.op_b || q.optionB || '',
-          optionC: q.op_c || q.optionC || '',
-          optionD: q.op_d || q.optionD || '',
-          correct: q.ans || q.correct || ''
-        }))
-      : [{ ...emptyQuestion }]
-  });
+  const isQuestion = template && template.q_id && !template.t_id;
+  const initialForm = isQuestion
+    ? {
+        name: template.t_name || '',
+        subject: template.su_name || '',
+        questions: [{
+          text: template.question || '',
+          optionA: template.op_a || '',
+          optionB: template.op_b || '',
+          optionC: template.op_c || '',
+          optionD: template.op_d || '',
+          correct: template.ans || ''
+        }]
+      }
+    : {
+        name: template?.t_name || '',
+        subject: template?.su_name || '',
+        questions: template?.questions?.length
+          ? template.questions.map(q => ({
+              q_id: q.q_id,
+              text: q.question || q.text || '',
+              optionA: q.op_a || q.optionA || '',
+              optionB: q.op_b || q.optionB || '',
+              optionC: q.op_c || q.optionC || '',
+              optionD: q.op_d || q.optionD || '',
+              correct: q.ans || q.correct || ''
+            }))
+          : [{ ...emptyQuestion }]
+      };
 
+  const [form, setForm] = useState(initialForm);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -46,31 +63,89 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
   }, []);
 
   useEffect(() => {
+    setHasLoaded(false);
+  }, [template]);
+
+  useEffect(() => {
+    if (isQuestion) return;
+    if (!template || hasLoaded) return;
     const fetchTemplateDetails = async () => {
       if (template && template.t_id) {
         setLoading(true);
         try {
-          const res = await axios.get(`http://localhost:3000/api/question/by-template/${template.t_id}`);
-          const questions = Array.isArray(res.data)
-            ? res.data
-            : Array.isArray(res.data.questions)
-              ? res.data.questions
-              : [];
-          console.log('Fetched questions for template:', questions);
+          const res = await axios.get('http://localhost:3000/api/question/display');
+          const templates = Array.isArray(res.data) ? res.data : [];
+          const found = templates.find(t => t.t_id === template.t_id);
+          if (found) {
+            setForm({
+              name: found.t_name || '',
+              subject: found.su_name || '',
+              questions: Array.isArray(found.questions)
+                ? found.questions.map(q => ({
+                    q_id: q.q_id,
+                    text: q.question || q.text || '',
+                    optionA: q.op_a || q.optionA || '',
+                    optionB: q.op_b || q.optionB || '',
+                    optionC: q.op_c || q.optionC || '',
+                    optionD: q.op_d || q.optionD || '',
+                    correct: q.ans || q.correct || ''
+                  }))
+                : found.questions
+                  ? [{
+                      q_id: found.questions.q_id,
+                      text: found.questions.question || found.questions.text || '',
+                      optionA: found.questions.op_a || found.questions.optionA || '',
+                      optionB: found.questions.op_b || found.questions.optionB || '',
+                      optionC: found.questions.op_c || found.questions.optionC || '',
+                      optionD: found.questions.op_d || found.questions.optionD || '',
+                      correct: found.questions.ans || found.questions.correct || ''
+                    }]
+                  : [{
+                      q_id: found.q_id,
+                      text: found.question || found.text || '',
+                      optionA: found.op_a || found.optionA || '',
+                      optionB: found.op_b || found.optionB || '',
+                      optionC: found.op_c || found.optionC || '',
+                      optionD: found.op_d || found.optionD || '',
+                      correct: found.ans || found.correct || ''
+                    }]
+            });
+          } else {
+            setForm({
+              name: template.t_name || '',
+              subject: template.su_name || '',
+              questions: template.questions && template.questions.length
+                ? template.questions.map(q => ({
+                    q_id: q.q_id,
+                    text: q.question || q.text || '',
+                    optionA: q.op_a || q.optionA || '',
+                    optionB: q.op_b || q.optionB || '',
+                    optionC: q.op_c || q.optionC || '',
+                    optionD: q.op_d || q.optionD || '',
+                    correct: q.ans || q.correct || ''
+                  }))
+                : [{ ...emptyQuestion }]
+            });
+          }
+          setHasLoaded(true);
+        } catch (error) {
+          console.error('Error fetching template details:', error);
           setForm({
             name: template.t_name || '',
             subject: template.su_name || '',
-            questions: questions.map(q => ({
-              text: q.question || q.text || '',
-              optionA: q.op_a || q.optionA || '',
-              optionB: q.op_b || q.optionB || '',
-              optionC: q.op_c || q.optionC || '',
-              optionD: q.op_d || q.optionD || '',
-              correct: q.ans || q.correct || ''
-            }))
+            questions: template.questions && template.questions.length
+              ? template.questions.map(q => ({
+                  q_id: q.q_id,
+                  text: q.question || q.text || '',
+                  optionA: q.op_a || q.optionA || '',
+                  optionB: q.op_b || q.optionB || '',
+                  optionC: q.op_c || q.optionC || '',
+                  optionD: q.op_d || q.optionD || '',
+                  correct: q.ans || q.correct || ''
+                }))
+              : [{ ...emptyQuestion }]
           });
-        } catch (error) {
-          console.error('Error fetching template details:', error);
+          setHasLoaded(true);
         } finally {
           setLoading(false);
         }
@@ -79,7 +154,7 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
     if (template && template.t_id) {
       fetchTemplateDetails();
     }
-  }, [template]);
+  }, [template, hasLoaded]);
 
   const handleQuestionChange = (idx, field, value) => {
     const updated = form.questions.map((q, i) =>
@@ -133,6 +208,7 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
       t_name: form.name,
       su_name: form.subject,
       questions: form.questions.map(q => ({
+        q_id: q.q_id,
         question: q.text,
         op_a: q.optionA,
         op_b: q.optionB,
@@ -142,9 +218,11 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
       }))
     };
 
+    console.log('Submitting payload:', payload);
+
     try {
       if (template && template.t_id) {
-        await axios.put(`http://localhost:3000/api/question/edit/${template.t_id}`, payload);
+        await axios.put(`http://localhost:3000/api/question/edit-by-template/${template.t_id}`, payload);
         alert('Template updated successfully!');
       } else {
         await axios.post('http://localhost:3000/api/question/add', payload);
