@@ -106,7 +106,7 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
     const question = form.questions[idx];
     if ((question.q_id || question.id) && template && template.t_id) {
       try {
-        await axios.delete(`http://localhost:3000/api/question/delete-template/${question.q_id || question.id}`);
+        await axios.delete(`http://localhost:3000/api/question/delete/${question.q_id || question.id}`);
         setForm({
           ...form,
           questions: form.questions.filter((_, i) => i !== idx)
