@@ -55,23 +55,17 @@ const ExamManagement = () => {
 
   const refreshTemplates = async () => {
     try {
-      const templatesRes = await axios.get('http://localhost:3000/api/template/list');
+      const templatesRes = await axios.get('http://localhost:3000/api/question/display');
       const templatesData = Array.isArray(templatesRes.data) ? templatesRes.data : [];
-      // Fetch questions for each template
-      const fetchedTemplates = await Promise.all(
-        templatesData.map(async (template) => {
-          const res = await axios.get(`http://localhost:3000/api/question/by-template/${template.t_id}`);
-          const questions = Array.isArray(res.data) ? res.data : [];
-          return {
-            ...template,
-            id: template.t_id,
-            title: template.t_name,
-            subject: template.su_name,
-            questions: questions.length,
-            questionList: questions
-          };
-        })
-      );
+      // Directly use templatesData, assuming each template includes its questions
+      const fetchedTemplates = templatesData.map(template => ({
+        ...template,
+        id: template.t_id,
+        title: template.t_name,
+        subject: template.su_name,
+        questions: Array.isArray(template.questions) ? template.questions.length : 0,
+        questionList: template.questions || []
+      }));
       setTemplates(fetchedTemplates.filter(Boolean));
     } catch (error) {
       console.error('Error fetching templates:', error);

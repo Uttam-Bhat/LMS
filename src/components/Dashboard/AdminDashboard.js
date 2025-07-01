@@ -52,7 +52,7 @@ const AdminDashboard = () => {
     // Fetch templates for CreateExamModal
     const fetchTemplates = async () => {
       try {
-        const templatesRes = await axios.get('http://localhost:3000/api/template/list');
+        const templatesRes = await axios.get('http://localhost:3000/api/question/display');
         setTemplates(Array.isArray(templatesRes.data) ? templatesRes.data : []);
       } catch (error) {
         console.error('Failed to fetch templates:', error);
