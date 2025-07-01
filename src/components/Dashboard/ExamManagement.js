@@ -56,11 +56,13 @@ const ExamManagement = () => {
   const refreshTemplates = async () => {
     try {
       const templatesRes = await axios.get('http://localhost:3000/api/question/display');
+      console.log('API /api/question/display response:', templatesRes.data); // Debug log
       const templatesData = Array.isArray(templatesRes.data) ? templatesRes.data : [];
-      // Directly use templatesData, assuming each template includes its questions
-      const fetchedTemplates = templatesData.map(template => ({
+      // Ensure t_id is included and pass all properties
+     const fetchedTemplates = templatesData.map(template => ({
         ...template,
         id: template.t_id,
+        t_id: template.t_id, // Ensure t_id is present for editing
         title: template.t_name,
         subject: template.su_name,
         questions: Array.isArray(template.questions) ? template.questions.length : 0,
@@ -170,15 +172,15 @@ const ExamManagement = () => {
                       <FaEdit />
                     </button>
                    <button
-                     className="action-btn delete"
-                      title="Delete template"
-                      onClick={() => {
-                      console.log('Deleting template:', template);
-                      handleDeleteTemplate(template.id);
-                      }}
-                    >
-                   <FaTrashAlt />
-                </button>
+                    className="action-btn delete"
+                    title="Delete template"
+                    onClick={() => {
+                    console.log('Deleting template:', template);
+                    handleDeleteTemplate(template.t_id); 
+                    }}
+                  >
+              <FaTrashAlt />
+              </button>
                   </div>
                 </div>
               ))}

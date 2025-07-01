@@ -12,6 +12,7 @@ const emptyQuestion = {
 };
 
 const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
+  console.log('CreateTemplateModal received template:', template);
   const [form, setForm] = useState({
     name: template?.t_name || '',
     subject: template?.su_name || '',
@@ -55,6 +56,7 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
             : Array.isArray(res.data.questions)
               ? res.data.questions
               : [];
+          console.log('Fetched questions for template:', questions);
           setForm({
             name: template.t_name || '',
             subject: template.su_name || '',
