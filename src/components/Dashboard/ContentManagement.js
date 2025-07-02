@@ -158,17 +158,43 @@ const ContentManagement = () => {
                     <option value="Image">Image</option>
                   </select>
                 </div>
-                <div>
-                  <label style={{fontWeight: 600, fontSize: 13}}>Upload File *</label>
-                  <div style={{border: '2px dashed #b0b8c1', borderRadius: 8, padding: 10, textAlign: 'center', background: '#fafbfc'}}>
-                    <input type="file" id="file-upload" onChange={handleFileChange} hidden />
-                    <label htmlFor="file-upload" style={{cursor: 'pointer', color: '#2563eb', fontWeight: 500, fontSize: 13}}>
-                      <span style={{fontSize: 18, color: '#b0b8c1'}}><i className="fas fa-file-upload"></i></span>
-                      Click to upload or drag and drop
-                    </label>
-                    {file && <div style={{marginTop: 6, color: '#2563eb', fontWeight: 500, fontSize: 12}}>{file.name}</div>}
-                  </div>
-                </div>
+                <div style={{ width: '100%' }}>
+  <label style={{ fontWeight: 600, marginBottom: 2, display: 'block', fontSize: 13 }}>Upload File *</label>
+  <div style={{
+    border: '2px dashed #b0b8c1',
+    borderRadius: 8,
+    padding: 10,
+    textAlign: 'center',
+    background: '#fafbfc',
+    marginBottom: 0
+  }}>
+    <input type="file" style={{ display: 'none' }} id="file-upload" onChange={handleFileChange} />
+    <label htmlFor="file-upload" style={{
+      cursor: 'pointer',
+      color: '#2563eb',
+      fontWeight: 500,
+      fontSize: 13,
+      display: 'block'
+    }}>
+      <span style={{
+        fontSize: 18,
+        display: 'block',
+        color: '#b0b8c1',
+        marginBottom: 2
+      }}>
+        <i className="fas fa-file-upload"></i>
+      </span>
+      Click to upload or drag and drop
+    </label>
+    <div style={{ color: '#888', fontSize: 10, marginTop: 1 }}>MP4 up to 100MB</div>
+    {file && (
+      <div style={{ marginTop: 2, color: '#2563eb', fontWeight: 500, fontSize: 12 }}>
+        {file.name}
+      </div>
+    )}
+  </div>
+</div>
+
                 <div style={{display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 12}}>
                   <button type="button" style={{background: '#f3f4f6', color: '#222', border: '1px solid #e1e1e1', fontWeight: 500, fontSize: 13, padding: '0.4rem 1rem'}} onClick={() => setShowModal(false)}>Cancel</button>
                   <button type="submit" style={{background: '#2563eb', color: '#fff', fontWeight: 600, fontSize: 13, padding: '0.4rem 1rem'}}>Upload Content</button>
