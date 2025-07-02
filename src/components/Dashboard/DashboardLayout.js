@@ -10,8 +10,6 @@ const DashboardLayout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [showProfileModal, setShowProfileModal] = useState(false);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   const submenuPaths = ['/admin/courses', '/admin/classes', '/admin/stream', '/admin/subjects', '/admin/chapters', '/admin/content'];
   const [menuOpen, setMenuOpen] = useState(submenuPaths.includes(location.pathname));
@@ -40,8 +38,8 @@ const DashboardLayout = ({ children }) => {
             </button>
             {isProfileOpen && (
               <div className="dropdown-menu">
-                <button onClick={() => { setShowProfileModal(true); setIsProfileOpen(false); }}>Profile</button>
-                <button onClick={() => { setShowSettingsModal(true); setIsProfileOpen(false); }}>Settings</button>
+                <button onClick={() => { navigate('/admin/profile'); setIsProfileOpen(false); }}>Profile</button>
+                <button onClick={() => { navigate('/admin/settings'); setIsProfileOpen(false); }}>Settings</button>
                 <button onClick={handleLogout}>Logout</button>
               </div>
             )}

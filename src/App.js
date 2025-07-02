@@ -19,6 +19,10 @@ import MyCourses from './components/Student/MyCourses';
 import RegisterExam from './components/Student/RegisterExam';
 import StudentDashboard from './components/Student/StudentDashboard';
 import Notification from './components/Student/Notification';
+import StudentProfile from './components/Student/StudentProfile';
+import StudentSettings from './components/Student/StudentSettings';
+import AdminProfile from './components/Dashboard/AdminProfile';
+import AdminSettings from './components/Dashboard/AdminSettings';
 
 function App() {
   return (
@@ -47,7 +51,10 @@ function App() {
           <Route path="/student/Logout" element={<StudentDashboard />} />
           <Route path="/student/available-courses" element={<AvailableCourses />} />
           <Route path="/student/my-courses" element={<MyCourses />} />
-          
+          <Route path="/student/profile" element={<StudentProfile />} />
+          <Route path="/student/settings" element={<StudentSettings />} />
+          <Route path="/admin/profile" element={<AdminProfile />} />
+          <Route path="/admin/settings" element={<AdminSettings />} />
         </Routes>
       </div>
     </Router>

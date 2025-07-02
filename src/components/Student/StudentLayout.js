@@ -7,8 +7,6 @@ const StudentLayout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [showProfileModal, setShowProfileModal] = useState(false);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [courseMenuOpen, setCourseMenuOpen] = useState(false);
 
   const handleLogout = () => {
@@ -33,10 +31,10 @@ const StudentLayout = ({ children }) => {
             </button>
             {isProfileOpen && (
               <div className="dropdown-menu">
-                <button onClick={() => { setShowProfileModal(true); setIsProfileOpen(false); }}>
+                <button onClick={() => { navigate('/student/profile'); setIsProfileOpen(false); }}>
                   <i className="fas fa-user"></i> Profile
                 </button>
-                <button onClick={() => { setShowSettingsModal(true); setIsProfileOpen(false); }}>
+                <button onClick={() => { navigate('/student/settings'); setIsProfileOpen(false); }}>
                   <i className="fas fa-cog"></i> Settings
                 </button>
                 <button onClick={handleLogout}>
@@ -47,35 +45,6 @@ const StudentLayout = ({ children }) => {
           </div>
         </div>
       </header>
-
-      {/* Profile Modal */}
-      {showProfileModal && (
-        <div className="modal-overlay">
-          <div className="create-course-modal">
-            <div className="modal-header">
-              <h2>Profile</h2>
-              <button className="close-button" onClick={() => setShowProfileModal(false)}>&times;</button>
-            </div>
-            <div style={{ padding: '1rem 0' }}>
-              <p>This is your profile information. (Customize as needed.)</p>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* Settings Modal */}
-      {showSettingsModal && (
-        <div className="modal-overlay">
-          <div className="create-course-modal">
-            <div className="modal-header">
-              <h2>Settings</h2>
-              <button className="close-button" onClick={() => setShowSettingsModal(false)}>&times;</button>
-            </div>
-            <div style={{ padding: '1rem 0' }}>
-              <p>Settings content goes here. (Customize as needed.)</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Sidebar and Main Content */}
       <div className="dashboard-content">
