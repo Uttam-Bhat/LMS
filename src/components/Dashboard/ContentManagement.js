@@ -35,6 +35,50 @@ const ContentManagement = () => {
     };
     fetchData();
   }, [association]);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!title || !description || !contentType || !file) {
+    alert("Please fill in all required fields.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("title", title);
+  formData.append("des", description);
+  formData.append("c_type", contentType.toLowerCase()); // e.g. 'pdf', 'video'
+  formData.append("file", file);
+
+  // add either course name or subject name
+  if (association === "course") {
+    const selectedCourse = courses.find(c => c.courseId === selectedAssociationId);
+    formData.append("coursename", selectedCourse ? selectedCourse.coursename : "");
+    formData.append("su_name", "");
+  } else {
+    const selectedSubject = subjects.find(s => s.su_id === selectedAssociationId);
+    formData.append("su_name", selectedSubject ? selectedSubject.su_name : "");
+    formData.append("coursename", "");
+  }
+
+  try {
+    const res = await axios.post("http://localhost:3000/api/content/add", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    });
+
+    alert("Content uploaded successfully!");
+    setShowModal(false);
+    // Optionally: reset form fields
+    setTitle('');
+    setDescription('');
+    setSelectedAssociationId('');
+    setFile(null);
+  } catch (err) {
+    console.error("Upload failed:", err);
+    alert("Failed to upload content.");
+  }
+};
 
   return (
     <DashboardLayout>
@@ -68,7 +112,7 @@ const ContentManagement = () => {
                 <h2 style={{fontWeight: 700, fontSize: '1.18rem', margin: 0}}>Upload New Content</h2>
                 <button className="stream-close-btn" style={{fontSize: 20, marginTop: -4}} onClick={() => setShowModal(false)}>×</button>
               </div>
-              <form style={{display: 'flex', flexDirection: 'column', gap: 8, width: '100%', boxSizing: 'border-box', height: 'auto'}}>
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
                 <div style={{width: '100%'}}>
                   <label style={{fontWeight: 600, marginBottom: 2, display: 'block', fontSize: 13}}>Content Association</label>
                   <div style={{display: 'flex', gap: 8, marginTop:2, flexWrap: 'Wrap'}}>

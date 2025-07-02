@@ -7,6 +7,7 @@ import {
   FaPlus,
   FaQuestionCircle,
   FaTrashAlt,
+  FaEye,
   FaUpload
 } from 'react-icons/fa';
 import CreateExamModal from './CreateExamModal';
@@ -20,39 +21,25 @@ const ExamManagement = () => {
   const [editTemplate, setEditTemplate] = useState(null);
   const [templates, setTemplates] = useState([]);
   const [exams, setExams] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
   const [editExam, setEditExam] = useState(null);
 
-  const questionSets = [
-    { id: 1, title: 'Programming Basics', count: 100, type: 'Multiple Choice' },
-    { id: 2, title: 'Data Structures', count: 75, type: 'Mixed' },
-  ];
-
-  const schedules = [
-    { 
-      id: 1, 
-      title: 'Mid-term Examination', 
-      date: '2024-04-15', 
-      time: '09:00 AM',
-      duration: '2 hours',
-      status: 'upcoming'
-    },
-    { 
-      id: 2, 
-      title: 'Final Examination', 
-      date: '2024-05-20', 
-      time: '10:00 AM',
-      duration: '3 hours',
-      status: 'draft'
-    },
-  ];
 
   const fileInputRef = React.useRef();
 
   useEffect(() => {
     refreshTemplates();
     refreshExams();
+    fetchFiles();
   }, []);
-
+  const fetchFiles = async () => {
+  try {
+    const res = await axios.get('http://localhost:3000/api/file/display');
+    setUploadedFiles(res.data);
+  } catch (err) {
+    console.error('Error fetching files:', err);
+  }
+};
   const refreshTemplates = async () => {
     try {
       const templatesRes = await axios.get('http://localhost:3000/api/question/display');
@@ -138,6 +125,35 @@ const ExamManagement = () => {
       alert('Failed to delete exam.');
     }
   };
+  const handleFileUpload = async (file) => {
+  if (!file) return;
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await axios.post("http://localhost:3000/api/file/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    alert("Upload successful!");
+    console.log("Response:", response.data);
+    // Optional: refresh questionSets from backend
+  } catch (error) {
+    console.error("Upload failed:", error);
+    alert("Upload failed");
+  }
+};
+const handleDelete = async (fileId) => {
+  try {
+    await axios.delete(`http://localhost:3000/api/file/delete/${fileId}`);
+    fetchFiles(); // Refresh list after delete
+  } catch (err) {
+    console.error('Delete error:', err);
+    alert('Failed to delete file');
+  }
+};
 
   return (
     <DashboardLayout>
@@ -211,42 +227,56 @@ const ExamManagement = () => {
               </button>
               <input
                 type="file"
-                ref={fileInputRef}
-                style={{ display: 'none' }}
-                onChange={e => {
-                  // You can handle the file upload here
-                  // For now, just log the file name
+                  ref={fileInputRef}
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
                   if (e.target.files && e.target.files[0]) {
-                    alert('Selected file: ' + e.target.files[0].name);
+                    handleFileUpload(e.target.files[0]);
                   }
-                }}
-              />
+              }}
+            />
             </div>
             <div className="question-bank">
-              <div className="upload-area">
-                <FaFileAlt className="upload-icon" />
-                <p className="upload-text">
-                  Drag and drop question files here or click to browse
-                </p>
-              </div>
-              {questionSets.map((set, idx) => (
-                <div key={set.id ? `qset-${set.id}` : `qset-idx-${idx}`} className="question-set">
-                  <div className="item-info">
-                    <span className="item-title">{set.title}</span>
-                    <span className="item-details">
-                      {set.count} questions • {set.type}
-                    </span>
-                  </div>
-                  <div className="item-actions">
-                    <button className="action-btn edit" title="Edit questions">
-                      <FaQuestionCircle />
-                    </button>
-                    <button className="action-btn delete" title="Delete set">
-                      <FaTrashAlt />
-                    </button>
-                  </div>
-                </div>
-              ))}
+              <div
+                className="upload-area"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                e.preventDefault();
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    handleFileUpload(e.dataTransfer.files[0]);
+                    e.dataTransfer.clearData();
+                }
+               }}
+            onClick={() => fileInputRef.current && fileInputRef.current.click()}
+            >
+            <FaFileAlt className="upload-icon" />
+            <p className="upload-text">
+             Drag and drop question files here or click to browse
+           </p>
+          </div>
+              {uploadedFiles.map((file, idx) => (
+  <div key={`file-${file.file_id || idx}`} className="question-set">
+    <div className="item-info">
+      <span className="item-title">{file.file_name}</span>
+    </div>
+    <div className="item-actions">
+      <button
+        className="action-btn edit"
+        title="View File"
+        onClick={() => window.open(`http://localhost:3000/${file.file_path.replace("\\", "/")}`, "_blank")}
+      >
+        <FaEye />
+      </button>
+      <button
+        className="action-btn delete"
+        title="Delete File"
+        onClick={() => handleDelete(file.file_id)}
+      >
+        <FaTrashAlt />
+      </button>
+    </div>
+  </div>
+))}
             </div>
           </div>
 
