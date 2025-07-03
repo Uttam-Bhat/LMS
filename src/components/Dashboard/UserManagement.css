@@ -198,4 +198,79 @@
 .delete-btn:hover {
   background: #f21818;
   color: white;
+}
+
+/* Assign Button Styles */
+.assign-btn {
+  background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 18px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+}
+.assign-btn:hover {
+  background: linear-gradient(90deg, #1e40af 0%, #2563eb 100%);
+  box-shadow: 0 4px 16px rgba(37,99,235,0.15);
+}
+
+.assigned-btn {
+  background: #e0e7ff;
+  color: #2563eb;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 18px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* Assign Modal Styles */
+.assign-modal .modal-header {
+  background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
+  color: #fff;
+  border-radius: 8px 8px 0 0;
+  padding: 18px 24px 12px 24px;
+}
+.assign-modal .modal-body {
+  padding: 24px 24px 0 24px;
+}
+.assign-modal .modal-footer {
+  padding: 18px 24px 24px 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.assign-modal .form-group {
+  margin-bottom: 18px;
+}
+.assign-modal label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+  color: #1e293b;
+}
+.assign-modal select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 5px;
+  border: 1px solid #cbd5e1;
+  font-size: 1rem;
+  background: #f8fafc;
+  margin-top: 4px;
+  margin-bottom: 2px;
+}
+.assign-modal .student-info {
+  background: #f1f5f9;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+  font-size: 1.05rem;
+  color: #334155;
+  box-shadow: 0 1px 4px rgba(30,64,175,0.04);
 } 

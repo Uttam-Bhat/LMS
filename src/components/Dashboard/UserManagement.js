@@ -4,6 +4,7 @@ import { FaPencilAlt, FaSearch, FaTrashAlt, FaUserCircle, FaUserPlus } from 'rea
 import CreateUserModal from './CreateUserModal';
 import DashboardLayout from './DashboardLayout';
 import './UserManagement.css';
+import AssignStudentModal from './AssignStudentModal';
 
 const UserManagement = () => {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -11,6 +12,9 @@ const UserManagement = () => {
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [editUser, setEditUser] = useState(null);
   const [editUserData, setEditUserData] = useState(null);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [assigningUser, setAssigningUser] = useState(null);
+  const [assignedStudents, setAssignedStudents] = useState({}); // { [userId]: true }
 
   const [users, setUsers] = useState([]);
 const [loading, setLoading] = useState(true);
@@ -113,6 +117,7 @@ useEffect(() => {
                 <th>Email</th>
                 <th>Role</th>
                 <th>Actions</th>
+                {activeFilter === 'student' && <th>Assign</th>}
               </tr>
             </thead>
             <tbody>
@@ -140,6 +145,15 @@ useEffect(() => {
                       </button>
                     </div>
                   </td>
+                  {activeFilter === 'student' && (
+                    <td>
+                      {assignedStudents[user.id] ? (
+                        <button className="assigned-btn" disabled>Assigned</button>
+                      ) : (
+                        <button className="assign-btn" onClick={() => { setAssigningUser(user); setShowAssignModal(true); }}>Assign</button>
+                      )}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -163,6 +177,18 @@ useEffect(() => {
     }}
   />
 )}
+
+        {showAssignModal && assigningUser && (
+          <AssignStudentModal
+            user={assigningUser}
+            onClose={() => { setShowAssignModal(false); setAssigningUser(null); }}
+            onAssigned={() => {
+              setAssignedStudents(prev => ({ ...prev, [assigningUser.id]: true }));
+              setShowAssignModal(false);
+              setAssigningUser(null);
+            }}
+          />
+        )}
 
       </div>
     </DashboardLayout>
