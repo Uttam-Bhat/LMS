@@ -47,26 +47,42 @@ const ClassesManagement = () => {
       return;
     }
 
-    const payload = {
-      class_name: form.class_name,
-      des: form.des,
-      section: form.section,
-      cdate: formatDateForBackend(form.cdate),
-    };
-
-    try {
-      if (editItem) {
-        // EDIT: Update existing class
-        await axios.put(`http://localhost:3000/api/class/edit/${editItem.cls_id}`, payload);
-
+    if (editItem) {
+      // Only send changed fields for edit
+      const changedFields = {};
+      if (form.class_name !== editItem.class_name) changedFields.class_name = form.class_name;
+      if (form.des !== editItem.des) changedFields.des = form.des;
+      if (form.section !== editItem.section) changedFields.section = form.section;
+      if (form.cdate !== editItem.cdate) changedFields.cdate = formatDateForBackend(form.cdate);
+      if (Object.keys(changedFields).length === 0) {
+        alert('No changes to save.');
+        return;
+      }
+      try {
+        await axios.put(`http://localhost:3000/api/class/edit/${editItem.cls_id}`, changedFields);
         setClasses(prev =>
           prev.map(cls =>
-            cls.cls_id === editItem.cls_id ? { ...cls, ...payload } : cls
+            cls.cls_id === editItem.cls_id ? { ...cls, ...changedFields } : cls
           )
         );
         alert('Class updated successfully');
-      } else {
-        // ADD: New class
+        setShowModal(false);
+        setEditItem(null);
+        setForm({ class_name: '', des: '', section: '', cdate: '' });
+      } catch (error) {
+        console.error('Failed to save class:', error);
+        alert('Failed to save class. Please check console for error.');
+        setForm({ class_name: '', des: '', section: '', cdate: '' });
+      }
+    } else {
+      // ADD: New class
+      const payload = {
+        class_name: form.class_name,
+        des: form.des,
+        section: form.section,
+        cdate: formatDateForBackend(form.cdate),
+      };
+      try {
         const response = await axios.post('http://localhost:3000/api/class/add', payload);
         const newClass = {
           ...payload,
@@ -74,13 +90,14 @@ const ClassesManagement = () => {
         };
         setClasses(prev => [...prev, newClass]);
         alert('Class added successfully');
+        setShowModal(false);
+        setEditItem(null);
+        setForm({ class_name: '', des: '', section: '', cdate: '' });
+      } catch (error) {
+        console.error('Failed to save class:', error);
+        alert('Failed to save class. Please check console for error.');
+        setForm({ class_name: '', des: '', section: '', cdate: '' });
       }
-
-      setShowModal(false);
-      setEditItem(null);
-    } catch (error) {
-      console.error('Failed to save class:', error);
-      alert('Failed to save class. Please check console for error.');
     }
   };
 
