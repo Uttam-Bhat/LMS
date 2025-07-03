@@ -278,7 +278,7 @@ const getUniqueClasses = () => {
     <td>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{ background: '#e8f0fe', color: '#2563eb', fontWeight: 600, padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem' }}>
-          {s.className || s.class_name || 'N/A'}
+          {s.class_details?.class_name || s.className || s.class_name || 'N/A'}
         </div>
       </div>
     </td>
