@@ -273,7 +273,7 @@ const getUniqueClasses = () => {
             <tbody>
             {filtered.map(s => (
   <tr key={s.id || s.sid}>
-    <td>{s.name || s.sname}</td>
+    <td>{s.sname || s.name || s.stream_name || 'N/A'}</td>
     <td>{s.description || s.des}</td>
     <td>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

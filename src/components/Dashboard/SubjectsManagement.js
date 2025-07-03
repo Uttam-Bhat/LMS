@@ -329,45 +329,39 @@ const SubjectsManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredSubjects.map(s => {
-                // Find the stream for this subject
-                const stream = streams.find(st => st.sname === s.sname);
-                // Find the class for this stream
-                const className = stream ? stream.class_name : 'N/A';
-                return (
-                  <tr key={s._id || s.id}>
-                    <td>{s.su_name}</td>
-                    <td>{s.des}</td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{
-                          background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
-                          padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem'
-                        }}>
-                          {className}
-                        </div>
+              {filteredSubjects.map(s => (
+                <tr key={s._id || s.id}>
+                  <td>{s.su_name}</td>
+                  <td>{s.des}</td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{
+                        background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
+                        padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem'
+                      }}>
+                        {s.class_info?.class_name || 'N/A'}
                       </div>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{
-                          background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
-                          padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem'
-                        }}>
-                          {s.sname || 'N/A'}
-                        </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{
+                        background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
+                        padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem'
+                      }}>
+                        {s.stream_info?.sname || 'N/A'}
                       </div>
-                    </td>
-                    <td>{s.cdate}</td>
-                    <td>
-                      <div className="stream-action-buttons">
-                        <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
-                        <button className="stream-delete-btn" onClick={() => handleDelete(s.su_id || s.id)}>Delete</button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                    </div>
+                  </td>
+                  <td>{s.cdate}</td>
+                  <td>
+                    <div className="stream-action-buttons">
+                      <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
+                      <button className="stream-delete-btn" onClick={() => handleDelete(s.su_id || s.id)}>Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         )}
