@@ -162,6 +162,16 @@ const StreamManagement = () => {
   const filtered = streamList.filter(s => 
   (s.name || s.sname || '').toLowerCase().includes(search.toLowerCase())
 );
+const getUniqueClasses = () => {
+  const seen = new Set();
+  return classes.filter(cls => {
+    if (seen.has(cls.class_name)) {
+      return false;
+    }
+    seen.add(cls.class_name);
+    return true;
+  });
+};
 
   return (
     <DashboardLayout>
@@ -251,8 +261,10 @@ const StreamManagement = () => {
                   required
                 >
                   <option value="">Select Class</option>
-                  {classes.map(cls => (
-                    <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
+                  {getUniqueClasses().map(cls => (
+                    <option key={cls.cls_id} value={cls.cls_id}>
+                      {cls.class_name}
+                    </option>
                   ))}
                 </select>
                 <label style={{ fontWeight: 500 }}>Created Date</label>

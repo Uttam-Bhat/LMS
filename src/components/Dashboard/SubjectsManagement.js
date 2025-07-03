@@ -11,11 +11,15 @@ const SubjectsManagement = () => {
   const [streams, setStreams] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [classes, setClasses] = useState([]);
+  const [selectedClass, setSelectedClass] = useState('');
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
+        const classRes = await axios.get('http://localhost:3000/api/class/display');
+        setClasses(classRes.data);
         await fetchStreams();
         await fetchSubjects();
       } catch (error) {
@@ -158,6 +162,37 @@ const SubjectsManagement = () => {
     s.su_name.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Filter streams by selected class
+  const filteredStreams = selectedClass
+    ? streams.filter(s => {
+        // Find the class for this stream and match both class_name and cls_id
+        const cls = classes.find(c => c.class_name === s.class_name && c.cls_id.toString() === selectedClass);
+        return !!cls;
+      })
+    : streams;
+
+  // When editing, set selectedClass based on the stream/class
+  useEffect(() => {
+    if (editItem && streams.length && classes.length) {
+      const stream = streams.find(s => s.sname === editItem.sname);
+      if (stream) {
+        const cls = classes.find(c => c.class_name === stream.class_name);
+        if (cls) setSelectedClass(cls.cls_id.toString());
+      }
+    }
+  }, [editItem, streams, classes]);
+
+  // Unique classes for dropdown
+  const uniqueClasses = classes.filter((cls, idx, arr) =>
+    arr.findIndex(c => c.class_name === cls.class_name) === idx
+  );
+
+  // Helper to get class name for a subject
+  const getClassNameForSubject = (subject) => {
+    const stream = streams.find(s => s.sname === subject.sname);
+    return stream ? stream.class_name : 'N/A';
+  };
+
   return (
     <DashboardLayout>
       <div className="stream-management">
@@ -198,35 +233,52 @@ const SubjectsManagement = () => {
                 <tr>
                   <th>Name</th>
                   <th>Description</th>
+                  <th>Class</th>
                   <th>Stream</th>
                   <th>Created</th>
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredSubjects.map(s => (
-                  <tr key={s._id || s.id}>
-                    <td>{s.su_name}</td>
-                    <td>{s.des}</td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{
-                          background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
-                          padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem'
-                        }}>
-                          {s.sname || 'N/A'}
+                {filteredSubjects.map(s => {
+                  // Find the stream for this subject
+                  const stream = streams.find(st => st.sname === s.sname);
+                  // Find the class for this stream
+                  const className = stream ? stream.class_name : 'N/A';
+                  return (
+                    <tr key={s._id || s.id}>
+                      <td>{s.su_name}</td>
+                      <td>{s.des}</td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <div style={{
+                            background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
+                            padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem'
+                          }}>
+                            {className}
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td>{s.cdate}</td>
-                    <td>
-                      <div className="stream-action-buttons">
-                        <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
-                        <button className="stream-delete-btn" onClick={() => handleDelete(s.su_id || s.id)}>Delete</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <div style={{
+                            background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
+                            padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem'
+                          }}>
+                            {s.sname || 'N/A'}
+                          </div>
+                        </div>
+                      </td>
+                      <td>{s.cdate}</td>
+                      <td>
+                        <div className="stream-action-buttons">
+                          <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
+                          <button className="stream-delete-btn" onClick={() => handleDelete(s.su_id || s.id)}>Delete</button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}
@@ -253,6 +305,32 @@ const SubjectsManagement = () => {
                   onChange={handleInputChange}
                 />
 
+                {/* Class Dropdown */}
+                <label style={{ fontWeight: 500, marginBottom: 4 }}>Class</label>
+                <select
+                  name="classId"
+                  value={selectedClass}
+                  onChange={e => { setSelectedClass(e.target.value); setForm(prev => ({ ...prev, streamId: '' })); }}
+                  style={{
+                    width: '100%',
+                    marginBottom: '1rem',
+                    padding: '0.75rem 1rem',
+                    border: '1px solid #e1e1e1',
+                    borderRadius: 8,
+                    fontSize: '1rem',
+                    background: '#fff',
+                    color: '#1a1a1a',
+                    outline: 'none',
+                  }}
+                  required
+                >
+                  <option value="">Select Class</option>
+                  {uniqueClasses.map(cls => (
+                    <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
+                  ))}
+                </select>
+
+                {/* Stream Dropdown */}
                 <label style={{ fontWeight: 500, marginBottom: 4 }}>Stream</label>
                 <select
                   name="streamId"
@@ -270,12 +348,11 @@ const SubjectsManagement = () => {
                     outline: 'none',
                   }}
                   required
+                  disabled={!selectedClass}
                 >
                   <option value="">Select Stream</option>
-                  {streams.map(stream => (
-                    <option key={stream.sid} value={stream.sid}>
-                      {stream.sname}
-                    </option>
+                  {filteredStreams.map(stream => (
+                    <option key={stream.sid} value={stream.sid}>{stream.sname}</option>
                   ))}
                 </select>
 

@@ -45,51 +45,44 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
 
   const [form, setForm] = useState(initialForm);
   const [hasLoaded, setHasLoaded] = useState(false);
+  const [classes, setClasses] = useState([]);
+  const [streams, setStreams] = useState([]);
   const [subjects, setSubjects] = useState([]);
+  const [selectedClass, setSelectedClass] = useState('');
+  const [selectedStream, setSelectedStream] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchSubjects = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/api/subject/display');
-        setSubjects(response.data);
-        console.log("Fetched subjects:", response.data);
-      } catch (error) {
-        console.error('Error fetching subjects:', error);
-      }
-    };
-
-    fetchSubjects();
+    // Fetch all classes
+    axios.get('http://localhost:3000/api/class/display').then(res => setClasses(res.data));
+    // Fetch all streams
+    axios.get('http://localhost:3000/api/stream/display').then(res => setStreams(res.data));
+    // Fetch all subjects
+    axios.get('http://localhost:3000/api/subject/display').then(res => setSubjects(res.data));
   }, []);
 
+  // Filter streams by selected class
+  const filteredStreams = streams.filter(s => {
+    const cls = classes.find(c => c.class_name === s.class_name);
+    return selectedClass ? (cls && cls.cls_id.toString() === selectedClass) : true;
+  });
+
+  // Filter subjects by selected stream
+  const filteredSubjects = subjects.filter(sub => {
+    return selectedStream ? sub.sname === (streams.find(s => s.sid.toString() === selectedStream)?.sname) : true;
+  });
+
+  // When editing, set selectedClass and selectedStream based on template
   useEffect(() => {
-    if (!template) return;
-    setForm({
-      name: template.t_name || '',
-      subject: template.su_name || '',
-      questions: Array.isArray(template.questions)
-        ? template.questions.map(q => ({
-            q_id: q.q_id,
-            text: q.question || q.text || '',
-            optionA: q.op_a || q.optionA || '',
-            optionB: q.op_b || q.optionB || '',
-            optionC: q.op_c || q.optionC || '',
-            optionD: q.op_d || q.optionD || '',
-            correct: q.ans || q.correct || ''
-          }))
-        : template.questions
-          ? [{
-              q_id: template.questions.q_id,
-              text: template.questions.question || template.questions.text || '',
-              optionA: template.questions.op_a || template.questions.optionA || '',
-              optionB: template.questions.op_b || template.questions.optionB || '',
-              optionC: template.questions.op_c || template.questions.optionC || '',
-              optionD: template.questions.op_d || template.questions.optionD || '',
-              correct: template.questions.ans || template.questions.correct || ''
-            }]
-          : [{ ...emptyQuestion }]
-    });
-  }, [template]);
+    if (template && streams.length && classes.length) {
+      const stream = streams.find(s => s.sname === template.su_name || s.sname === template.sname);
+      if (stream) {
+        setSelectedStream(stream.sid.toString());
+        const cls = classes.find(c => c.class_name === stream.class_name);
+        if (cls) setSelectedClass(cls.cls_id.toString());
+      }
+    }
+  }, [template, streams, classes]);
 
   const handleQuestionChange = (idx, field, value) => {
     const updated = form.questions.map((q, i) =>
@@ -189,18 +182,38 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
             />
           </div>
 
+          {/* Class Dropdown */}
+          <div className="form-group">
+            <label>Class</label>
+            <select value={selectedClass} onChange={e => { setSelectedClass(e.target.value); setSelectedStream(''); }} required>
+              <option value="">Select a class</option>
+              {classes.map(cls => (
+                <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
+              ))}
+            </select>
+          </div>
+          {/* Stream Dropdown */}
+          <div className="form-group">
+            <label>Stream</label>
+            <select value={selectedStream} onChange={e => setSelectedStream(e.target.value)} disabled={!selectedClass} required>
+              <option value="">Select a stream</option>
+              {filteredStreams.map(stream => (
+                <option key={stream.sid} value={stream.sid}>{stream.sname}</option>
+              ))}
+            </select>
+          </div>
+          {/* Subject Dropdown */}
           <div className="form-group">
             <label>Subject</label>
             <select
               value={form.subject}
               onChange={e => setForm({ ...form, subject: e.target.value })}
+              disabled={!selectedStream}
               required
             >
               <option value="">Select Subject</option>
-              {subjects.map(sub => (
-                <option key={sub.su_id} value={sub.su_name}>
-                  {sub.su_name}
-                </option>
+              {filteredSubjects.map(sub => (
+                <option key={sub.su_id} value={sub.su_name}>{sub.su_name}</option>
               ))}
             </select>
           </div>

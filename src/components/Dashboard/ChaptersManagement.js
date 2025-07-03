@@ -11,11 +11,21 @@ const ChaptersManagement = () => {
   const [subjects, setSubjects] = useState([]);
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [classes, setClasses] = useState([]);
+  const [streams, setStreams] = useState([]);
+  const [selectedClass, setSelectedClass] = useState('');
+  const [selectedStream, setSelectedStream] = useState('');
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
+        // Fetch classes
+        const classRes = await axios.get('http://localhost:3000/api/class/display');
+        setClasses(classRes.data);
+        // Fetch streams
+        const streamRes = await axios.get('http://localhost:3000/api/stream/display');
+        setStreams(streamRes.data);
         await fetchSubjects();
         await fetchChapters();
       } catch (error) {
@@ -154,6 +164,42 @@ const ChaptersManagement = () => {
     s.ch_name.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Unique classes for dropdown
+  const uniqueClasses = classes.filter((cls, idx, arr) =>
+    arr.findIndex(c => c.class_name === cls.class_name) === idx
+  );
+  // Unique streams for dropdown, filtered by selected class
+  const filteredStreams = selectedClass
+    ? streams.filter(s => {
+        const cls = classes.find(c => c.class_name === s.class_name && c.cls_id.toString() === selectedClass);
+        return !!cls;
+      })
+    : streams;
+  const uniqueStreams = filteredStreams.filter((stream, idx, arr) =>
+    arr.findIndex(s => s.sname === stream.sname) === idx
+  );
+  // Unique subjects for dropdown, filtered by selected stream
+  const filteredSubjects = selectedStream
+    ? subjects.filter(sub => sub.sname === (streams.find(s => s.sid.toString() === selectedStream)?.sname))
+    : subjects;
+  const uniqueSubjects = filteredSubjects.filter((sub, idx, arr) =>
+    arr.findIndex(s => s.su_name === sub.su_name) === idx
+  );
+  // When editing, set selectedClass and selectedStream based on subject
+  useEffect(() => {
+    if (editItem && streams.length && classes.length && subjects.length) {
+      const subject = subjects.find(s => s.su_name === editItem.su_name);
+      if (subject) {
+        const stream = streams.find(s => s.sname === subject.sname);
+        if (stream) {
+          setSelectedStream(stream.sid.toString());
+          const cls = classes.find(c => c.class_name === stream.class_name);
+          if (cls) setSelectedClass(cls.cls_id.toString());
+        }
+      }
+    }
+  }, [editItem, streams, classes, subjects]);
+
   return (
     <DashboardLayout>
       <div className="stream-management">
@@ -249,6 +295,56 @@ const ChaptersManagement = () => {
                   onChange={handleInputChange}
                 />
 
+                {/* Class Dropdown */}
+                <label style={{ fontWeight: 500, marginBottom: 4 }}>Class</label>
+                <select
+                  name="classId"
+                  value={selectedClass}
+                  onChange={e => { setSelectedClass(e.target.value); setSelectedStream(''); setForm(prev => ({ ...prev, su_name: '' })); }}
+                  style={{
+                    width: '100%',
+                    marginBottom: '1rem',
+                    padding: '0.75rem 1rem',
+                    border: '1px solid #e1e1e1',
+                    borderRadius: 8,
+                    fontSize: '1rem',
+                    background: '#fff',
+                    color: '#1a1a1a',
+                    outline: 'none',
+                  }}
+                  required
+                >
+                  <option value="">Select Class</option>
+                  {uniqueClasses.map(cls => (
+                    <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
+                  ))}
+                </select>
+                {/* Stream Dropdown */}
+                <label style={{ fontWeight: 500, marginBottom: 4 }}>Stream</label>
+                <select
+                  name="streamId"
+                  value={selectedStream}
+                  onChange={e => { setSelectedStream(e.target.value); setForm(prev => ({ ...prev, su_name: '' })); }}
+                  style={{
+                    width: '100%',
+                    marginBottom: '1rem',
+                    padding: '0.75rem 1rem',
+                    border: '1px solid #e1e1e1',
+                    borderRadius: 8,
+                    fontSize: '1rem',
+                    background: '#fff',
+                    color: '#1a1a1a',
+                    outline: 'none',
+                  }}
+                  required
+                  disabled={!selectedClass}
+                >
+                  <option value="">Select Stream</option>
+                  {uniqueStreams.map(stream => (
+                    <option key={stream.sid} value={stream.sid}>{stream.sname}</option>
+                  ))}
+                </select>
+                {/* Subject Dropdown */}
                 <label style={{ fontWeight: 500, marginBottom: 4 }}>Subject</label>
                 <select
                   name="su_name"
@@ -266,12 +362,11 @@ const ChaptersManagement = () => {
                     outline: 'none',
                   }}
                   required
+                  disabled={!selectedStream}
                 >
                   <option value="">Select Subject</option>
-                  {subjects.map(subject => (
-                    <option key={subject.su_id} value={subject.su_name}>
-                      {subject.su_name}
-                    </option>
+                  {uniqueSubjects.map(sub => (
+                    <option key={sub.su_id} value={sub.su_name}>{sub.su_name}</option>
                   ))}
                 </select>
 
