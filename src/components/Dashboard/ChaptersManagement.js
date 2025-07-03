@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
+import { FaBook, FaSearch, FaPlus } from 'react-icons/fa';
 
 const ChaptersManagement = () => {
   const [search, setSearch] = useState('');
@@ -202,10 +203,72 @@ const ChaptersManagement = () => {
 
   return (
     <DashboardLayout>
-      <div className="stream-management">
-        <div className="stream-header">
-          <h1>Manage Chapters</h1>
-          <button className="add-stream-btn" onClick={() => {
+      <div className="chapter-management-header" style={{ padding: '2rem 0 1rem 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <FaBook size={32} color="#2563eb" />
+          <div>
+            <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Manage Chapters</h1>
+            <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic chapters</div>
+          </div>
+        </div>
+      </div>
+      <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 8px #0001', padding: '1.5rem 2rem', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 16, maxWidth: 1100, marginLeft: 'auto', marginRight: 'auto' }}>
+        {/* Search input */}
+        <div style={{ position: 'relative', flex: 1 }}>
+          <FaSearch style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0' }} />
+          <input
+            type="text"
+            placeholder="Search chapters..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '0.75rem 1rem 0.75rem 2.5rem',
+              border: '1px solid #e5e7eb',
+              borderRadius: 8,
+              fontSize: '1rem',
+              background: '#f9fafb',
+              color: '#1a1a1a',
+              outline: 'none',
+            }}
+          />
+        </div>
+        {/* Name A-Z dropdown (sort) */}
+        <select
+          value={''}
+          onChange={() => {}}
+          style={{
+            minWidth: 140,
+            padding: '0.75rem 1rem',
+            border: '1px solid #e5e7eb',
+            borderRadius: 8,
+            fontSize: '1rem',
+            background: '#f9fafb',
+            color: '#1a1a1a',
+            outline: 'none',
+          }}
+          disabled
+        >
+          <option>Name A–Z</option>
+        </select>
+        {/* Add Chapter button */}
+        <button
+          className="add-stream-btn"
+          style={{
+            background: '#2563eb',
+            color: '#fff',
+            fontWeight: 600,
+            fontSize: '1.1rem',
+            border: 'none',
+            borderRadius: 10,
+            padding: '0.75rem 2rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            boxShadow: '0 2px 8px #2563eb22',
+            cursor: 'pointer',
+          }}
+          onClick={() => {
             if (subjects.length === 0) {
               alert('Please wait for subjects to load before adding a chapter.');
               return;
@@ -213,180 +276,168 @@ const ChaptersManagement = () => {
             setShowModal(true);
             setEditItem(null);
             setForm({ ch_name: '', des: '', cdate: '', su_name: '' });
-          }}>
-            Add Chapter
-          </button>
-        </div>
-
-        <div className="stream-filters">
-          <div className="stream-search-box">
-            <input
-              type="text"
-              placeholder="Search chapters..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
+          }}
+        >
+          <FaPlus /> Add Chapter
+        </button>
+      </div>
+      <div className="stream-table-container">
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '2rem' }}>
+            <p>Loading chapters...</p>
           </div>
-        </div>
-
-        <div className="stream-table-container">
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <p>Loading chapters...</p>
-            </div>
-          ) : (
-            <table className="stream-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Description</th>
-                  <th>Subject</th>
-                  <th>Created</th>
-                  <th>Action</th>
+        ) : (
+          <table className="stream-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Subject</th>
+                <th>Created</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredChapters.map(s => (
+                <tr key={s._id || s.id}>
+                  <td>{s.ch_name}</td>
+                  <td>{s.des}</td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{
+                        background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
+                        padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem'
+                      }}>
+                        {s.su_name || 'N/A'}
+                      </div>
+                    </div>
+                  </td>
+                  <td>{s.cdate}</td>
+                  <td>
+                    <div className="stream-action-buttons">
+                      <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
+                      <button className="stream-delete-btn" onClick={() => handleDelete(s.ch_id || s.id)}>Delete</button>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {filteredChapters.map(s => (
-                  <tr key={s._id || s.id}>
-                    <td>{s.ch_name}</td>
-                    <td>{s.des}</td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{
-                          background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
-                          padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem'
-                        }}>
-                          {s.su_name || 'N/A'}
-                        </div>
-                      </div>
-                    </td>
-                    <td>{s.cdate}</td>
-                    <td>
-                      <div className="stream-action-buttons">
-                        <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
-                        <button className="stream-delete-btn" onClick={() => handleDelete(s.ch_id || s.id)}>Delete</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-
-        {showModal && (
-          <div className="stream-modal-overlay">
-            <div className="stream-modal">
-              <div className="stream-modal-header">
-                <h2>{editItem ? 'Edit Chapter' : 'Add Chapter'}</h2>
-                <button className="stream-close-btn" onClick={() => setShowModal(false)}>×</button>
-              </div>
-              <div>
-                <input
-                  name="ch_name"
-                  placeholder="Chapter Name"
-                  value={form.ch_name}
-                  onChange={handleInputChange}
-                />
-                <input
-                  name="des"
-                  placeholder="Description"
-                  value={form.des}
-                  onChange={handleInputChange}
-                />
-
-                {/* Class Dropdown */}
-                <label style={{ fontWeight: 500, marginBottom: 4 }}>Class</label>
-                <select
-                  name="classId"
-                  value={selectedClass}
-                  onChange={e => { setSelectedClass(e.target.value); setSelectedStream(''); setForm(prev => ({ ...prev, su_name: '' })); }}
-                  style={{
-                    width: '100%',
-                    marginBottom: '1rem',
-                    padding: '0.75rem 1rem',
-                    border: '1px solid #e1e1e1',
-                    borderRadius: 8,
-                    fontSize: '1rem',
-                    background: '#fff',
-                    color: '#1a1a1a',
-                    outline: 'none',
-                  }}
-                  required
-                >
-                  <option value="">Select Class</option>
-                  {uniqueClasses.map(cls => (
-                    <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
-                  ))}
-                </select>
-                {/* Stream Dropdown */}
-                <label style={{ fontWeight: 500, marginBottom: 4 }}>Stream</label>
-                <select
-                  name="streamId"
-                  value={selectedStream}
-                  onChange={e => { setSelectedStream(e.target.value); setForm(prev => ({ ...prev, su_name: '' })); }}
-                  style={{
-                    width: '100%',
-                    marginBottom: '1rem',
-                    padding: '0.75rem 1rem',
-                    border: '1px solid #e1e1e1',
-                    borderRadius: 8,
-                    fontSize: '1rem',
-                    background: '#fff',
-                    color: '#1a1a1a',
-                    outline: 'none',
-                  }}
-                  required
-                  disabled={!selectedClass}
-                >
-                  <option value="">Select Stream</option>
-                  {uniqueStreams.map(stream => (
-                    <option key={stream.sid} value={stream.sid}>{stream.sname}</option>
-                  ))}
-                </select>
-                {/* Subject Dropdown */}
-                <label style={{ fontWeight: 500, marginBottom: 4 }}>Subject</label>
-                <select
-                  name="su_name"
-                  value={form.su_name}
-                  onChange={handleInputChange}
-                  style={{
-                    width: '100%',
-                    marginBottom: '1rem',
-                    padding: '0.75rem 1rem',
-                    border: '1px solid #e1e1e1',
-                    borderRadius: 8,
-                    fontSize: '1rem',
-                    background: '#fff',
-                    color: '#1a1a1a',
-                    outline: 'none',
-                  }}
-                  required
-                  disabled={!selectedStream}
-                >
-                  <option value="">Select Subject</option>
-                  {uniqueSubjects.map(sub => (
-                    <option key={sub.su_id} value={sub.su_name}>{sub.su_name}</option>
-                  ))}
-                </select>
-
-                <label style={{ fontWeight: 500 }}>Created Date</label>
-                <input
-                  type="date"
-                  name="cdate"
-                  value={form.cdate}
-                  onChange={handleInputChange}
-                  required
-                />
-
-                <button className="add-stream-btn" onClick={handleAddOrUpdate}>
-                  {editItem ? 'Save Changes' : 'Add Chapter'}
-                </button>
-              </div>
-            </div>
-          </div>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
+
+      {showModal && (
+        <div className="stream-modal-overlay">
+          <div className="stream-modal">
+            <div className="stream-modal-header">
+              <h2>{editItem ? 'Edit Chapter' : 'Add Chapter'}</h2>
+              <button className="stream-close-btn" onClick={() => setShowModal(false)}>×</button>
+            </div>
+            <div>
+              <input
+                name="ch_name"
+                placeholder="Chapter Name"
+                value={form.ch_name}
+                onChange={handleInputChange}
+              />
+              <input
+                name="des"
+                placeholder="Description"
+                value={form.des}
+                onChange={handleInputChange}
+              />
+
+              {/* Class Dropdown */}
+              <label style={{ fontWeight: 500, marginBottom: 4 }}>Class</label>
+              <select
+                name="classId"
+                value={selectedClass}
+                onChange={e => { setSelectedClass(e.target.value); setSelectedStream(''); setForm(prev => ({ ...prev, su_name: '' })); }}
+                style={{
+                  width: '100%',
+                  marginBottom: '1rem',
+                  padding: '0.75rem 1rem',
+                  border: '1px solid #e1e1e1',
+                  borderRadius: 8,
+                  fontSize: '1rem',
+                  background: '#fff',
+                  color: '#1a1a1a',
+                  outline: 'none',
+                }}
+                required
+              >
+                <option value="">Select Class</option>
+                {uniqueClasses.map(cls => (
+                  <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
+                ))}
+              </select>
+              {/* Stream Dropdown */}
+              <label style={{ fontWeight: 500, marginBottom: 4 }}>Stream</label>
+              <select
+                name="streamId"
+                value={selectedStream}
+                onChange={e => { setSelectedStream(e.target.value); setForm(prev => ({ ...prev, su_name: '' })); }}
+                style={{
+                  width: '100%',
+                  marginBottom: '1rem',
+                  padding: '0.75rem 1rem',
+                  border: '1px solid #e1e1e1',
+                  borderRadius: 8,
+                  fontSize: '1rem',
+                  background: '#fff',
+                  color: '#1a1a1a',
+                  outline: 'none',
+                }}
+                required
+                disabled={!selectedClass}
+              >
+                <option value="">Select Stream</option>
+                {uniqueStreams.map(stream => (
+                  <option key={stream.sid} value={stream.sid}>{stream.sname}</option>
+                ))}
+              </select>
+              {/* Subject Dropdown */}
+              <label style={{ fontWeight: 500, marginBottom: 4 }}>Subject</label>
+              <select
+                name="su_name"
+                value={form.su_name}
+                onChange={handleInputChange}
+                style={{
+                  width: '100%',
+                  marginBottom: '1rem',
+                  padding: '0.75rem 1rem',
+                  border: '1px solid #e1e1e1',
+                  borderRadius: 8,
+                  fontSize: '1rem',
+                  background: '#fff',
+                  color: '#1a1a1a',
+                  outline: 'none',
+                }}
+                required
+                disabled={!selectedStream}
+              >
+                <option value="">Select Subject</option>
+                {uniqueSubjects.map(sub => (
+                  <option key={sub.su_id} value={sub.su_name}>{sub.su_name}</option>
+                ))}
+              </select>
+
+              <label style={{ fontWeight: 500 }}>Created Date</label>
+              <input
+                type="date"
+                name="cdate"
+                value={form.cdate}
+                onChange={handleInputChange}
+                required
+              />
+
+              <button className="add-stream-btn" onClick={handleAddOrUpdate}>
+                {editItem ? 'Save Changes' : 'Add Chapter'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 };

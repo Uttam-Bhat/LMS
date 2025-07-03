@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
+import { FaStream, FaSearch, FaPlus } from 'react-icons/fa';
 
 const StreamManagement = () => {
   const [search, setSearch] = useState('');
@@ -175,23 +176,97 @@ const getUniqueClasses = () => {
 
   return (
     <DashboardLayout>
-      <div className="stream-management">
-        <div className="stream-header">
-          <h1>Manage Streams</h1>
-          <button className="add-stream-btn" onClick={() => { setShowModal(true); setEditItem(null); }}>
-            Add Stream
-          </button>
+      <div className="stream-management-header" style={{ padding: '2rem 0 1rem 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <FaStream size={32} color="#2563eb" />
+          <div>
+            <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Manage Streams</h1>
+            <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic streams</div>
+          </div>
         </div>
-
-        <div className="stream-search-box input">
+      </div>
+      <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 8px #0001', padding: '1.5rem 2rem', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 16, maxWidth: 1100, marginLeft: 'auto', marginRight: 'auto' }}>
+        {/* Search input */}
+        <div style={{ position: 'relative', flex: 1 }}>
+          <FaSearch style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0' }} />
           <input
             type="text"
             placeholder="Search streams..."
             value={search}
             onChange={e => setSearch(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '0.75rem 1rem 0.75rem 2.5rem',
+              border: '1px solid #e5e7eb',
+              borderRadius: 8,
+              fontSize: '1rem',
+              background: '#f9fafb',
+              color: '#1a1a1a',
+              outline: 'none',
+            }}
           />
         </div>
-
+        {/* Name A-Z dropdown (sort) */}
+        <select
+          value={''}
+          onChange={() => {}}
+          style={{
+            minWidth: 140,
+            padding: '0.75rem 1rem',
+            border: '1px solid #e5e7eb',
+            borderRadius: 8,
+            fontSize: '1rem',
+            background: '#f9fafb',
+            color: '#1a1a1a',
+            outline: 'none',
+          }}
+          disabled
+        >
+          <option>Name A–Z</option>
+        </select>
+        {/* Add Stream button */}
+        <button
+          className="add-stream-btn"
+          style={{
+            background: '#2563eb',
+            color: '#fff',
+            fontWeight: 600,
+            fontSize: '1.1rem',
+            border: 'none',
+            borderRadius: 10,
+            padding: '0.75rem 2rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            boxShadow: '0 2px 8px #2563eb22',
+            cursor: 'pointer',
+          }}
+          onClick={() => { setShowModal(true); setEditItem(null); }}
+        >
+          <FaPlus /> Add Stream
+        </button>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 8, maxWidth: 1100, marginLeft: 'auto', marginRight: 'auto' }}>
+        <div style={{
+          minWidth: 110,
+          minHeight: 70,
+          background: '#f1f5f9',
+          borderRadius: 16,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 2px 8px #0001',
+          fontWeight: 700,
+          fontSize: '1.5rem',
+          color: '#2563eb',
+          marginBottom: 8
+        }}>
+          {streamList.length}
+          <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Streams</div>
+        </div>
+      </div>
+      <div className="stream-management">
         <div className="stream-table-container">
           <table className="stream-table">
             <thead>
