@@ -205,18 +205,34 @@ const SubjectsManagement = () => {
           </div>
         </div>
       </div>
-      <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 8px #0001', padding: '1.5rem 2rem', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 16, maxWidth: 1100, marginLeft: 'auto', marginRight: 'auto' }}>
-        {/* Search input */}
-        <div style={{ position: 'relative', flex: 1 }}>
-          <FaSearch style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0' }} />
-          <input
-            type="text"
-            placeholder="Search subjects..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, maxWidth: 1100, margin: '0 auto 24px auto' }}>
+        {/* Filter/search bar and add button */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
+          <div style={{ position: 'relative', flex: 1 }}>
+            <FaSearch style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0' }} />
+            <input
+              type="text"
+              placeholder="Search subjects..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.75rem 1rem 0.75rem 2.5rem',
+                border: '1px solid #e5e7eb',
+                borderRadius: 8,
+                fontSize: '1rem',
+                background: '#f9fafb',
+                color: '#1a1a1a',
+                outline: 'none',
+              }}
+            />
+          </div>
+          <select
+            value={selectedClass}
+            onChange={e => { setSelectedClass(e.target.value); setForm(prev => ({ ...prev, streamId: '' })); }}
             style={{
-              width: '100%',
-              padding: '0.75rem 1rem 0.75rem 2.5rem',
+              minWidth: 160,
+              padding: '0.75rem 1rem',
               border: '1px solid #e5e7eb',
               borderRadius: 8,
               fontSize: '1rem',
@@ -224,75 +240,76 @@ const SubjectsManagement = () => {
               color: '#1a1a1a',
               outline: 'none',
             }}
-          />
+          >
+            <option value="">All Classes</option>
+            {uniqueClasses.map(cls => (
+              <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
+            ))}
+          </select>
+          <select
+            value={''}
+            onChange={() => {}}
+            style={{
+              minWidth: 140,
+              padding: '0.75rem 1rem',
+              border: '1px solid #e5e7eb',
+              borderRadius: 8,
+              fontSize: '1rem',
+              background: '#f9fafb',
+              color: '#1a1a1a',
+              outline: 'none',
+            }}
+            disabled
+          >
+            <option>Name A–Z</option>
+          </select>
+          <button
+            className="add-stream-btn"
+            style={{
+              background: '#2563eb',
+              color: '#fff',
+              fontWeight: 600,
+              fontSize: '1.1rem',
+              border: 'none',
+              borderRadius: 10,
+              padding: '0.75rem 2rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              boxShadow: '0 2px 8px #2563eb22',
+              cursor: 'pointer',
+            }}
+            onClick={() => {
+              if (streams.length === 0) {
+                alert('Please wait for streams to load before adding a subject.');
+                return;
+              }
+              setShowModal(true);
+              setEditItem(null);
+              setForm({ name: '', description: '', created: '', streamId: '' });
+            }}
+          >
+            <FaPlus /> Add Subject
+          </button>
         </div>
-        {/* All Classes dropdown */}
-        <select
-          value={selectedClass}
-          onChange={e => { setSelectedClass(e.target.value); setForm(prev => ({ ...prev, streamId: '' })); }}
-          style={{
-            minWidth: 160,
-            padding: '0.75rem 1rem',
-            border: '1px solid #e5e7eb',
-            borderRadius: 8,
-            fontSize: '1rem',
-            background: '#f9fafb',
-            color: '#1a1a1a',
-            outline: 'none',
-          }}
-        >
-          <option value="">All Classes</option>
-          {uniqueClasses.map(cls => (
-            <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
-          ))}
-        </select>
-        {/* Name A-Z dropdown (sort) */}
-        <select
-          value={''}
-          onChange={() => {}}
-          style={{
-            minWidth: 140,
-            padding: '0.75rem 1rem',
-            border: '1px solid #e5e7eb',
-            borderRadius: 8,
-            fontSize: '1rem',
-            background: '#f9fafb',
-            color: '#1a1a1a',
-            outline: 'none',
-          }}
-          disabled
-        >
-          <option>Name A–Z</option>
-        </select>
-        {/* Add Subject button */}
-        <button
-          className="add-stream-btn"
-          style={{
-            background: '#2563eb',
-            color: '#fff',
-            fontWeight: 600,
-            fontSize: '1.1rem',
-            border: 'none',
-            borderRadius: 10,
-            padding: '0.75rem 2rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            boxShadow: '0 2px 8px #2563eb22',
-            cursor: 'pointer',
-          }}
-          onClick={() => {
-            if (streams.length === 0) {
-              alert('Please wait for streams to load before adding a subject.');
-              return;
-            }
-            setShowModal(true);
-            setEditItem(null);
-            setForm({ name: '', description: '', created: '', streamId: '' });
-          }}
-        >
-          <FaPlus /> Add Subject
-        </button>
+        {/* Count box */}
+        <div style={{
+          minWidth: 110,
+          minHeight: 70,
+          background: '#f1f5f9',
+          borderRadius: 16,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 2px 8px #0001',
+          fontWeight: 700,
+          fontSize: '1.5rem',
+          color: '#2563eb',
+        }}>
+          {subjects.length}
+          <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Subjects</div>
+        </div>
       </div>
       <div className="stream-table-container">
         {loading ? (
