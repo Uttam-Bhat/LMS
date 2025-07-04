@@ -4,6 +4,22 @@ import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
 import { FaBook, FaSearch, FaPlus } from 'react-icons/fa';
 
+// Utility: Convert date from dd-mm-yyyy to yyyy-mm-dd for the date input
+function formatDateForInput(dateStr) {
+  if (!dateStr) return '';
+  // Check if date is already in yyyy-mm-dd format
+  if (dateStr.includes('-') && dateStr.split('-')[0].length === 4) {
+    return dateStr;
+  }
+  // Convert from dd-mm-yyyy to yyyy-mm-dd
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    const [dd, mm, yyyy] = parts;
+    return `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
+  }
+  return dateStr;
+}
+
 const ChaptersManagement = () => {
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -65,49 +81,22 @@ const ChaptersManagement = () => {
       alert('Please wait for subjects to load before editing.');
       return;
     }
-    
-    console.log('Opening modal for item:', item);
-    console.log('Available subjects:', subjects);
-    
+
     setEditItem(item);
-    
-    // Find the matching subject
-    let subjectMatch = subjects.find(s => s.su_name === item.su_name);
-    
-    // If not found by exact name, try case-insensitive match
-    if (!subjectMatch) {
-      subjectMatch = subjects.find(s => 
-        s.su_name && item.su_name && 
-        s.su_name.toLowerCase() === item.su_name.toLowerCase()
-      );
-    }
-    
-    console.log('Found subject match:', subjectMatch);
-    
-    // Convert date from dd-mm-yyyy to yyyy-mm-dd for the date input
-    const formatDateForInput = (dateStr) => {
-      if (!dateStr) return '';
-      // Check if date is already in yyyy-mm-dd format
-      if (dateStr.includes('-') && dateStr.split('-')[0].length === 4) {
-        return dateStr;
-      }
-      // Convert from dd-mm-yyyy to yyyy-mm-dd
-      const parts = dateStr.split('-');
-      if (parts.length === 3) {
-        const [dd, mm, yyyy] = parts;
-        return `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
-      }
-      return dateStr;
-    };
 
+    // Use nested structure for subject, stream, and class
+    const su_name = item.subject_info?.su_name || '';
+    const stream_id = item.subject_info?.stream_info?.sid ? String(item.subject_info.stream_info.sid) : '';
+    const class_id = item.subject_info?.stream_info?.class_info?.cls_id ? String(item.subject_info.stream_info.class_info.cls_id) : '';
     const formattedDate = formatDateForInput(item.cdate);
-    console.log('Original date:', item.cdate, 'Formatted date:', formattedDate);
 
+    setSelectedClass(class_id);
+    setSelectedStream(stream_id);
     setForm({
       ch_name: item.ch_name || '',
       des: item.des || '',
       cdate: formattedDate,
-      su_name: subjectMatch ? subjectMatch.su_name : '',
+      su_name,
     });
     setShowModal(true);
   };
@@ -134,7 +123,8 @@ const ChaptersManagement = () => {
       return;
     }
 
-    const payload = {
+    // Only send changed fields for update
+    let payload = {
       ch_name: form.ch_name,
       des: form.des,
       cdate: formatDateForAPI(form.cdate),
@@ -143,10 +133,30 @@ const ChaptersManagement = () => {
       class_id: classObj.cls_id,
     };
 
+    if (editItem) {
+      // Compare with original values and only include changed fields
+      const orig = editItem;
+      const origSubjectId = orig.subject_info?.su_id;
+      const origStreamId = orig.subject_info?.stream_info?.sid;
+      const origClassId = orig.subject_info?.stream_info?.class_info?.cls_id;
+      const origDate = formatDateForAPI(orig.cdate);
+      payload = {};
+      if (form.ch_name !== orig.ch_name) payload.ch_name = form.ch_name;
+      if (form.des !== orig.des) payload.des = form.des;
+      if (formatDateForAPI(form.cdate) !== origDate) payload.cdate = formatDateForAPI(form.cdate);
+      if (subjectObj.su_id !== origSubjectId) payload.subject_id = subjectObj.su_id;
+      if (streamObj.sid !== origStreamId) payload.stream_id = streamObj.sid;
+      if (classObj.cls_id !== origClassId) payload.class_id = classObj.cls_id;
+      if (Object.keys(payload).length === 0) {
+        alert('No changes detected.');
+        return;
+      }
+    }
+
     try {
       if (editItem) {
         // Edit mode
-        await axios.put(`http://localhost:3000/api/chapter/edit/${editItem.ch_id || editItem.id}`, payload);
+        await axios.put(`http://localhost:3000/api/chapter/edit/${editItem.ch_id}`, payload);
       } else {
         // Add mode
         await axios.post('http://localhost:3000/api/chapter/add', payload);
@@ -155,6 +165,8 @@ const ChaptersManagement = () => {
       setShowModal(false);
       setForm({ ch_name: '', des: '', cdate: '', su_name: '' });
       setEditItem(null);
+      setSelectedClass('');
+      setSelectedStream('');
     } catch (err) {
       console.error('Error saving chapter:', err);
       alert('Failed to save chapter. Please try again.');
@@ -321,24 +333,24 @@ const ChaptersManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredChapters.map(s => {
-                // Find the subject, stream, and class by their IDs (string comparison)
-                const subject = subjects.find(sub => String(sub.su_id) === String(s.subject_id));
-                const stream = streams.find(str => String(str.sid) === String(s.stream_id));
-                const classObj = classes.find(cls => String(cls.cls_id) === String(s.class_id));
+              {filteredChapters.map(chapter => {
+                // Use the new nested structure from backend
+                const subjectInfo = chapter.subject_info || {};
+                const streamInfo = subjectInfo.stream_info || {};
+                const classInfo = streamInfo.class_info || {};
 
                 return (
-                  <tr key={s._id || s.id}>
-                    <td>{classObj?.class_name || 'N/A'}</td>
-                    <td>{stream?.sname || 'N/A'}</td>
-                    <td>{subject?.su_name || 'N/A'}</td>
-                    <td>{s.ch_name}</td>
-                    <td>{s.des}</td>
-                    <td>{s.cdate}</td>
+                  <tr key={chapter.ch_id}>
+                    <td>{classInfo.class_name || 'N/A'}</td>
+                    <td>{streamInfo.sname || 'N/A'}</td>
+                    <td>{subjectInfo.su_name || 'N/A'}</td>
+                    <td>{chapter.ch_name}</td>
+                    <td>{chapter.des}</td>
+                    <td>{chapter.cdate}</td>
                     <td>
                       <div className="stream-action-buttons">
-                        <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
-                        <button className="stream-delete-btn" onClick={() => handleDelete(s.ch_id || s.id)}>Delete</button>
+                        <button className="stream-edit-btn" onClick={() => openModal(chapter)}>Edit</button>
+                        <button className="stream-delete-btn" onClick={() => handleDelete(chapter.ch_id)}>Delete</button>
                       </div>
                     </td>
                   </tr>
