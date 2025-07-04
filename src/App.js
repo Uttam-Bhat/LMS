@@ -23,6 +23,7 @@ import StudentProfile from './components/Student/StudentProfile';
 import StudentSettings from './components/Student/StudentSettings';
 import AdminProfile from './components/Dashboard/AdminProfile';
 import AdminSettings from './components/Dashboard/AdminSettings';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -32,29 +33,29 @@ function App() {
           <Route path="/" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/users" element={<UserManagement />} />
-          <Route path="/admin/teachers" element={<TeachersManagement />} />
-          <Route path="/admin/students" element={<StudentsManagement />} />
-          <Route path="/admin/courses" element={<CourseManagement />} />
-          <Route path="/admin/exams" element={<ExamManagement />} />
-          <Route path="/admin/results" element={<ResultsPlaceholder />} />
-          <Route path="/admin/stream" element={<StreamManagement />} />
-          <Route path="/admin/subjects" element={<SubjectsManagement />} />
-          <Route path="/admin/chapters" element={<ChaptersManagement />} />
-          <Route path="/admin/content" element={<ContentManagement />} />
-          <Route path="/admin/classes" element={<ClassesManagement />} />
-          <Route path="/student" element={<StudentDashboard />} />
-          <Route path="/student/exam" element={<RegisterExam />} />
-          <Route path="/student/notifications" element={<Notification />} />
-          <Route path="/student/result" element={<StudentDashboard />} />
-          <Route path="/student/Logout" element={<StudentDashboard />} />
-          <Route path="/student/available-courses" element={<AvailableCourses />} />
-          <Route path="/student/my-courses" element={<MyCourses />} />
-          <Route path="/student/profile" element={<StudentProfile />} />
-          <Route path="/student/settings" element={<StudentSettings />} />
-          <Route path="/admin/profile" element={<AdminProfile />} />
-          <Route path="/admin/settings" element={<AdminSettings />} />
+          <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
+          <Route path="/admin/teachers" element={<ProtectedRoute><TeachersManagement /></ProtectedRoute>} />
+          <Route path="/admin/students" element={<ProtectedRoute><StudentsManagement /></ProtectedRoute>} />
+          <Route path="/admin/courses" element={<ProtectedRoute><CourseManagement /></ProtectedRoute>} />
+          <Route path="/admin/exams" element={<ProtectedRoute><ExamManagement /></ProtectedRoute>} />
+          <Route path="/admin/results" element={<ProtectedRoute><ResultsPlaceholder /></ProtectedRoute>} />
+          <Route path="/admin/stream" element={<ProtectedRoute><StreamManagement /></ProtectedRoute>} />
+          <Route path="/admin/subjects" element={<ProtectedRoute><SubjectsManagement /></ProtectedRoute>} />
+          <Route path="/admin/chapters" element={<ProtectedRoute><ChaptersManagement /></ProtectedRoute>} />
+          <Route path="/admin/content" element={<ProtectedRoute><ContentManagement /></ProtectedRoute>} />
+          <Route path="/admin/classes" element={<ProtectedRoute><ClassesManagement /></ProtectedRoute>} />
+          <Route path="/student" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
+          <Route path="/student/exam" element={<ProtectedRoute><RegisterExam /></ProtectedRoute>} />
+          <Route path="/student/notifications" element={<ProtectedRoute><Notification /></ProtectedRoute>} />
+          <Route path="/student/result" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
+          <Route path="/student/Logout" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
+          <Route path="/student/available-courses" element={<ProtectedRoute><AvailableCourses /></ProtectedRoute>} />
+          <Route path="/student/my-courses" element={<ProtectedRoute><MyCourses /></ProtectedRoute>} />
+          <Route path="/student/profile" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />
+          <Route path="/student/settings" element={<ProtectedRoute><StudentSettings /></ProtectedRoute>} />
+          <Route path="/admin/profile" element={<ProtectedRoute><AdminProfile /></ProtectedRoute>} />
+          <Route path="/admin/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
         </Routes>
       </div>
     </Router>

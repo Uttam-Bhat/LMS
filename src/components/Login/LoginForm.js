@@ -31,6 +31,9 @@ const LoginForm = () => {
 
       alert(`Welcome ${user.fullname}!`);
 
+      // Store token or flag for authentication
+      localStorage.setItem('token', user._id); // or use a real token if available
+
       // Role-based redirection
       if (user.user_type === 'admin') {
         navigate('/admin');
