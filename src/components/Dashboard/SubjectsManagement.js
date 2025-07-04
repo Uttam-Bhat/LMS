@@ -106,7 +106,7 @@ const SubjectsManagement = () => {
       name: item.su_name || '',
       description: item.des || '',
       created: formattedDate,
-      streamId: streamMatch ? streamMatch.sid.toString() : '',
+      streamId: (item.stream_info && item.stream_info.sid ? item.stream_info.sid.toString() : (item.sid ? item.sid.toString() : '')),
     });
     setShowModal(true);
   };
@@ -165,11 +165,9 @@ const SubjectsManagement = () => {
 
   // Filter streams by selected class
   const filteredStreams = selectedClass
-    ? streams.filter(s => {
-        // Find the class for this stream and match both class_name and cls_id
-        const cls = classes.find(c => c.class_name === s.class_name && c.cls_id.toString() === selectedClass);
-        return !!cls;
-      })
+    ? streams.filter(s =>
+        s.class_info && s.class_info.cls_id && s.class_info.cls_id.toString() === selectedClass
+      )
     : streams;
 
   // When editing, set selectedClass based on the stream/class
@@ -183,16 +181,21 @@ const SubjectsManagement = () => {
     }
   }, [editItem, streams, classes]);
 
-  // Unique classes for dropdown
-  const uniqueClasses = classes.filter((cls, idx, arr) =>
-    arr.findIndex(c => c.class_name === cls.class_name) === idx
-  );
-
-  // Helper to get class name for a subject
-  const getClassNameForSubject = (subject) => {
-    const stream = streams.find(s => s.sname === subject.sname);
-    return stream ? stream.class_name : 'N/A';
-  };
+  // Build uniqueClasses from subjects' stream_info.class_info
+  const uniqueClasses = [];
+  const classIds = new Set();
+  subjects.forEach(s => {
+    const cls = s.stream_info?.class_info;
+    if (cls && !classIds.has(cls.cls_id)) {
+      uniqueClasses.push(cls);
+      classIds.add(cls.cls_id);
+    }
+  });
+  // Build availableStreams for dropdown from subjects' stream_info for selected class
+  const availableStreams = subjects
+    .filter(s => s.stream_info?.class_info?.cls_id?.toString() === selectedClass)
+    .map(s => s.stream_info)
+    .filter((stream, idx, arr) => stream && arr.findIndex(s2 => s2.sid === stream.sid) === idx);
 
   return (
     <DashboardLayout>
@@ -243,7 +246,7 @@ const SubjectsManagement = () => {
           >
             <option value="">All Classes</option>
             {uniqueClasses.map(cls => (
-              <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
+              <option key={String(cls.cls_id)} value={String(cls.cls_id)}>{cls.class_name}</option>
             ))}
           </select>
           <select
@@ -339,7 +342,7 @@ const SubjectsManagement = () => {
                         background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
                         padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem'
                       }}>
-                        {s.class_info?.class_name || 'N/A'}
+                        {s.stream_info?.class_info?.class_name || 'N/A'}
                       </div>
                     </div>
                   </td>
@@ -409,7 +412,7 @@ const SubjectsManagement = () => {
               >
                 <option value="">Select Class</option>
                 {uniqueClasses.map(cls => (
-                  <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
+                  <option key={String(cls.cls_id)} value={String(cls.cls_id)}>{cls.class_name}</option>
                 ))}
               </select>
 
@@ -434,8 +437,8 @@ const SubjectsManagement = () => {
                 disabled={!selectedClass}
               >
                 <option value="">Select Stream</option>
-                {filteredStreams.map(stream => (
-                  <option key={stream.sid} value={stream.sid}>{stream.sname}</option>
+                {availableStreams.map(stream => (
+                  <option key={String(stream.sid)} value={String(stream.sid)}>{stream.sname}</option>
                 ))}
               </select>
 
