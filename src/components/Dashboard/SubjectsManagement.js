@@ -8,7 +8,7 @@ const SubjectsManagement = () => {
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
-  const [form, setForm] = useState({ name: '', description: '', created: '', streamId: '' });
+  const [form, setForm] = useState({ code: '', name: '', description: '', created: '', streamId: '' });
   const [streams, setStreams] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -92,6 +92,7 @@ const SubjectsManagement = () => {
     const formattedDate = formatDateForInput(item.cdate);
 
     setForm({
+      code: item.subject_code || item.su_code || '',
       name: item.su_name || '',
       description: item.des || '',
       created: formattedDate,
@@ -115,11 +116,12 @@ const SubjectsManagement = () => {
   const handleAddOrUpdate = async () => {
     const stream = streams.find(s => String(s.sid) === String(form.streamId));
     const classObj = classes.find(c => String(c.cls_id) === String(selectedClass));
-    if (!form.name || !form.description || !form.created || !stream || !selectedClass || !stream.sid || !classObj || !classObj.cls_id) {
-      setErrorMessage(`All fields are required. Debug info: name=${form.name}, description=${form.description}, created=${form.created}, stream=${!!stream}, selectedClass=${selectedClass}, stream.sid=${stream?.sid}, classObj.cls_id=${classObj?.cls_id}`);
+    if (!form.code || !form.name || !form.description || !form.created || !stream || !selectedClass || !stream.sid || !classObj || !classObj.cls_id) {
+      setErrorMessage(`All fields are required. Debug info: code=${form.code}, name=${form.name}, description=${form.description}, created=${form.created}, stream=${!!stream}, selectedClass=${selectedClass}, stream.sid=${stream?.sid}, classObj.cls_id=${classObj?.cls_id}`);
       return;
     }
     const payload = {
+      subject_code: form.code,
       su_name: form.name,
       des: form.description,
       cdate: formatDateForAPI(form.created),
@@ -138,7 +140,7 @@ const SubjectsManagement = () => {
       }
       fetchSubjects();
       setShowModal(false);
-      setForm({ name: '', description: '', created: '', streamId: '' });
+      setForm({ code: '', name: '', description: '', created: '', streamId: '' });
       setEditItem(null);
     } catch (err) {
       setErrorMessage('Error saving subject. Please try again.');
@@ -271,7 +273,7 @@ const SubjectsManagement = () => {
               }
               setShowModal(true);
               setEditItem(null);
-              setForm({ name: '', description: '', created: '', streamId: '' });
+              setForm({ code: '', name: '', description: '', created: '', streamId: '' });
             }}
           >
             <FaPlus /> Add Subject
@@ -305,6 +307,7 @@ const SubjectsManagement = () => {
           <table className="stream-table">
             <thead>
               <tr>
+                <th>Code</th>
                 <th>Name</th>
                 <th>Description</th>
                 <th>Class</th>
@@ -316,6 +319,7 @@ const SubjectsManagement = () => {
             <tbody>
               {filteredSubjects.map(s => (
                 <tr key={s._id || s.id}>
+                  <td>{s.subject_code || s.su_code || ''}</td>
                   <td>{s.su_name}</td>
                   <td>{s.des}</td>
                   <td>
@@ -363,6 +367,12 @@ const SubjectsManagement = () => {
               {errorMessage && (
                 <div style={{ color: 'red', marginBottom: '10px' }}>{errorMessage}</div>
               )}
+              <input
+                name="code"
+                placeholder="Subject Code"
+                value={form.code}
+                onChange={handleInputChange}
+              />
               <input
                 name="name"
                 placeholder="Subject Name"
