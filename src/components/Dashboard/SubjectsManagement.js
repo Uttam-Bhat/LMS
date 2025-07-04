@@ -115,16 +115,16 @@ const SubjectsManagement = () => {
   const handleAddOrUpdate = async () => {
     const stream = streams.find(s => String(s.sid) === String(form.streamId));
     const classObj = classes.find(c => String(c.cls_id) === String(selectedClass));
-    if (!form.name || !form.description || !form.created || !stream || !selectedClass || !stream.sname || !classObj || !classObj.class_name) {
-      setErrorMessage(`All fields are required. Debug info: name=${form.name}, description=${form.description}, created=${form.created}, stream=${!!stream}, selectedClass=${selectedClass}, stream.sname=${stream?.sname}, classObj.class_name=${classObj?.class_name}`);
+    if (!form.name || !form.description || !form.created || !stream || !selectedClass || !stream.sid || !classObj || !classObj.cls_id) {
+      setErrorMessage(`All fields are required. Debug info: name=${form.name}, description=${form.description}, created=${form.created}, stream=${!!stream}, selectedClass=${selectedClass}, stream.sid=${stream?.sid}, classObj.cls_id=${classObj?.cls_id}`);
       return;
     }
     const payload = {
       su_name: form.name,
       des: form.description,
       cdate: formatDateForAPI(form.created),
-      sname: stream.sname,
-      class_name: classObj.class_name,
+      stream_id: stream.sid,
+      class_id: classObj.cls_id,
     };
     console.log('Payload to be sent:', payload);
     setErrorMessage(''); // Clear error if validation passes
