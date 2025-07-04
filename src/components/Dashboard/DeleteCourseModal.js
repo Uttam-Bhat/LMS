@@ -2,20 +2,21 @@ import React from 'react';
 import { FaTimes, FaExclamationTriangle, FaTrashAlt } from 'react-icons/fa';
 import './CreateCourseModal.css';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const DeleteCourseModal = ({ onClose, course, onDelete }) => {
   const handleDelete = async () => {
     if (!course.courseId) {
-      alert('Error: Course ID is missing. Cannot delete this course.');
+      toast.error('Error: Course ID is missing. Cannot delete this course.');
       return;
     }
     try {
       await axios.delete(`http://localhost:3000/api/course/delete/${course.courseId}`);
-      alert('Course deleted successfully!');
+      toast.success('Course deleted successfully!');
       onDelete && onDelete(course.courseId);
       onClose();
     } catch (error) {
-      alert('Failed to delete course.');
+      toast.error('Failed to delete course.');
     }
   };
 

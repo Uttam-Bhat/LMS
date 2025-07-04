@@ -2,6 +2,8 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import './CreateUserModal.css';
+import toast from 'react-hot-toast';
+
 const CreateUserModal = ({ onClose = () => {}, editUser = null, onUpdate = () => {} }) => {
   const [formData, setFormData] = useState({
     fullname:'',
@@ -53,10 +55,10 @@ const CreateUserModal = ({ onClose = () => {}, editUser = null, onUpdate = () =>
       
       if (editUser) {
         await axios.put(`http://localhost:3000/api/admin/edit/${editUser.id}`, payload);
-        alert('User updated successfully');
+        toast.success('User updated successfully');
       } else {
         await axios.post('http://localhost:3000/api/admin/register', payload);
-        alert('User added successfully');
+        toast.success('User added successfully');
       }
       onUpdate(); // Refresh user list
       onClose();  // Close modal
@@ -66,9 +68,9 @@ const CreateUserModal = ({ onClose = () => {}, editUser = null, onUpdate = () =>
       console.error('Error details:', error.response);
       
       if (editUser) {
-        alert(`Failed to update user: ${error.response?.data?.message || error.message}`);
+        toast.error(`Failed to update user: ${error.response?.data?.message || error.message}`);
       } else {
-        alert(`Failed to add user: ${error.response?.data?.message || error.message}`);
+        toast.error(`Failed to add user: ${error.response?.data?.message || error.message}`);
       }
     }
   };

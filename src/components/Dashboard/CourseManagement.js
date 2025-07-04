@@ -7,6 +7,7 @@ import CreateCourseModal from './CreateCourseModal';
 import DashboardLayout from './DashboardLayout';
 import DeleteCourseModal from './DeleteCourseModal';
 import EditCourseModal from './EditCourseModal';
+import toast from 'react-hot-toast';
 
 import { FaChartLine, FaEdit, FaPlus, FaTrashAlt, FaUserPlus } from 'react-icons/fa';
 
@@ -79,11 +80,11 @@ const CourseManagement = () => {
         // Refresh both courses and teachers data to ensure everything is in sync
         await Promise.all([fetchCourses(), fetchTeachers()]);
         
-        alert('Course updated successfully!');
+        toast.success('Course updated successfully!');
       }
     } catch (error) {
       console.error('Failed to update course:', error);
-      alert('Failed to update course. Please try again.');
+      toast.error('Failed to update course. Please try again.');
     }
   };
 
@@ -101,7 +102,7 @@ const CourseManagement = () => {
     console.log('Students added to course:', students);
     // Here you would typically update the backend
     // For now, we'll just show an alert
-    alert(`${students.length} student(s) added to ${selectedCourse.coursename}`);
+    toast.success(`${students.length} student(s) added to ${selectedCourse.coursename}`);
   };
 
   useEffect(() => {

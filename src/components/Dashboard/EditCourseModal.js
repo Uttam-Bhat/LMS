@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import './CreateCourseModal.css';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const EditCourseModal = ({ onClose, course, onUpdate }) => {
   const [formData, setFormData] = useState({
@@ -65,7 +66,7 @@ const EditCourseModal = ({ onClose, course, onUpdate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.courseId) {
-      alert('Error: Course ID is missing. Cannot update this course.');
+      toast.error('Error: Course ID is missing. Cannot update this course.');
       return;
     }
     const payload = {
@@ -81,12 +82,12 @@ const EditCourseModal = ({ onClose, course, onUpdate }) => {
       if (response.status === 200) {
         // Call the onUpdate callback to update the parent component
         onUpdate && onUpdate(payload);
-        alert('Course updated successfully!');
+        toast.success('Course updated successfully!');
         onClose();
       }
     } catch (error) {
       console.error('Failed to update course:', error);
-      alert('Failed to update course. Please try again.');
+      toast.error('Failed to update course. Please try again.');
     }
   };
 

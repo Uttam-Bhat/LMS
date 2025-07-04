@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
 import { FaChalkboardTeacher, FaSearch, FaPlus } from 'react-icons/fa';
+import toast from 'react-hot-toast';
+import ConfirmDialog from './ConfirmDialog';
 
 const ClassesManagement = () => {
   const [search, setSearch] = useState('');
@@ -11,6 +13,8 @@ const ClassesManagement = () => {
   const [form, setForm] = useState({ class_name: '', des: '', section: '', cdate: '' });
   const [classes, setClasses] = useState([]);
   const [statusMessage, setStatusMessage] = useState('');
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
   // Utility to convert yyyy-MM-dd to dd-MM-yyyy for backend
   const formatDateForBackend = (dateStr) => {
@@ -44,7 +48,7 @@ const ClassesManagement = () => {
 
   const handleSave = async () => {
     if (!form.class_name || !form.des || !form.section || !form.cdate) {
-      alert('Please fill in all fields');
+      toast('Please fill in all fields');
       return;
     }
 
@@ -56,7 +60,7 @@ const ClassesManagement = () => {
       if (form.section !== editItem.section) changedFields.section = form.section;
       if (form.cdate !== editItem.cdate) changedFields.cdate = formatDateForBackend(form.cdate);
       if (Object.keys(changedFields).length === 0) {
-        alert('No changes to save.');
+        toast('No changes to save.');
         return;
       }
       try {
@@ -66,13 +70,13 @@ const ClassesManagement = () => {
             cls.cls_id === editItem.cls_id ? { ...cls, ...changedFields } : cls
           )
         );
-        alert('Class updated successfully');
+        toast.success('Class updated successfully');
         setShowModal(false);
         setEditItem(null);
         setForm({ class_name: '', des: '', section: '', cdate: '' });
       } catch (error) {
         console.error('Failed to save class:', error);
-        alert('Failed to save class. Please check console for error.');
+        toast.error('Failed to save class. Please check console for error.');
         setForm({ class_name: '', des: '', section: '', cdate: '' });
       }
     } else {
@@ -90,26 +94,34 @@ const ClassesManagement = () => {
           cls_id: response.data.cls_id || Date.now(),
         };
         setClasses(prev => [...prev, newClass]);
-        alert('Class added successfully');
+        toast.success('Class added successfully');
         setShowModal(false);
         setEditItem(null);
         setForm({ class_name: '', des: '', section: '', cdate: '' });
       } catch (error) {
         console.error('Failed to save class:', error);
-        alert('Failed to save class. Please check console for error.');
+        toast.error('Failed to save class. Please check console for error.');
         setForm({ class_name: '', des: '', section: '', cdate: '' });
       }
     }
   };
 
-  const handleDelete = async (cls_id) => {
+  const handleDelete = (id) => {
+    setPendingDeleteId(id);
+    setConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/api/class/delete/${cls_id}`);
-      setClasses(prev => prev.filter(cls => cls.cls_id !== cls_id));
-      setStatusMessage('Class deleted successfully.');
-    } catch (error) {
-      console.error('Error deleting class:', error);
-      setStatusMessage('Failed to delete class.');
+      await axios.delete(`http://localhost:3000/api/class/delete/${pendingDeleteId}`);
+      fetchClasses();
+      toast.success('Class deleted successfully!');
+    } catch (err) {
+      console.error('Error deleting class:', err);
+      toast.error('Failed to delete class. Please try again.');
+    } finally {
+      setConfirmOpen(false);
+      setPendingDeleteId(null);
     }
   };
 
@@ -118,24 +130,25 @@ const ClassesManagement = () => {
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
+  const fetchClasses = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/class/display');
+      // Ensure every class object has a cls_id property and map start_date/end_date
+      const dataWithIds = (response.data || []).map((cls, idx) => ({
+        ...cls,
+        cls_id: cls.cls_id || cls.id || cls._id || idx + 1, // fallback to id/_id or index
+        start_date: cls.start_date || '',
+        end_date: cls.end_date || '',
+        des: cls.des || '',
+        cdate: cls.cdate || '',
+      }));
+      setClasses(dataWithIds);
+    } catch (error) {
+      console.error('Failed to fetch classes:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchClasses = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/api/class/display');
-        // Ensure every class object has a cls_id property and map start_date/end_date
-        const dataWithIds = (response.data || []).map((cls, idx) => ({
-          ...cls,
-          cls_id: cls.cls_id || cls.id || cls._id || idx + 1, // fallback to id/_id or index
-          start_date: cls.start_date || '',
-          end_date: cls.end_date || '',
-          des: cls.des || '',
-          cdate: cls.cdate || '',
-        }));
-        setClasses(dataWithIds);
-      } catch (error) {
-        console.error('Failed to fetch classes:', error);
-      }
-    };
     fetchClasses();
   }, []);
 
@@ -324,6 +337,14 @@ const ClassesManagement = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete Class?"
+        message="Are you sure you want to delete this class? This action cannot be undone."
+        onConfirm={confirmDelete}
+        onCancel={() => { setConfirmOpen(false); setPendingDeleteId(null); }}
+      />
     </DashboardLayout>
   );
 };

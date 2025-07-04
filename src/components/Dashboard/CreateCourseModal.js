@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import './CreateCourseModal.css';
+import toast from 'react-hot-toast';
 
 const CreateCourseModal = ({ onClose, onCourseAdded }) => {
   const [teachers, setTeachers] = useState([]);
@@ -59,7 +60,7 @@ const CreateCourseModal = ({ onClose, onCourseAdded }) => {
     try {
       const response = await axios.post('http://localhost:3000/api/course/add', payload);
       console.log('Course created:', response.data);
-      alert('Course created successfully!');
+      toast.success('Course created successfully!');
       // Map backend response to UI structure if needed
       const newCourse = {
         courseId: response.data.courseId || Date.now(),
@@ -77,7 +78,7 @@ const CreateCourseModal = ({ onClose, onCourseAdded }) => {
       onClose();
     } catch (error) {
       console.error('Failed to create course:', error);
-      alert('Course creation failed. Check console for details.');
+      toast.error('Course creation failed. Check console for details.');
     }
   };
 

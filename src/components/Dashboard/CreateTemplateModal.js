@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import './CreateCourseModal.css';
+import toast from 'react-hot-toast';
 
 const emptyQuestion = {
   text: '',
@@ -104,10 +105,10 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
           ...form,
           questions: form.questions.filter((_, i) => i !== idx)
         });
-        alert('Question deleted successfully!');
+        toast.success('Question deleted successfully!');
       } catch (error) {
         console.error('Error deleting question:', error);
-        alert('Failed to delete question.');
+        toast.error('Failed to delete question.');
       }
     } else {
       setForm({
@@ -121,13 +122,13 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
     e.preventDefault();
 
     if (!form.name.trim() || !form.subject.trim()) {
-      alert('Template name and subject are required.');
+      toast('Template name and subject are required.');
       return;
     }
 
     for (let q of form.questions) {
       if (!q.text || !q.optionA || !q.optionB || !q.optionC || !q.optionD || !q.correct) {
-        alert('All fields in each question are required.');
+        toast('All fields in each question are required.');
         return;
       }
     }
@@ -151,16 +152,16 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
     try {
       if (template && template.t_id) {
         await axios.put(`http://localhost:3000/api/question/edit-by-template/${template.t_id}`, payload);
-        alert('Template updated successfully!');
+        toast.success('Template updated successfully!');
       } else {
         await axios.post('http://localhost:3000/api/question/add', payload);
-        alert('Template created successfully!');
+        toast.success('Template created successfully!');
       }
       if (refreshTemplates) await refreshTemplates();
       onClose();
     } catch (error) {
       console.error('Error saving template:', error);
-      alert('Failed to save template.');
+      toast.error('Failed to save template.');
     }
   };
 

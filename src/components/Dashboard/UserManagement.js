@@ -5,6 +5,8 @@ import CreateUserModal from './CreateUserModal';
 import DashboardLayout from './DashboardLayout';
 import './UserManagement.css';
 import AssignStudentModal from './AssignStudentModal';
+import toast from 'react-hot-toast';
+import ConfirmDialog from './ConfirmDialog';
 
 const UserManagement = () => {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -17,24 +19,28 @@ const UserManagement = () => {
   const [assignedStudents, setAssignedStudents] = useState({}); // { [userId]: true }
 
   const [users, setUsers] = useState([]);
-const [loading, setLoading] = useState(true);
-const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-useEffect(() => {
-  const fetchUsers = async () => {
-    try {
-      const response = await axios.get('http://localhost:3000/api/admin/users');
-      setUsers(response.data); // Expecting array of user objects
-      setLoading(false);
-    } catch (err) {
-      console.error('Failed to fetch users:', err);
-      setError('Failed to load users');
-      setLoading(false);
-    }
-  };
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
-  fetchUsers();
-}, []);
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/admin/users');
+        setUsers(response.data); // Expecting array of user objects
+        setLoading(false);
+      } catch (err) {
+        console.error('Failed to fetch users:', err);
+        setError('Failed to load users');
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
   const handleFilterChange = (filter) => {
     setActiveFilter(filter);
   };
@@ -49,20 +55,26 @@ useEffect(() => {
                          user.email.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
-  const handleDeleteUser = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) return;
-  
+
+  const handleDelete = (id) => {
+    setPendingDeleteId(id);
+    setConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/api/admin/delete/${id}`);
-      alert('User deleted successfully');
-  
-      // Remove user from local state
-      setUsers(prevUsers => prevUsers.filter(user => user.id !== id));
+      await axios.delete(`http://localhost:3000/api/admin/delete/${pendingDeleteId}`);
+      setUsers(prevUsers => prevUsers.filter(user => user.id !== pendingDeleteId));
+      toast.success('User deleted successfully');
     } catch (error) {
       console.error('Failed to delete user:', error);
-      alert('Error deleting user');
+      toast.error('Error deleting user');
+    } finally {
+      setConfirmOpen(false);
+      setPendingDeleteId(null);
     }
   };
+
   return (
     <DashboardLayout>
       <div className="user-management">
@@ -131,16 +143,16 @@ useEffect(() => {
                   </td>
                   <td>{user.email}</td>
                   <td>
-                  <span className={`role-badge ${user.user_type || 'unknown'}`}>
-                     {(user.user_type|| 'unknown').charAt(0).toUpperCase() + (user.user_type || 'unknown').slice(1)}
-                  </span>
-            </td>
+                    <span className={`role-badge ${user.user_type || 'unknown'}`}>
+                      {(user.user_type || 'unknown').charAt(0).toUpperCase() + (user.user_type || 'unknown').slice(1)}
+                    </span>
+                  </td>
                   <td>
                     <div className="action-buttons">
                       <button className="edit-btn" title="Edit user" onClick={() => { setEditUserData(user); setShowCreateUserModal(true); }}>
                         <FaPencilAlt />
                       </button>
-                      <button className="delete-btn" title="Delete user" onClick={() => handleDeleteUser(user.id)}>
+                      <button className="delete-btn" title="Delete user" onClick={() => handleDelete(user.id)}>
                         <FaTrashAlt />
                       </button>
                     </div>
@@ -161,22 +173,22 @@ useEffect(() => {
         </div>
 
         {(showCreateUserModal || editUserData) && (
-  <CreateUserModal
-    onClose={() => {
-      setShowCreateUserModal(false);
-      setEditUserData(null);
-    }}
-    editUser={editUserData}
-    onUpdate={async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/api/admin/users');
-        setUsers(response.data);
-      } catch (err) {
-        console.error('Failed to refresh users:', err);
-      }
-    }}
-  />
-)}
+          <CreateUserModal
+            onClose={() => {
+              setShowCreateUserModal(false);
+              setEditUserData(null);
+            }}
+            editUser={editUserData}
+            onUpdate={async () => {
+              try {
+                const response = await axios.get('http://localhost:3000/api/admin/users');
+                setUsers(response.data);
+              } catch (err) {
+                console.error('Failed to refresh users:', err);
+              }
+            }}
+          />
+        )}
 
         {showAssignModal && assigningUser && (
           <AssignStudentModal
@@ -189,6 +201,14 @@ useEffect(() => {
             }}
           />
         )}
+
+        <ConfirmDialog
+          open={confirmOpen}
+          title="Delete User?"
+          message="Are you sure you want to delete this user? This action cannot be undone."
+          onConfirm={confirmDelete}
+          onCancel={() => { setConfirmOpen(false); setPendingDeleteId(null); }}
+        />
 
       </div>
     </DashboardLayout>

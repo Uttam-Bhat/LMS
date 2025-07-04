@@ -14,6 +14,7 @@ import CreateExamModal from './CreateExamModal';
 import CreateTemplateModal from './CreateTemplateModal';
 import DashboardLayout from './DashboardLayout';
 import './ExamManagement.css';
+import toast from 'react-hot-toast';
 
 const ExamManagement = () => {
   const [showCreateExamModal, setShowCreateExamModal] = useState(false);
@@ -98,10 +99,10 @@ const ExamManagement = () => {
   try {
     await axios.delete(`http://localhost:3000/api/question/delete-template/${templateId}`);
     await refreshTemplates();
-    alert('Template deleted successfully!');
+    toast.success('Template deleted successfully!');
   } catch (error) {
     console.error('Error deleting template:', error);
-    alert('Failed to delete template.');
+    toast.error('Failed to delete template.');
   }
 };
 
@@ -119,10 +120,10 @@ const ExamManagement = () => {
     try {
       await axios.delete(`http://localhost:3000/api/exam/delete/${examId}`);
       await refreshExams();
-      alert('Exam deleted successfully!');
+      toast.success('Exam deleted successfully!');
     } catch (error) {
       console.error('Error deleting exam:', error);
-      alert('Failed to delete exam.');
+      toast.error('Failed to delete exam.');
     }
   };
   const handleFileUpload = async (file) => {
@@ -137,12 +138,12 @@ const ExamManagement = () => {
       },
     });
 
-    alert("Upload successful!");
+    toast.success('Upload successful!');
     console.log("Response:", response.data);
     // Optional: refresh questionSets from backend
   } catch (error) {
     console.error("Upload failed:", error);
-    alert("Upload failed");
+    toast.error('Upload failed');
   }
 };
 const handleDelete = async (fileId) => {
@@ -151,7 +152,7 @@ const handleDelete = async (fileId) => {
     fetchFiles(); // Refresh list after delete
   } catch (err) {
     console.error('Delete error:', err);
-    alert('Failed to delete file');
+    toast.error('Failed to delete file');
   }
 };
 

@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
 import { FaStream, FaSearch, FaPlus } from 'react-icons/fa';
+import toast from 'react-hot-toast';
+import ConfirmDialog from './ConfirmDialog';
 
 const StreamManagement = () => {
   const [search, setSearch] = useState('');
@@ -11,6 +13,18 @@ const StreamManagement = () => {
   const [form, setForm] = useState({ name: '', description: '', created: '', classId: '' });
   const [classes, setClasses] = useState([]);
   const [streamList, setStreamList] = useState([]);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
+
+  const fetchStreams = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/stream/display');
+      setStreamList(response.data);
+    } catch (error) {
+      console.error('Error fetching streams', error);
+      setStreamList([]);
+    }
+  };
 
   useEffect(() => {
     // Fetch classes for dropdown
@@ -21,16 +35,6 @@ const StreamManagement = () => {
       } catch (error) {
         console.error('Error fetching classes', error);
         setClasses([]);
-      }
-    };
-
-    const fetchStreams = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/api/stream/display');
-        setStreamList(response.data);
-      } catch (error) {
-        console.error('Error fetching streams', error);
-        setStreamList([]);
       }
     };
 
@@ -83,7 +87,7 @@ const StreamManagement = () => {
       const selectedClass = classes.find(cls => cls.cls_id === parseInt(form.classId));
   
       if (!selectedClass) {
-        alert("Invalid class selected.");
+        toast('Invalid class selected.');
         return;
       }
   
@@ -108,27 +112,30 @@ const StreamManagement = () => {
       setStreamList(response.data);
     } catch (error) {
       console.error('Failed to add stream:', error);
-      alert('Failed to add stream. Please try again.');
+      toast.error('Failed to add stream. Please try again.');
     }
   };
-  const handleDeleteStream = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this stream?')) return;
-  
+  const handleDelete = (id) => {
+    setPendingDeleteId(id);
+    setConfirmOpen(true);
+  };
+  const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/api/stream/delete/${id}`);
-  
-      // Refresh stream list
-      const response = await axios.get('http://localhost:3000/api/stream/display');
-      setStreamList(response.data);
-    } catch (error) {
-      console.error('Failed to delete stream:', error);
-      alert('Failed to delete stream.');
+      await axios.delete(`http://localhost:3000/api/stream/delete/${pendingDeleteId}`);
+      fetchStreams();
+      toast.success('Stream deleted successfully!');
+    } catch (err) {
+      console.error('Error deleting stream:', err);
+      toast.error('Failed to delete stream. Please try again.');
+    } finally {
+      setConfirmOpen(false);
+      setPendingDeleteId(null);
     }
   };
   const handleSubmitStream = async () => {
     const selectedClass = classes.find(cls => cls.cls_id === parseInt(form.classId));
     if (!form.name || !form.description || !form.created || !selectedClass || !selectedClass.cls_id) {
-      alert("All fields are required.");
+      toast('All fields are required.');
       return;
     }
 
@@ -158,7 +165,7 @@ const StreamManagement = () => {
       setStreamList(response.data);
     } catch (error) {
       console.error(editItem ? 'Failed to update stream:' : 'Failed to add stream:', error);
-      alert(`Failed to ${editItem ? 'update' : 'add'} stream. Please try again.`);
+      toast.error(`Failed to ${editItem ? 'update' : 'add'} stream. Please try again.`);
     }
   };
   
@@ -293,7 +300,7 @@ const getUniqueClasses = () => {
     <td>
       <div className="stream-action-buttons">
         <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
-        <button className="stream-delete-btn" onClick={() => handleDeleteStream(s.id || s.sid)}>Delete</button>
+        <button className="stream-delete-btn" onClick={() => handleDelete(s.id || s.sid)}>Delete</button>
       </div>
     </td>
   </tr>
@@ -363,6 +370,13 @@ const getUniqueClasses = () => {
           </div>
         )}
       </div>
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete Stream?"
+        message="Are you sure you want to delete this stream? This action cannot be undone."
+        onConfirm={confirmDelete}
+        onCancel={() => { setConfirmOpen(false); setPendingDeleteId(null); }}
+      />
     </DashboardLayout>
   );
 };

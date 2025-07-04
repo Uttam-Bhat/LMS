@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
 import { FaBook, FaSearch, FaPlus } from 'react-icons/fa';
+import toast from 'react-hot-toast';
+import ConfirmDialog from './ConfirmDialog';
 
 // Utility: Convert date from dd-mm-yyyy to yyyy-mm-dd for the date input
 function formatDateForInput(dateStr) {
@@ -32,6 +34,8 @@ const ChaptersManagement = () => {
   const [streams, setStreams] = useState([]);
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedStream, setSelectedStream] = useState('');
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -78,7 +82,7 @@ const ChaptersManagement = () => {
 
   const openModal = (item) => {
     if (subjects.length === 0) {
-      alert('Please wait for subjects to load before editing.');
+      toast('Please wait for subjects to load before editing.');
       return;
     }
 
@@ -119,7 +123,7 @@ const ChaptersManagement = () => {
     const classObj = classes.find(c => String(c.cls_id) === String(selectedClass));
 
     if (!form.ch_name || !form.des || !form.cdate || !subjectObj || !streamObj || !classObj) {
-      alert('All fields are required.');
+      toast('All fields are required.');
       return;
     }
 
@@ -148,7 +152,7 @@ const ChaptersManagement = () => {
       if (streamObj.sid !== origStreamId) payload.stream_id = streamObj.sid;
       if (classObj.cls_id !== origClassId) payload.class_id = classObj.cls_id;
       if (Object.keys(payload).length === 0) {
-        alert('No changes detected.');
+        toast('No changes detected.');
         return;
       }
     }
@@ -169,18 +173,26 @@ const ChaptersManagement = () => {
       setSelectedStream('');
     } catch (err) {
       console.error('Error saving chapter:', err);
-      alert('Failed to save chapter. Please try again.');
+      toast.error('Failed to save chapter. Please try again.');
     }
   };
 
   const handleDelete = async (id) => {
+    setPendingDeleteId(id);
+    setConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
     try {
-      console.log('Deleting chapter with ID:', id);
-      await axios.delete(`http://localhost:3000/api/chapter/delete/${id}`);
+      await axios.delete(`http://localhost:3000/api/chapter/delete/${pendingDeleteId}`);
       fetchChapters();
+      toast.success('Chapter deleted successfully!');
     } catch (err) {
       console.error('Error deleting chapter:', err);
-      alert('Failed to delete chapter. Please try again.');
+      toast.error('Failed to delete chapter. Please try again.');
+    } finally {
+      setConfirmOpen(false);
+      setPendingDeleteId(null);
     }
   };
 
@@ -284,7 +296,7 @@ const ChaptersManagement = () => {
             }}
             onClick={() => {
               if (subjects.length === 0) {
-                alert('Please wait for subjects to load before adding a chapter.');
+                toast('Please wait for subjects to load before adding a chapter.');
                 return;
               }
               setShowModal(true);
@@ -473,6 +485,13 @@ const ChaptersManagement = () => {
           </div>
         </div>
       )}
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete Chapter?"
+        message="Are you sure you want to delete this chapter? This action cannot be undone."
+        onConfirm={confirmDelete}
+        onCancel={() => { setConfirmOpen(false); setPendingDeleteId(null); }}
+      />
     </DashboardLayout>
   );
 };

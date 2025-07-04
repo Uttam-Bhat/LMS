@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
 import { FaEdit, FaTrashAlt, FaEye } from 'react-icons/fa';
+import toast from 'react-hot-toast';
+import ConfirmDialog from './ConfirmDialog';
 
 const ContentManagement = () => {
   const [search, setSearch] = useState('');
@@ -17,6 +19,8 @@ const ContentManagement = () => {
   const [file, setFile] = useState(null);
   const [contents, setContents] = useState([]);
   const [editContent, setEditContent] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -66,7 +70,7 @@ const ContentManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title || !description || !contentType || (!file && !editContent) || !selectedAssociationId) {
-      alert("Please fill in all fields and select a course or subject.");
+      toast('Please fill in all fields and select a course or subject.');
       return;
     }
     const formData = new FormData();
@@ -77,14 +81,14 @@ const ContentManagement = () => {
     if (association === "course") {
       const selectedCourse = courses.find(course => (course.courseId || course.cid)?.toString() === selectedAssociationId);
       if (!selectedCourse) {
-        alert("Invalid course selected");
+        toast('Invalid course selected');
         return;
       }
       formData.append("coursename", selectedCourse.coursename);
     } else {
       const selectedSubject = subjects.find(subject => subject.su_id.toString() === selectedAssociationId);
       if (!selectedSubject) {
-        alert("Invalid subject selected");
+        toast('Invalid subject selected');
         return;
       }
       formData.append("su_name", selectedSubject.su_name);
@@ -94,30 +98,37 @@ const ContentManagement = () => {
         await axios.put(`http://localhost:3000/api/content/update/${editContent.ct_id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" }
         });
-        alert("Content updated successfully");
+        toast.success('Content updated successfully');
       } else {
         await axios.post("http://localhost:3000/api/content/add", formData, {
           headers: { "Content-Type": "multipart/form-data" }
         });
-        alert("Content added successfully");
+        toast.success('Content added successfully');
       }
       closeModal();
       fetchContents();
     } catch (err) {
       console.error("Upload error:", err);
-      alert(editContent ? "Failed to update content" : "Failed to add content");
+      toast.error(editContent ? "Failed to update content" : "Failed to add content");
     }
   };
 
-  const handleDeleteContent = async (ct_id) => {
-    if (!window.confirm('Are you sure you want to delete this content?')) return;
+  const handleDelete = (ct_id) => {
+    setPendingDeleteId(ct_id);
+    setConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/api/content/delete/${ct_id}`);
+      await axios.delete(`http://localhost:3000/api/content/delete/${pendingDeleteId}`);
       fetchContents();
-      alert('Content deleted successfully!');
+      toast.success('Content deleted successfully!');
     } catch (err) {
       console.error('Delete error:', err);
-      alert('Failed to delete content');
+      toast.error('Failed to delete content');
+    } finally {
+      setConfirmOpen(false);
+      setPendingDeleteId(null);
     }
   };
 
@@ -313,7 +324,7 @@ const ContentManagement = () => {
                     <td style={{padding: 10, border: '1px solid #e2e8f0', textAlign: 'center'}}>
                       <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10}}>
                         <button className="action-btn edit" style={{background: '#f3f4f6', border: '1px solid #2563eb', color: '#2563eb', borderRadius: 6, padding: '4px 10px', cursor: 'pointer'}} title="Edit" onClick={() => handleEditContent(content)}><FaEdit /></button>
-                        <button className="action-btn delete" style={{background: '#f3f4f6', border: '1px solid #e11d48', color: '#e11d48', borderRadius: 6, padding: '4px 10px', cursor: 'pointer'}} title="Delete" onClick={() => handleDeleteContent(content.ct_id)}><FaTrashAlt /></button>
+                        <button className="action-btn delete" style={{background: '#f3f4f6', border: '1px solid #e11d48', color: '#e11d48', borderRadius: 6, padding: '4px 10px', cursor: 'pointer'}} title="Delete" onClick={() => handleDelete(content.ct_id)}><FaTrashAlt /></button>
                       </div>
                     </td>
                   </tr>
@@ -322,6 +333,14 @@ const ContentManagement = () => {
             </tbody>
           </table>
         </div>
+
+        <ConfirmDialog
+          open={confirmOpen}
+          title="Delete Content?"
+          message="Are you sure you want to delete this content? This action cannot be undone."
+          onConfirm={confirmDelete}
+          onCancel={() => { setConfirmOpen(false); setPendingDeleteId(null); }}
+        />
       </div>
     </DashboardLayout>
   );

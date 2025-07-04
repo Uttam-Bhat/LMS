@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './CreateCourseModal.css';
+import toast from 'react-hot-toast';
 
 const examTypes = [
   'Internal',
@@ -23,23 +24,23 @@ const CreateExamModal = ({ onClose, templates, exam, refreshExams }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.e_name || !form.e_date || !form.e_time || !form.duration || !form.t_name) {
-      alert('All fields are required.');
+      toast('All fields are required.');
       return;
     }
     setLoading(true);
     try {
       if (exam && exam.e_id) {
         await axios.put(`http://localhost:3000/api/exam/edit/${exam.e_id}`, form);
-        alert('Exam updated successfully!');
+        toast.success('Exam updated successfully!');
       } else {
         await axios.post('http://localhost:3000/api/exam/add', form);
-        alert('Exam created successfully!');
+        toast.success('Exam created successfully!');
       }
       if (refreshExams) await refreshExams();
       onClose();
     } catch (error) {
       console.error('Error saving exam:', error);
-      alert('Failed to save exam.');
+      toast.error('Failed to save exam.');
     } finally {
       setLoading(false);
     }

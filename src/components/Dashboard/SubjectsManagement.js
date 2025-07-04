@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { FaBookOpen, FaPlus, FaSearch } from 'react-icons/fa';
 import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
+import toast from 'react-hot-toast';
+import ConfirmDialog from './ConfirmDialog';
 
 const SubjectsManagement = () => {
   const [search, setSearch] = useState('');
@@ -15,6 +17,8 @@ const SubjectsManagement = () => {
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -57,7 +61,7 @@ const SubjectsManagement = () => {
 
   const openModal = (item) => {
     if (streams.length === 0) {
-      alert('Please wait for streams to load before editing.');
+      toast('Please wait for streams to load before editing.');
       return;
     }
 
@@ -148,14 +152,22 @@ const SubjectsManagement = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = (id) => {
+    setPendingDeleteId(id);
+    setConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
     try {
-      console.log('Deleting subject with ID:', id);
-      await axios.delete(`http://localhost:3000/api/subject/subject-delete/${id}`);
+      await axios.delete(`http://localhost:3000/api/subject/delete/${pendingDeleteId}`);
       fetchSubjects();
+      toast.success('Subject deleted successfully!');
     } catch (err) {
       console.error('Error deleting subject:', err);
-      alert('Failed to delete subject. Please try again.');
+      toast.error('Failed to delete subject. Please try again.');
+    } finally {
+      setConfirmOpen(false);
+      setPendingDeleteId(null);
     }
   };
 
@@ -268,7 +280,7 @@ const SubjectsManagement = () => {
             }}
             onClick={() => {
               if (streams.length === 0) {
-                alert('Please wait for streams to load before adding a subject.');
+                toast('Please wait for streams to load before adding a subject.');
                 return;
               }
               setShowModal(true);
@@ -457,6 +469,14 @@ const SubjectsManagement = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete Subject?"
+        message="Are you sure you want to delete this subject? This action cannot be undone."
+        onConfirm={confirmDelete}
+        onCancel={() => { setConfirmOpen(false); setPendingDeleteId(null); }}
+      />
     </DashboardLayout>
   );
 };
