@@ -39,15 +39,21 @@ const StreamManagement = () => {
   }, []);
 
   const openModal = (item) => {
-    const itemClassName = item.className || item.class_name || '';
-  
-    // Find matching class by name (case-insensitive)
-    const matchingClass = classes.find(cls => 
-      cls.class_name.toLowerCase() === itemClassName.toLowerCase()
-    );
-  
-    const clsId = matchingClass ? matchingClass.cls_id.toString() : '';
-  
+    // Prefer class_id or class_details.cls_id if available
+    let clsId = '';
+    if (item.class_id) {
+      clsId = item.class_id.toString();
+    } else if (item.class_details && item.class_details.cls_id) {
+      clsId = item.class_details.cls_id.toString();
+    } else {
+      // fallback to name-based matching
+      const itemClassName = item.className || item.class_name || '';
+      const matchingClass = classes.find(cls => 
+        cls.class_name.toLowerCase() === itemClassName.toLowerCase()
+      );
+      clsId = matchingClass ? matchingClass.cls_id.toString() : '';
+    }
+
     setEditItem(item);
     setForm({
       name: item.name || item.sname || '',
@@ -55,7 +61,7 @@ const StreamManagement = () => {
       created: formatDateForInput(item.created || item.cdate),
       classId: clsId
     });
-  
+
     setShowModal(true);
   };
   
@@ -121,18 +127,19 @@ const StreamManagement = () => {
   };
   const handleSubmitStream = async () => {
     const selectedClass = classes.find(cls => cls.cls_id === parseInt(form.classId));
-    if (!selectedClass) {
-      alert("Invalid class selected.");
+    if (!form.name || !form.description || !form.created || !selectedClass || !selectedClass.cls_id) {
+      alert("All fields are required.");
       return;
     }
-  
+
     const payload = {
       sname: form.name,
       des: form.description,
       cdate: formatDateForAPI(form.created),
-      class_name: selectedClass.class_name
+      class_id: selectedClass.cls_id
     };
-  
+    console.log("Submitting stream payload:", payload);
+
     try {
       if (editItem) {
         // Edit mode
@@ -141,11 +148,11 @@ const StreamManagement = () => {
         // Add mode
         await axios.post('http://localhost:3000/api/stream/add', payload);
       }
-  
+
       setShowModal(false);
       setForm({ name: '', description: '', created: '', classId: '' });
       setEditItem(null);
-  
+
       // Refresh list
       const response = await axios.get('http://localhost:3000/api/stream/display');
       setStreamList(response.data);
