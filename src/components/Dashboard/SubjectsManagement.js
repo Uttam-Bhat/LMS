@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { FaBookOpen, FaPlus, FaSearch } from 'react-icons/fa';
 import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
-import { FaBookOpen, FaSearch, FaPlus } from 'react-icons/fa';
 
 const SubjectsManagement = () => {
   const [search, setSearch] = useState('');
@@ -14,6 +14,7 @@ const SubjectsManagement = () => {
   const [loading, setLoading] = useState(true);
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const loadData = async () => {
@@ -45,7 +46,7 @@ const SubjectsManagement = () => {
 
   const fetchSubjects = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/subject/display');
+      const response = await axios.get('http://localhost:3000/api/subject/subject-display');
       console.log('Fetched subjects:', response.data);
       setSubjects(response.data);
     } catch (error) {
@@ -59,38 +60,27 @@ const SubjectsManagement = () => {
       alert('Please wait for streams to load before editing.');
       return;
     }
-    
-    console.log('Opening modal for item:', item);
-    console.log('Available streams:', streams);
-    
+
     setEditItem(item);
-    
-    // Find the matching stream - try multiple approaches
-    let streamMatch = streams.find(s => s.sname === item.sname);
-    
-    // If not found by exact name, try case-insensitive match
-    if (!streamMatch) {
-      streamMatch = streams.find(s => 
-        s.sname && item.sname && 
-        s.sname.toLowerCase() === item.sname.toLowerCase()
-      );
+
+    // Find the matching stream and class IDs from item
+    let streamId = '';
+    let classId = '';
+    if (item.stream_info) {
+      streamId = item.stream_info.sid ? item.stream_info.sid.toString() : '';
+      classId = item.stream_info.class_info?.cls_id ? item.stream_info.class_info.cls_id.toString() : '';
+    } else {
+      // fallback for legacy data
+      streamId = item.sid ? item.sid.toString() : '';
+      classId = item.class_info?.cls_id ? item.class_info.cls_id.toString() : '';
     }
-    
-    // If still not found, try matching by stream ID if available
-    if (!streamMatch && item.streamId) {
-      streamMatch = streams.find(s => s.sid === item.streamId);
-    }
-    
-    console.log('Found stream match:', streamMatch);
-    
+
     // Convert date from dd-mm-yyyy to yyyy-mm-dd for the date input
     const formatDateForInput = (dateStr) => {
       if (!dateStr) return '';
-      // Check if date is already in yyyy-mm-dd format
       if (dateStr.includes('-') && dateStr.split('-')[0].length === 4) {
         return dateStr;
       }
-      // Convert from dd-mm-yyyy to yyyy-mm-dd
       const parts = dateStr.split('-');
       if (parts.length === 3) {
         const [dd, mm, yyyy] = parts;
@@ -100,14 +90,14 @@ const SubjectsManagement = () => {
     };
 
     const formattedDate = formatDateForInput(item.cdate);
-    console.log('Original date:', item.cdate, 'Formatted date:', formattedDate);
 
     setForm({
       name: item.su_name || '',
       description: item.des || '',
       created: formattedDate,
-      streamId: (item.stream_info && item.stream_info.sid ? item.stream_info.sid.toString() : (item.sid ? item.sid.toString() : '')),
+      streamId: streamId,
     });
+    setSelectedClass(classId); // Set the class dropdown directly
     setShowModal(true);
   };
 
@@ -116,34 +106,42 @@ const SubjectsManagement = () => {
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
+  const formatDateForAPI = (dateStr) => {
+    if (!dateStr) return '';
+    const [yyyy, mm, dd] = dateStr.split('-');
+    return `${dd}-${mm}-${yyyy}`;
+  };
+
   const handleAddOrUpdate = async () => {
-    const stream = streams.find(s => s.sid === parseInt(form.streamId));
-    // Convert yyyy-mm-dd to dd-mm-yyyy
-    const formatDateForAPI = (dateStr) => {
-      if (!dateStr) return '';
-      const [yyyy, mm, dd] = dateStr.split('-');
-      return `${dd}-${mm}-${yyyy}`;
-    };
+    const stream = streams.find(s => String(s.sid) === String(form.streamId));
+    const classObj = classes.find(c => String(c.cls_id) === String(selectedClass));
+    if (!form.name || !form.description || !form.created || !stream || !selectedClass || !stream.sname || !classObj || !classObj.class_name) {
+      setErrorMessage(`All fields are required. Debug info: name=${form.name}, description=${form.description}, created=${form.created}, stream=${!!stream}, selectedClass=${selectedClass}, stream.sname=${stream?.sname}, classObj.class_name=${classObj?.class_name}`);
+      return;
+    }
     const payload = {
       su_name: form.name,
       des: form.description,
       cdate: formatDateForAPI(form.created),
-      sname: stream ? stream.sname : '',
+      sname: stream.sname,
+      class_name: classObj.class_name,
     };
-
+    console.log('Payload to be sent:', payload);
+    setErrorMessage(''); // Clear error if validation passes
     try {
       if (editItem) {
         // Edit mode
-        await axios.put(`http://localhost:3000/api/subject/edit/${editItem.su_id || editItem.id}`, payload);
+        await axios.put(`http://localhost:3000/api/subject/subject-edit/${editItem.su_id || editItem.id}`, payload);
       } else {
         // Add mode
-        await axios.post('http://localhost:3000/api/subject/add', payload);
+        await axios.post('http://localhost:3000/api/subject/subject-add', payload);
       }
       fetchSubjects();
       setShowModal(false);
       setForm({ name: '', description: '', created: '', streamId: '' });
       setEditItem(null);
     } catch (err) {
+      setErrorMessage('Error saving subject. Please try again.');
       console.error('Error saving subject:', err);
     }
   };
@@ -151,7 +149,7 @@ const SubjectsManagement = () => {
   const handleDelete = async (id) => {
     try {
       console.log('Deleting subject with ID:', id);
-      await axios.delete(`http://localhost:3000/api/subject/delete/${id}`);
+      await axios.delete(`http://localhost:3000/api/subject/subject-delete/${id}`);
       fetchSubjects();
     } catch (err) {
       console.error('Error deleting subject:', err);
@@ -180,22 +178,6 @@ const SubjectsManagement = () => {
       }
     }
   }, [editItem, streams, classes]);
-
-  // Build uniqueClasses from subjects' stream_info.class_info
-  const uniqueClasses = [];
-  const classIds = new Set();
-  subjects.forEach(s => {
-    const cls = s.stream_info?.class_info;
-    if (cls && !classIds.has(cls.cls_id)) {
-      uniqueClasses.push(cls);
-      classIds.add(cls.cls_id);
-    }
-  });
-  // Build availableStreams for dropdown from subjects' stream_info for selected class
-  const availableStreams = subjects
-    .filter(s => s.stream_info?.class_info?.cls_id?.toString() === selectedClass)
-    .map(s => s.stream_info)
-    .filter((stream, idx, arr) => stream && arr.findIndex(s2 => s2.sid === stream.sid) === idx);
 
   return (
     <DashboardLayout>
@@ -245,7 +227,7 @@ const SubjectsManagement = () => {
             }}
           >
             <option value="">All Classes</option>
-            {uniqueClasses.map(cls => (
+            {classes.map(cls => (
               <option key={String(cls.cls_id)} value={String(cls.cls_id)}>{cls.class_name}</option>
             ))}
           </select>
@@ -342,7 +324,7 @@ const SubjectsManagement = () => {
                         background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
                         padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem'
                       }}>
-                        {s.stream_info?.class_info?.class_name || 'N/A'}
+                        {s.class_name || s.stream_info?.class_info?.class_name || 'N/A'}
                       </div>
                     </div>
                   </td>
@@ -378,6 +360,9 @@ const SubjectsManagement = () => {
               <button className="stream-close-btn" onClick={() => setShowModal(false)}>×</button>
             </div>
             <div>
+              {errorMessage && (
+                <div style={{ color: 'red', marginBottom: '10px' }}>{errorMessage}</div>
+              )}
               <input
                 name="name"
                 placeholder="Subject Name"
@@ -411,7 +396,7 @@ const SubjectsManagement = () => {
                 required
               >
                 <option value="">Select Class</option>
-                {uniqueClasses.map(cls => (
+                {classes.map(cls => (
                   <option key={String(cls.cls_id)} value={String(cls.cls_id)}>{cls.class_name}</option>
                 ))}
               </select>
@@ -437,9 +422,13 @@ const SubjectsManagement = () => {
                 disabled={!selectedClass}
               >
                 <option value="">Select Stream</option>
-                {availableStreams.map(stream => (
-                  <option key={String(stream.sid)} value={String(stream.sid)}>{stream.sname}</option>
-                ))}
+                {streams
+                  .filter(s => String(s.class_details?.cls_id) === String(selectedClass))
+                  .map(stream => (
+                    <option key={String(stream.sid)} value={String(stream.sid)}>
+                      {stream.sname}
+                    </option>
+                  ))}
               </select>
 
               <label style={{ fontWeight: 500 }}>Created Date</label>

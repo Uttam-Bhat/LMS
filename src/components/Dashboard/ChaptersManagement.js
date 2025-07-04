@@ -165,41 +165,25 @@ const ChaptersManagement = () => {
     s.ch_name.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Unique classes for dropdown
-  const uniqueClasses = classes.filter((cls, idx, arr) =>
-    arr.findIndex(c => c.class_name === cls.class_name) === idx
-  );
-  // Unique streams for dropdown, filtered by selected class
-  const filteredStreams = selectedClass
-    ? streams.filter(s => {
-        const cls = classes.find(c => c.class_name === s.class_name && c.cls_id.toString() === selectedClass);
-        return !!cls;
-      })
-    : streams;
-  const uniqueStreams = filteredStreams.filter((stream, idx, arr) =>
-    arr.findIndex(s => s.sname === stream.sname) === idx
-  );
-  // Unique subjects for dropdown, filtered by selected stream
-  const filteredSubjects = selectedStream
-    ? subjects.filter(sub => sub.sname === (streams.find(s => s.sid.toString() === selectedStream)?.sname))
-    : subjects;
-  const uniqueSubjects = filteredSubjects.filter((sub, idx, arr) =>
-    arr.findIndex(s => s.su_name === sub.su_name) === idx
-  );
-  // When editing, set selectedClass and selectedStream based on subject
-  useEffect(() => {
-    if (editItem && streams.length && classes.length && subjects.length) {
-      const subject = subjects.find(s => s.su_name === editItem.su_name);
-      if (subject) {
-        const stream = streams.find(s => s.sname === subject.sname);
-        if (stream) {
-          setSelectedStream(stream.sid.toString());
-          const cls = classes.find(c => c.class_name === stream.class_name);
-          if (cls) setSelectedClass(cls.cls_id.toString());
-        }
-      }
+  // Build uniqueClasses from subjects' stream_info.class_info
+  const uniqueClasses = [];
+  const classIds = new Set();
+  subjects.forEach(s => {
+    const cls = s.stream_info?.class_info;
+    if (cls && !classIds.has(cls.cls_id)) {
+      uniqueClasses.push(cls);
+      classIds.add(cls.cls_id);
     }
-  }, [editItem, streams, classes, subjects]);
+  });
+  // Build availableStreams for dropdown from subjects' stream_info for selected class
+  const availableStreams = subjects
+    .filter(s => s.stream_info?.class_info?.cls_id?.toString() === selectedClass)
+    .map(s => s.stream_info)
+    .filter((stream, idx, arr) => stream && arr.findIndex(s2 => s2.sid === stream.sid) === idx);
+  // Build availableSubjects for dropdown from subjects for selected stream
+  const availableSubjects = subjects
+    .filter(s => s.stream_info?.sid?.toString() === selectedStream)
+    .filter((sub, idx, arr) => sub && arr.findIndex(s2 => s2.su_id === sub.su_id) === idx);
 
   return (
     <DashboardLayout>
@@ -308,37 +292,36 @@ const ChaptersManagement = () => {
           <table className="stream-table">
             <thead>
               <tr>
+                <th>Class</th>
+                <th>Stream</th>
+                <th>Subject</th>
                 <th>Name</th>
                 <th>Description</th>
-                <th>Subject</th>
                 <th>Created</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {filteredChapters.map(s => (
-                <tr key={s._id || s.id}>
-                  <td>{s.ch_name}</td>
-                  <td>{s.des}</td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{
-                        background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
-                        padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem'
-                      }}>
-                        {s.su_name || 'N/A'}
+              {filteredChapters.map(s => {
+                // Find the subject for this chapter
+                const subject = subjects.find(sub => sub.su_name === s.su_name);
+                return (
+                  <tr key={s._id || s.id}>
+                    <td>{subject?.stream_info?.class_info?.class_name || 'N/A'}</td>
+                    <td>{subject?.stream_info?.sname || 'N/A'}</td>
+                    <td>{s.su_name || 'N/A'}</td>
+                    <td>{s.ch_name}</td>
+                    <td>{s.des}</td>
+                    <td>{s.cdate}</td>
+                    <td>
+                      <div className="stream-action-buttons">
+                        <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
+                        <button className="stream-delete-btn" onClick={() => handleDelete(s.ch_id || s.id)}>Delete</button>
                       </div>
-                    </div>
-                  </td>
-                  <td>{s.cdate}</td>
-                  <td>
-                    <div className="stream-action-buttons">
-                      <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
-                      <button className="stream-delete-btn" onClick={() => handleDelete(s.ch_id || s.id)}>Delete</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
@@ -386,7 +369,7 @@ const ChaptersManagement = () => {
               >
                 <option value="">Select Class</option>
                 {uniqueClasses.map(cls => (
-                  <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
+                  <option key={String(cls.cls_id)} value={String(cls.cls_id)}>{cls.class_name}</option>
                 ))}
               </select>
               {/* Stream Dropdown */}
@@ -410,8 +393,8 @@ const ChaptersManagement = () => {
                 disabled={!selectedClass}
               >
                 <option value="">Select Stream</option>
-                {uniqueStreams.map(stream => (
-                  <option key={stream.sid} value={stream.sid}>{stream.sname}</option>
+                {availableStreams.map(stream => (
+                  <option key={String(stream.sid)} value={String(stream.sid)}>{stream.sname}</option>
                 ))}
               </select>
               {/* Subject Dropdown */}
@@ -435,8 +418,8 @@ const ChaptersManagement = () => {
                 disabled={!selectedStream}
               >
                 <option value="">Select Subject</option>
-                {uniqueSubjects.map(sub => (
-                  <option key={sub.su_id} value={sub.su_name}>{sub.su_name}</option>
+                {availableSubjects.map(sub => (
+                  <option key={String(sub.su_id)} value={sub.su_name}>{sub.su_name}</option>
                 ))}
               </select>
 
