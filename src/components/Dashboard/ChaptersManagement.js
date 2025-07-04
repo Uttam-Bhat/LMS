@@ -40,7 +40,7 @@ const ChaptersManagement = () => {
 
   const fetchSubjects = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/subject/display');
+      const response = await axios.get('http://localhost:3000/api/subject/subject-display');
       console.log('Fetched subjects:', response.data);
       setSubjects(response.data);
     } catch (error) {
@@ -124,12 +124,23 @@ const ChaptersManagement = () => {
       const [yyyy, mm, dd] = dateStr.split('-');
       return `${dd}-${mm}-${yyyy}`;
     };
-    
+
+    const subjectObj = subjects.find(s => s.su_name === form.su_name && s.stream_info?.sid?.toString() === selectedStream);
+    const streamObj = availableStreams.find(s => String(s.sid) === String(selectedStream));
+    const classObj = classes.find(c => String(c.cls_id) === String(selectedClass));
+
+    if (!form.ch_name || !form.des || !form.cdate || !subjectObj || !streamObj || !classObj) {
+      alert('All fields are required.');
+      return;
+    }
+
     const payload = {
       ch_name: form.ch_name,
       des: form.des,
       cdate: formatDateForAPI(form.cdate),
-      su_name: form.su_name,
+      subject_id: subjectObj.su_id,
+      stream_id: streamObj.sid,
+      class_id: classObj.cls_id,
     };
 
     try {
@@ -175,15 +186,23 @@ const ChaptersManagement = () => {
       classIds.add(cls.cls_id);
     }
   });
-  // Build availableStreams for dropdown from subjects' stream_info for selected class
-  const availableStreams = subjects
-    .filter(s => s.stream_info?.class_info?.cls_id?.toString() === selectedClass)
-    .map(s => s.stream_info)
-    .filter((stream, idx, arr) => stream && arr.findIndex(s2 => s2.sid === stream.sid) === idx);
+  // Build availableStreams for dropdown from streams for selected class using class_details.cls_id
+  const availableStreams = streams.filter(
+    stream => String(stream.class_details?.cls_id) === String(selectedClass)
+  );
   // Build availableSubjects for dropdown from subjects for selected stream
   const availableSubjects = subjects
     .filter(s => s.stream_info?.sid?.toString() === selectedStream)
     .filter((sub, idx, arr) => sub && arr.findIndex(s2 => s2.su_id === sub.su_id) === idx);
+
+  // Debug: log availableStreams and selectedClass before rendering
+  console.log('Available streams for class', selectedClass, availableStreams);
+
+  // Debug logs for data inspection
+  console.log('Chapters:', filteredChapters);
+  console.log('Subjects:', subjects);
+  console.log('Streams:', streams);
+  console.log('Classes:', classes);
 
   return (
     <DashboardLayout>
@@ -303,13 +322,16 @@ const ChaptersManagement = () => {
             </thead>
             <tbody>
               {filteredChapters.map(s => {
-                // Find the subject for this chapter
-                const subject = subjects.find(sub => sub.su_name === s.su_name);
+                // Find the subject, stream, and class by their IDs (string comparison)
+                const subject = subjects.find(sub => String(sub.su_id) === String(s.subject_id));
+                const stream = streams.find(str => String(str.sid) === String(s.stream_id));
+                const classObj = classes.find(cls => String(cls.cls_id) === String(s.class_id));
+
                 return (
                   <tr key={s._id || s.id}>
-                    <td>{subject?.stream_info?.class_info?.class_name || 'N/A'}</td>
-                    <td>{subject?.stream_info?.sname || 'N/A'}</td>
-                    <td>{s.su_name || 'N/A'}</td>
+                    <td>{classObj?.class_name || 'N/A'}</td>
+                    <td>{stream?.sname || 'N/A'}</td>
+                    <td>{subject?.su_name || 'N/A'}</td>
                     <td>{s.ch_name}</td>
                     <td>{s.des}</td>
                     <td>{s.cdate}</td>
@@ -368,7 +390,7 @@ const ChaptersManagement = () => {
                 required
               >
                 <option value="">Select Class</option>
-                {uniqueClasses.map(cls => (
+                {classes.map(cls => (
                   <option key={String(cls.cls_id)} value={String(cls.cls_id)}>{cls.class_name}</option>
                 ))}
               </select>

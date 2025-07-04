@@ -92,7 +92,7 @@ const SubjectsManagement = () => {
     const formattedDate = formatDateForInput(item.cdate);
 
     setForm({
-      code: item.subject_code || item.su_code || '',
+      code: item.sub_code || '',
       name: item.su_name || '',
       description: item.des || '',
       created: formattedDate,
@@ -121,7 +121,7 @@ const SubjectsManagement = () => {
       return;
     }
     const payload = {
-      subject_code: form.code,
+      sub_code: form.code,
       su_name: form.name,
       des: form.description,
       cdate: formatDateForAPI(form.created),
@@ -319,7 +319,7 @@ const SubjectsManagement = () => {
             <tbody>
               {filteredSubjects.map(s => (
                 <tr key={s._id || s.id}>
-                  <td>{s.subject_code || s.su_code || ''}</td>
+                  <td>{s.sub_code || ''}</td>
                   <td>{s.su_name}</td>
                   <td>{s.des}</td>
                   <td>
