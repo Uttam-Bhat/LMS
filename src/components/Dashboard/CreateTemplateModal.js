@@ -59,20 +59,30 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
     axios.get('http://localhost:3000/api/subject/subject-display').then(res => setSubjects(res.data));
   }, []);
 
-  // When editing, set subject based on template (by su_id)
+  // Remove the old subject effect and use only one effect for all three fields
   useEffect(() => {
-    if (template && subjects.length > 0) {
-      // Try to use su_id if present, otherwise look up by su_name
-      let subjectId = template.su_id;
-      if (!subjectId && template.su_name) {
-        const found = subjects.find(s => s.su_name === template.su_name);
-        subjectId = found ? found.su_id : '';
+    if (template && classes.length > 0 && streams.length > 0 && subjects.length > 0) {
+      // Set class
+      if (template.class_info && template.class_info.cls_id) {
+        setSelectedClass(String(template.class_info.cls_id));
       }
-      if (subjectId) {
-        setForm(prev => ({ ...prev, subject: subjectId }));
+      // Set stream
+      if (template.stream_info && template.stream_info.sid) {
+        setSelectedStream(String(template.stream_info.sid));
+      }
+      // Set subject
+      if (template.subject_info && template.subject_info.su_id) {
+        setForm(prev => ({ ...prev, subject: String(template.subject_info.su_id) }));
       }
     }
-  }, [template, subjects]);
+  }, [template, classes, streams, subjects]);
+
+  useEffect(() => {
+    console.log('TEMPLATE PASSED TO MODAL:', template);
+    console.log('CLASSES:', classes);
+    console.log('STREAMS:', streams);
+    console.log('SUBJECTS:', subjects);
+  }, [template, classes, streams, subjects]);
 
   const handleQuestionChange = (idx, field, value) => {
     const updated = form.questions.map((q, i) =>
@@ -114,8 +124,8 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.name.trim() || !form.subject) {
-      toast('Template name and subject are required.');
+    if (!form.name.trim() || !form.subject || !selectedClass || !selectedStream) {
+      toast('Template name, class, stream, and subject are required.');
       return;
     }
 
@@ -129,17 +139,21 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
     const payload = {
       t_name: form.name,
       subject_id: form.subject,
-      class_id: selectedClass,
       stream_id: selectedStream,
-      questions: form.questions.map(q => ({
-        q_id: q.q_id,
-        question: q.text,
-        op_a: q.optionA,
-        op_b: q.optionB,
-        op_c: q.optionC,
-        op_d: q.optionD,
-        ans: q.correct
-      }))
+      class_id: selectedClass,
+      questions: form.questions.map(q => {
+        const base = {
+          question: q.text,
+          op_a: q.optionA,
+          op_b: q.optionB,
+          op_c: q.optionC,
+          op_d: q.optionD,
+          ans: q.correct
+        };
+        // If q_id exists (editing), include it so backend updates instead of inserts
+        if (q.q_id) base.q_id = q.q_id;
+        return base;
+      })
     };
 
     console.log('Submitting payload:', payload);

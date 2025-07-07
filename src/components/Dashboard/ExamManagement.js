@@ -66,7 +66,12 @@ const ExamManagement = () => {
   const refreshExams = async () => {
     try {
       const res = await axios.get('http://localhost:3000/api/exam/display');
-      setExams(Array.isArray(res.data) ? res.data : []);
+      // Map t_id or templateId to template_id for modal compatibility
+      const exams = (Array.isArray(res.data) ? res.data : []).map(exam => ({
+        ...exam,
+        template_id: exam.template_id || exam.t_id || exam.templateId || ''
+      }));
+      setExams(exams);
     } catch (error) {
       console.error('Error fetching exams:', error);
     }
