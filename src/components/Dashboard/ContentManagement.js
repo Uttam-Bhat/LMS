@@ -27,20 +27,33 @@ const ContentManagement = () => {
   };
 
   useEffect(() => {
+    // Clear previous list to avoid stale data
+    setCourses([]);
+    setSubjects([]);
     const fetchData = async () => {
       try {
         if (association === 'course') {
           const res = await axios.get('http://localhost:3000/api/course/display');
           setCourses(res.data.courses || res.data);
-        } else {
-          const res = await axios.get('http://localhost:3000/api/subject/display');
-          setSubjects(res.data.subjects || res.data);
+        } else if (association === 'subject') {
+          const res = await axios.get('http://localhost:3000/api/subject/subject-display');
+          // Try to handle both array and object response
+          if (Array.isArray(res.data)) {
+            setSubjects(res.data);
+          } else if (Array.isArray(res.data.subjects)) {
+            setSubjects(res.data.subjects);
+          } else {
+            setSubjects([]);
+          }
         }
       } catch (err) {
+        setCourses([]);
+        setSubjects([]);
         console.error('Error fetching data:', err);
       }
     };
     fetchData();
+    setSelectedAssociationId(''); // Reset selection when switching
   }, [association]);
 
   const fetchContents = async () => {
@@ -70,7 +83,7 @@ const ContentManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title || !description || !contentType || (!file && !editContent) || !selectedAssociationId) {
-      toast('Please fill in all fields and select a course or subject.');
+      toast.error('Please fill in all fields and select a course or subject.');
       return;
     }
     const formData = new FormData();
@@ -79,19 +92,13 @@ const ContentManagement = () => {
     formData.append("c_type", contentType.toLowerCase());
     if (file) formData.append("file", file);
     if (association === "course") {
-      const selectedCourse = courses.find(course => (course.courseId || course.cid)?.toString() === selectedAssociationId);
-      if (!selectedCourse) {
-        toast('Invalid course selected');
-        return;
-      }
-      formData.append("coursename", selectedCourse.coursename);
-    } else {
-      const selectedSubject = subjects.find(subject => subject.su_id.toString() === selectedAssociationId);
-      if (!selectedSubject) {
-        toast('Invalid subject selected');
-        return;
-      }
-      formData.append("su_name", selectedSubject.su_name);
+      formData.append("course_id", selectedAssociationId);
+    } else if (association === "subject") {
+      formData.append("subject_id", selectedAssociationId);
+    }
+    if ((association !== 'course' && association !== 'subject') || !selectedAssociationId) {
+      toast.error('You must select either a course or a subject.');
+      return;
     }
     try {
       if (editContent) {
@@ -109,7 +116,8 @@ const ContentManagement = () => {
       fetchContents();
     } catch (err) {
       console.error("Upload error:", err);
-      toast.error(editContent ? "Failed to update content" : "Failed to add content");
+      let msg = err?.response?.data?.message || (editContent ? "Failed to update content" : "Failed to add content");
+      toast.error(msg);
     }
   };
 

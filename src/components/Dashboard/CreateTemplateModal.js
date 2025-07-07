@@ -46,44 +46,20 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
 
   const [form, setForm] = useState(initialForm);
   const [hasLoaded, setHasLoaded] = useState(false);
-  const [classes, setClasses] = useState([]);
-  const [streams, setStreams] = useState([]);
   const [subjects, setSubjects] = useState([]);
-  const [selectedClass, setSelectedClass] = useState('');
-  const [selectedStream, setSelectedStream] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Fetch all classes
-    axios.get('http://localhost:3000/api/class/display').then(res => setClasses(res.data));
-    // Fetch all streams
-    axios.get('http://localhost:3000/api/stream/display').then(res => setStreams(res.data));
     // Fetch all subjects
-    axios.get('http://localhost:3000/api/subject/display').then(res => setSubjects(res.data));
+    axios.get('http://localhost:3000/api/subject/subject-display').then(res => setSubjects(res.data));
   }, []);
 
-  // Filter streams by selected class
-  const filteredStreams = streams.filter(s => {
-    const cls = classes.find(c => c.class_name === s.class_name);
-    return selectedClass ? (cls && cls.cls_id.toString() === selectedClass) : true;
-  });
-
-  // Filter subjects by selected stream
-  const filteredSubjects = subjects.filter(sub => {
-    return selectedStream ? sub.sname === (streams.find(s => s.sid.toString() === selectedStream)?.sname) : true;
-  });
-
-  // When editing, set selectedClass and selectedStream based on template
+  // When editing, set subject based on template
   useEffect(() => {
-    if (template && streams.length && classes.length) {
-      const stream = streams.find(s => s.sname === template.su_name || s.sname === template.sname);
-      if (stream) {
-        setSelectedStream(stream.sid.toString());
-        const cls = classes.find(c => c.class_name === stream.class_name);
-        if (cls) setSelectedClass(cls.cls_id.toString());
-      }
+    if (template && template.su_name && subjects.length > 0) {
+      setForm(prev => ({ ...prev, subject: template.su_name }));
     }
-  }, [template, streams, classes]);
+  }, [template, subjects]);
 
   const handleQuestionChange = (idx, field, value) => {
     const updated = form.questions.map((q, i) =>
@@ -183,38 +159,16 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
             />
           </div>
 
-          {/* Class Dropdown */}
-          <div className="form-group">
-            <label>Class</label>
-            <select value={selectedClass} onChange={e => { setSelectedClass(e.target.value); setSelectedStream(''); }} required>
-              <option value="">Select a class</option>
-              {classes.map(cls => (
-                <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
-              ))}
-            </select>
-          </div>
-          {/* Stream Dropdown */}
-          <div className="form-group">
-            <label>Stream</label>
-            <select value={selectedStream} onChange={e => setSelectedStream(e.target.value)} disabled={!selectedClass} required>
-              <option value="">Select a stream</option>
-              {filteredStreams.map(stream => (
-                <option key={stream.sid} value={stream.sid}>{stream.sname}</option>
-              ))}
-            </select>
-          </div>
-          {/* Subject Dropdown */}
           <div className="form-group">
             <label>Subject</label>
             <select
               value={form.subject}
               onChange={e => setForm({ ...form, subject: e.target.value })}
-              disabled={!selectedStream}
               required
             >
-              <option value="">Select Subject</option>
-              {filteredSubjects.map(sub => (
-                <option key={sub.su_id} value={sub.su_name}>{sub.su_name}</option>
+              <option value="">Select</option>
+              {subjects.map(subject => (
+                <option key={subject.su_id} value={subject.su_name}>{subject.su_name}</option>
               ))}
             </select>
           </div>
