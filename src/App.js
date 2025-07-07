@@ -24,6 +24,7 @@ import StudentSettings from './components/Student/StudentSettings';
 import AdminProfile from './components/Dashboard/AdminProfile';
 import AdminSettings from './components/Dashboard/AdminSettings';
 import ProtectedRoute from './components/ProtectedRoute';
+import Materials from './components/Student/Materials';
 
 function App() {
   return (
@@ -56,6 +57,7 @@ function App() {
           <Route path="/student/settings" element={<ProtectedRoute><StudentSettings /></ProtectedRoute>} />
           <Route path="/admin/profile" element={<ProtectedRoute><AdminProfile /></ProtectedRoute>} />
           <Route path="/admin/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
+          <Route path="/student/materials" element={<ProtectedRoute><Materials /></ProtectedRoute>} />
         </Routes>
       </div>
     </Router>
