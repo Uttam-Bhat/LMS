@@ -5,9 +5,8 @@ import StudentLayout from './StudentLayout';
 
 const AvailableCourses = () => {
   const [courses, setCourses] = useState([]);
-  const [applied, setApplied] = useState([]);
+  const [enrolled, setEnrolled] = useState([]);
   const [search, setSearch] = useState('');
-  const [view, setView] = useState('all');
   const [teachers, setTeachers] = useState([]);
 
   // ✅ Fetch courses from backend
@@ -15,14 +14,7 @@ const AvailableCourses = () => {
     const fetchCourses = async () => {
       try {
         const response = await axios.get('http://localhost:3000/api/course/display');
-        const formattedCourses = response.data.map(course => ({
-          id: course.courseId,
-          name: course.coursename || 'Untitled',
-          description: course.des || 'No description available',
-          course_type: course.course_type || 'N/A',
-          teacherId: course.ass_teacher ?? null, // use null if undefined
-        }));
-        setCourses(formattedCourses);
+        setCourses(response.data);
       } catch (error) {
         console.error('Error fetching courses:', error);
       }
@@ -47,21 +39,18 @@ const AvailableCourses = () => {
 
   // ✅ Filter courses
   const filteredCourses = courses.filter(course => {
-    const teacher = teachers.find(t => String(t.id) === String(course.teacherId));
+    const teacher = teachers.find(t => String(t.id) === String(course.ass_teacher));
     const teacherName = teacher?.fullname || '';
-
     const matchesSearch =
-      (course.name || '').toLowerCase().includes(search.toLowerCase()) ||
+      (course.coursename || '').toLowerCase().includes(search.toLowerCase()) ||
       (teacherName || '').toLowerCase().includes(search.toLowerCase()) ||
-      (course.description || '').toLowerCase().includes(search.toLowerCase());
-
-    const matchesView = view === 'all' || view === 'active';
-    return matchesSearch && matchesView;
+      (course.des || '').toLowerCase().includes(search.toLowerCase());
+    return matchesSearch;
   });
 
-  const handleApply = (id) => {
-    setApplied(prev => [...prev, id]);
-    alert('Applied for course!');
+  const handleEnroll = (id) => {
+    setEnrolled(prev => [...prev, id]);
+    alert('Enrolled in course!');
   };
 
   return (
@@ -71,7 +60,7 @@ const AvailableCourses = () => {
         <div className="page-header">
           <div className="header-content">
             <h1>Available Courses</h1>
-            <p>Browse and apply for new courses</p>
+            <p>Browse and enroll in new courses</p>
           </div>
         </div>
 
@@ -86,10 +75,6 @@ const AvailableCourses = () => {
               onChange={e => setSearch(e.target.value)}
             />
           </div>
-          <div className="view-options">
-            <button className={`view-btn${view === 'all' ? ' active' : ''}`} onClick={() => setView('all')}>All</button>
-            <button className={`view-btn${view === 'active' ? ' active' : ''}`} onClick={() => setView('active')}>Active</button>
-          </div>
         </div>
 
         {/* Courses Grid */}
@@ -98,44 +83,45 @@ const AvailableCourses = () => {
             <div style={{ color: '#6b7a90', fontSize: '1.1rem' }}>No courses found.</div>
           ) : (
             filteredCourses.map(course => {
-              const teacher = teachers.find(t => String(t.id) === String(course.teacherId));
+              const teacher = teachers.find(t => String(t.id) === String(course.ass_teacher));
               const teacherName = teacher?.fullname || 'Not Assigned';
 
               return (
-                <div key={course.id} className="course-card">
+                <div key={course.courseId} className="course-card">
                   <div className="course-header">
-                    <h3>{course.name}</h3>
+                    <h3>{course.coursename}</h3>
                     <span className="status-badge active">Active</span>
                   </div>
                   <div className="course-info">
                     <div className="info-item">
                       <i className="fas fa-chalkboard-teacher"></i>
-                      <span>{teacherName}</span>
+                      <span>Teacher: {teacherName}</span>
                     </div>
                     <div className="info-item">
                       <i className="fas fa-layer-group"></i>
-                      <span>{course.course_type}</span>
+                      <span>Type: {course.course_type}</span>
+                    </div>
+                    <div className="info-item">
+                      <i className="fas fa-calendar-alt"></i>
+                      <span>Start: {course.start_date}</span>
+                    </div>
+                    <div className="info-item">
+                      <i className="fas fa-calendar-check"></i>
+                      <span>End: {course.end_date}</span>
                     </div>
                     <div className="info-item">
                       <i className="fas fa-info-circle"></i>
-                      <span>{course.description}</span>
+                      <span>Description: {course.des}</span>
                     </div>
                   </div>
                   <div className="course-actions">
                     <button
                       className="student-action-btn apply"
-                      title="Apply for course"
-                      onClick={() => handleApply(course.id)}
-                      disabled={applied.includes(course.id)}
+                      title="Enroll in course"
+                      onClick={() => handleEnroll(course.courseId)}
+                      disabled={enrolled.includes(course.courseId)}
                     >
-                      {applied.includes(course.id) ? 'Applied' : 'Apply'}
-                    </button>
-                    <button
-                      className="student-action-btn view"
-                      title="View course details"
-                      onClick={() => alert('View course details')}
-                    >
-                      View
+                      {enrolled.includes(course.courseId) ? 'Enrolled' : 'Enroll'}
                     </button>
                   </div>
                 </div>
