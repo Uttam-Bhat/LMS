@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { FaEdit, FaTrashAlt } from 'react-icons/fa';
+import ConfirmDialog from './ConfirmDialog';
 import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
-import { FaEdit, FaTrashAlt, FaEye } from 'react-icons/fa';
-import toast from 'react-hot-toast';
-import ConfirmDialog from './ConfirmDialog';
 
 const ContentManagement = () => {
   const [search, setSearch] = useState('');

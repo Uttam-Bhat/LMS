@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { FaBook, FaPlus, FaSearch } from 'react-icons/fa';
+import ConfirmDialog from './ConfirmDialog';
 import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
-import { FaBook, FaSearch, FaPlus } from 'react-icons/fa';
-import toast from 'react-hot-toast';
-import ConfirmDialog from './ConfirmDialog';
 
 // Utility: Convert date from dd-mm-yyyy to yyyy-mm-dd for the date input
 function formatDateForInput(dateStr) {
@@ -250,7 +250,7 @@ const ChaptersManagement = () => {
               value={search}
               onChange={e => setSearch(e.target.value)}
               style={{
-                width: '100%',
+                width: '90%',
                 padding: '0.75rem 1rem 0.75rem 2.5rem',
                 border: '1px solid #e5e7eb',
                 borderRadius: 8,
@@ -274,7 +274,7 @@ const ChaptersManagement = () => {
               color: '#1a1a1a',
               outline: 'none',
             }}
-            disabled
+            
           >
             <option>Name A–Z</option>
           </select>
