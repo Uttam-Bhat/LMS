@@ -74,40 +74,9 @@ const StudentsManagement = () => {
         <div className="users-table-container">
           <table className="users-table">
             <thead>
-              <tr>
-                <th>Student</th>
-                <th>Class</th>
-                <th>Exam</th>
-                <th>Score</th>
-                <th>Course</th>
-                <th>Actions</th>
-              </tr>
+              <tr></tr>
             </thead>
             <tbody>
-              {filteredStudents.map(student => (
-                <tr key={student.id}>
-                  <td>
-                    <div className="user-info">
-                      <FaUserCircle />
-                      <span>{student.name}</span>
-                    </div>
-                  </td>
-                  <td>{student.class}</td>
-                  <td>{student.exam}</td>
-                  <td>{student.score}</td>
-                  <td>{student.course}</td>
-                  <td>
-                    <div className="action-buttons">
-                      <button className="edit-btn" title="Edit student" onClick={() => handleEdit(student)}>
-                        <FaPencilAlt />
-                      </button>
-                      <button className="delete-btn" title="Delete student" onClick={() => handleDelete(student.id)}>
-                        <FaTrashAlt />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
             </tbody>
           </table>
         </div>

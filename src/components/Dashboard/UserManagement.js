@@ -129,7 +129,7 @@ const UserManagement = () => {
                 <th>Email</th>
                 <th>Role</th>
                 <th>Actions</th>
-                {activeFilter === 'student' && <th>Assign</th>}
+                {filteredUsers.some(u => u.user_type === 'student') && <th>Assign</th>}
               </tr>
             </thead>
             <tbody>
@@ -157,7 +157,7 @@ const UserManagement = () => {
                       </button>
                     </div>
                   </td>
-                  {activeFilter === 'student' && (
+                  {user.user_type === 'student' && (
                     <td>
                       {assignedStudents[user.id] ? (
                         <button className="assigned-btn" disabled>Assigned</button>
