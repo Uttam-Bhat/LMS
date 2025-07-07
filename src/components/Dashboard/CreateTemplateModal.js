@@ -18,7 +18,7 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
   const initialForm = isQuestion
     ? {
         name: template.t_name || '',
-        subject: template.su_name || '',
+        subject: template.su_id || '',
         questions: [{
           text: template.question || '',
           optionA: template.op_a || '',
@@ -30,7 +30,7 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
       }
     : {
         name: template?.t_name || '',
-        subject: template?.su_name || '',
+        subject: template?.su_id || '',
         questions: template?.questions?.length
           ? template.questions.map(q => ({
               q_id: q.q_id,
@@ -54,10 +54,18 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
     axios.get('http://localhost:3000/api/subject/subject-display').then(res => setSubjects(res.data));
   }, []);
 
-  // When editing, set subject based on template
+  // When editing, set subject based on template (by su_id)
   useEffect(() => {
-    if (template && template.su_name && subjects.length > 0) {
-      setForm(prev => ({ ...prev, subject: template.su_name }));
+    if (template && subjects.length > 0) {
+      // Try to use su_id if present, otherwise look up by su_name
+      let subjectId = template.su_id;
+      if (!subjectId && template.su_name) {
+        const found = subjects.find(s => s.su_name === template.su_name);
+        subjectId = found ? found.su_id : '';
+      }
+      if (subjectId) {
+        setForm(prev => ({ ...prev, subject: subjectId }));
+      }
     }
   }, [template, subjects]);
 
@@ -97,7 +105,7 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.name.trim() || !form.subject.trim()) {
+    if (!form.name.trim() || !form.subject) {
       toast('Template name and subject are required.');
       return;
     }
@@ -111,7 +119,7 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
 
     const payload = {
       t_name: form.name,
-      su_name: form.subject,
+      subject_id: form.subject,
       questions: form.questions.map(q => ({
         q_id: q.q_id,
         question: q.text,
@@ -137,7 +145,8 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
       onClose();
     } catch (error) {
       console.error('Error saving template:', error);
-      toast.error('Failed to save template.');
+      const backendMsg = error.response?.data?.message || 'Failed to save template.';
+      toast.error(backendMsg);
     }
   };
 
@@ -168,7 +177,7 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
             >
               <option value="">Select</option>
               {subjects.map(subject => (
-                <option key={subject.su_id} value={subject.su_name}>{subject.su_name}</option>
+                <option key={subject.su_id} value={subject.su_id}>{subject.su_name}</option>
               ))}
             </select>
           </div>
