@@ -2,12 +2,14 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import StudentLayout from './StudentLayout';
 import './StudentDashboard.css';
-import { FaFolderOpen, FaSearch, FaBook, FaInfoCircle, FaImage, FaEye } from 'react-icons/fa';
+import { FaFolderOpen, FaSearch, FaBook, FaInfoCircle, FaImage, FaEye, FaChevronDown } from 'react-icons/fa';
 
 const Materials = () => {
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState('course'); // 'course' or 'subject'
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     axios.get('http://localhost:3000/api/content/display')
@@ -16,9 +18,20 @@ const Materials = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const filteredMaterials = materials.filter(item =>
+  // Tab filtering
+  const tabFilteredMaterials = materials.filter(item => {
+    if (activeTab === 'course') {
+      return item.coursename && item.coursename.trim() !== '';
+    } else {
+      return item.su_name && item.su_name.trim() !== '';
+    }
+  });
+
+  // Search filtering
+  const filteredMaterials = tabFilteredMaterials.filter(item =>
     (item.title || '').toLowerCase().includes(search.toLowerCase()) ||
     (item.su_name || '').toLowerCase().includes(search.toLowerCase()) ||
+    (item.coursename || '').toLowerCase().includes(search.toLowerCase()) ||
     (item.des || '').toLowerCase().includes(search.toLowerCase())
   );
 
@@ -53,6 +66,75 @@ const Materials = () => {
             </div>
           </div>
         </div>
+        {/* Dropdown for Materials Type */}
+        <div style={{ position: 'relative', margin: '0 0 1.5rem 0', width: 'fit-content' }}>
+          <button
+            onClick={() => setDropdownOpen(v => !v)}
+            style={{
+              border: '1px solid #e5e7eb',
+              background: '#fff',
+              fontWeight: 600,
+              fontSize: '1.08rem',
+              color: '#2563eb',
+              padding: '0.7rem 2.2rem 0.7rem 1.2rem',
+              borderRadius: 8,
+              cursor: 'pointer',
+              outline: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              boxShadow: '0 2px 8px #2563eb11',
+              minWidth: 180,
+              position: 'relative',
+              zIndex: 2
+            }}
+          >
+            Materials
+            <FaChevronDown style={{ marginLeft: 8, fontSize: 16, transition: 'transform 0.2s', transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+          </button>
+          {dropdownOpen && (
+            <div style={{
+              position: 'absolute',
+              top: '110%',
+              left: 0,
+              background: '#fff',
+              border: '1px solid #e5e7eb',
+              borderRadius: 8,
+              boxShadow: '0 4px 16px #2563eb18',
+              minWidth: 180,
+              zIndex: 10,
+              padding: '0.5rem 0',
+            }}>
+              <div
+                onClick={() => { setActiveTab('course'); setDropdownOpen(false); }}
+                style={{
+                  padding: '0.7rem 1.5rem',
+                  cursor: 'pointer',
+                  color: activeTab === 'course' ? '#2563eb' : '#222',
+                  fontWeight: activeTab === 'course' ? 700 : 500,
+                  background: activeTab === 'course' ? '#f6f8fb' : 'transparent',
+                  borderBottom: '1px solid #f0f0f0',
+                  transition: 'background 0.2s, color 0.2s',
+                }}
+              >
+                Course Materials
+              </div>
+              <div
+                onClick={() => { setActiveTab('subject'); setDropdownOpen(false); }}
+                style={{
+                  padding: '0.7rem 1.5rem',
+                  cursor: 'pointer',
+                  color: activeTab === 'subject' ? '#2563eb' : '#222',
+                  fontWeight: activeTab === 'subject' ? 700 : 500,
+                  background: activeTab === 'subject' ? '#f6f8fb' : 'transparent',
+                  transition: 'background 0.2s, color 0.2s',
+                }}
+              >
+                Subject Materials
+              </div>
+            </div>
+          )}
+        </div>
         <div className="materials-section">
           {loading ? (
             <div style={{ textAlign: 'center', padding: '2rem' }}>Loading materials...</div>
@@ -77,7 +159,7 @@ const Materials = () => {
                   <tr style={{ background: '#f6f8fb', color: '#2563eb', fontWeight: 700 }}>
                     <th style={{ padding: '12px 8px', textAlign: 'left' }}>Title</th>
                     <th style={{ padding: '12px 8px', textAlign: 'left' }}>Type</th>
-                    <th style={{ padding: '12px 8px', textAlign: 'left' }}>Subject</th>
+                    <th style={{ padding: '12px 8px', textAlign: 'left' }}>{activeTab === 'course' ? 'Course' : 'Subject'}</th>
                     <th style={{ padding: '12px 8px', textAlign: 'left' }}>Description</th>
                     <th style={{ padding: '12px 8px', textAlign: 'center' }}>View</th>
                   </tr>
@@ -91,15 +173,15 @@ const Materials = () => {
                         {item.c_type}
                       </td>
                       <td style={{ padding: '10px 8px', color: '#222', fontWeight: 500 }}>
-                        {item.su_name && item.su_name.trim() !== ''
-                          ? item.su_name
-                          : (item.coursename && item.coursename.trim() !== '' ? item.coursename : '-')}
+                        {activeTab === 'course'
+                          ? (item.coursename && item.coursename.trim() !== '' ? item.coursename : '-')
+                          : (item.su_name && item.su_name.trim() !== '' ? item.su_name : '-')}
                       </td>
                       <td style={{ padding: '10px 8px', color: '#555' }}>{item.des}</td>
                       <td style={{ padding: '10px 8px', textAlign: 'center' }}>
                         {item.file_path ? (
                           <a
-                            href={`http://localhost:3000/${item.file_path.replace('\\', '/')}`}
+                            href={`http://localhost:3000/${item.file_path.replace('\\', '/').replace('\\', '/')}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{
