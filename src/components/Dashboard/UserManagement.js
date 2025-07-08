@@ -88,8 +88,14 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
     <>
       {activeSubPage === 'all-users' && (
         <div className="user-management">
-          <div className="page-header">
-            <h1>User Management</h1>
+          <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+              <FaUserPlus size={38} color="#2563eb" style={{ flexShrink: 0 }} />
+              <div>
+                <h1 style={{ fontSize: '2.1rem', fontWeight: 700, color: '#2563eb', margin: 0 }}>User Management</h1>
+                <div style={{ color: '#6b7280', fontSize: '1.08rem', marginTop: 2 }}>Add, assign, and manage users</div>
+              </div>
+            </div>
             <button 
               className="add-user-btn"
               onClick={() => setShowCreateUserModal(true)}
@@ -167,17 +173,19 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
                         </button>
                       </div>
                     </td>
-                    {user.user_type === 'student' && (
-                      <td>
-                        {assignedStudents[user.id] ? (
+                    <td>
+                      {user.user_type === 'student' ? (
+                        assignedStudents[user.id] ? (
                           <button className="assigned-btn" disabled>Assigned</button>
                         ) : (
                           <button className="assign-btn" onClick={() => { setAssigningUser(user); setShowAssignModal(true); }} disabled={assignedStudents[user.id]}>
                             Assign
                           </button>
-                        )}
-                      </td>
-                    )}
+                        )
+                      ) : (
+                        <span style={{ color: '#b0b0b0', fontSize: '1.2em' }}>-</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

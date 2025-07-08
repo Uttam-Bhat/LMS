@@ -135,10 +135,13 @@ const CourseManagement = () => {
   return (
     <DashboardLayout>
       <div className="course-management">
-        <div className="page-header">
-          <div className="header-content">
-            <h1>Course Management</h1>
-            <p>Create, manage and track your courses</p>
+        <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+            <FaChartLine size={38} color="#2563eb" style={{ flexShrink: 0 }} />
+            <div>
+              <h1 style={{ fontSize: '2.1rem', fontWeight: 700, color: '#2563eb', margin: 0 }}>Course Management</h1>
+              <div style={{ color: '#6b7280', fontSize: '1.08rem', marginTop: 2 }}>Create, manage and track your courses</div>
+            </div>
           </div>
           <button 
             className="create-course-btn"
@@ -247,9 +250,6 @@ const CourseManagement = () => {
                   </button>
                   <button className="action-btn assign" title="Add User" onClick={() => openModal('addUser', course)}>
                     <FaUserPlus />
-                  </button>
-                  <button className="action-btn track" title="View Report" onClick={() => openModal('report', course)}>
-                    <FaChartLine />
                   </button>
                   <button className="action-btn delete" title="Delete course" onClick={() => openModal('delete', course)}>
                     <FaTrashAlt />
