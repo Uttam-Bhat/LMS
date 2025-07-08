@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import {
   FaAngleDown, FaHome, FaUsers, FaBook, FaChalkboardTeacher, FaUserGraduate, FaFileAlt,
-  FaChartBar, FaStream, FaLayerGroup, FaListAlt, FaBookOpen, FaThList, FaFolderOpen
+  FaChartBar, FaStream, FaLayerGroup, FaListAlt, FaBookOpen, FaThList, FaFolderOpen, FaUserCircle
 } from 'react-icons/fa';
 import './Dashboard.css';
 import { Toaster } from 'react-hot-toast';
@@ -11,6 +11,7 @@ const DashboardLayout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(location.pathname.startsWith('/admin/users'));
 
   const submenuPaths = ['/admin/courses', '/admin/classes', '/admin/stream', '/admin/subjects', '/admin/chapters', '/admin/content'];
   const [menuOpen, setMenuOpen] = useState(submenuPaths.includes(location.pathname));
@@ -57,9 +58,19 @@ const DashboardLayout = ({ children }) => {
                 <Link to="/admin" className={location.pathname === '/admin' ? 'active' : ''}>
                   <FaHome /><span>Dashboard</span>
                 </Link>
-                <Link to="/admin/users" className={location.pathname === '/admin/users' ? 'active' : ''}>
-                  <FaUsers /><span>User Management</span>
-                </Link>
+                <div className={`menu-parent${userMenuOpen ? ' open' : ''}`}> 
+                  <button className="menu-toggle" onClick={() => setUserMenuOpen(!userMenuOpen)}>
+                    <FaUsers style={{ marginRight: 8 }} />
+                    <span>User Management</span>
+                    <FaAngleDown className={`menu-arrow${userMenuOpen ? ' rotated' : ''}`} size={14} style={{ marginLeft: 'auto' }} />
+                  </button>
+                  {userMenuOpen && (
+                    <div className="submenu">
+                      <Link to="/admin/users/all" className={location.pathname === '/admin/users/all' ? 'active' : ''}><FaUserCircle /><span>All Users</span></Link>
+                      <Link to="/admin/users/students" className={location.pathname === '/admin/users/students' ? 'active' : ''}><FaUserGraduate /><span>Students</span></Link>
+                    </div>
+                  )}
+                </div>
 
                 <div className={`menu-parent${menuOpen ? ' open' : ''}`}> 
                   <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
