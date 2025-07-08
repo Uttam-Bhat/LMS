@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './CreateUserModal.css';
+import toast from 'react-hot-toast';
 
 const AssignStudentModal = ({ user, onClose, onAssigned }) => {
   const [classes, setClasses] = useState([]);
@@ -56,15 +57,26 @@ const AssignStudentModal = ({ user, onClose, onAssigned }) => {
     setAssigning(true);
     setError('');
     try {
-      // TODO: Replace with your actual API call for assignment
-      // await axios.post('http://localhost:3000/api/assign', { userId: user.id, classId: selectedClass, streamId: selectedStream });
-      setTimeout(() => {
+      const response = await axios.post('http://localhost:3000/api/student/student-add', {
+        user_id: user.id,
+        class_id: selectedClass,
+        stream_id: selectedStream,
+      });
+      if (response.status === 201) {
+        toast.success('Student successfully enrolled!');
         setAssigning(false);
-        onAssigned();
-      }, 800); // Simulate API
+        onAssigned(true, 'Student successfully enrolled!');
+      } else {
+        toast.error(response.data?.message || 'Failed to assign student');
+        setError(response.data?.message || 'Failed to assign student');
+        setAssigning(false);
+        onAssigned(false, response.data?.message || 'Failed to assign student');
+      }
     } catch (err) {
-      setError('Failed to assign student');
+      toast.error(err.response?.data?.message || 'Failed to assign student');
+      setError(err.response?.data?.message || 'Failed to assign student');
       setAssigning(false);
+      onAssigned(false, err.response?.data?.message || 'Failed to assign student');
     }
   };
 

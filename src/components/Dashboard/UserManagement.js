@@ -16,7 +16,7 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
   const [editUserData, setEditUserData] = useState(null);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [assigningUser, setAssigningUser] = useState(null);
-  const [assignedStudents, setAssignedStudents] = useState({}); // { [userId]: true }
+  const [assignedStudents, setAssignedStudents] = useState({});
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +29,16 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get('http://localhost:3000/api/admin/users');
-        setUsers(response.data); // Expecting array of user objects
+        setUsers(response.data);
+        // Fetch assigned students and update assignedStudents state
+        const studentRes = await axios.get('http://localhost:3000/api/student/student-display');
+        const assigned = {};
+        (studentRes.data || []).forEach(stu => {
+          if (stu.user_info && stu.user_info.id) {
+            assigned[stu.user_info.id] = true;
+          }
+        });
+        setAssignedStudents(assigned);
         setLoading(false);
       } catch (err) {
         console.error('Failed to fetch users:', err);
@@ -163,7 +172,9 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
                         {assignedStudents[user.id] ? (
                           <button className="assigned-btn" disabled>Assigned</button>
                         ) : (
-                          <button className="assign-btn" onClick={() => { setAssigningUser(user); setShowAssignModal(true); }}>Assign</button>
+                          <button className="assign-btn" onClick={() => { setAssigningUser(user); setShowAssignModal(true); }} disabled={assignedStudents[user.id]}>
+                            Assign
+                          </button>
                         )}
                       </td>
                     )}
@@ -195,10 +206,24 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
             <AssignStudentModal
               user={assigningUser}
               onClose={() => { setShowAssignModal(false); setAssigningUser(null); }}
-              onAssigned={() => {
-                setAssignedStudents(prev => ({ ...prev, [assigningUser.id]: true }));
+              onAssigned={(_success, _message) => {
                 setShowAssignModal(false);
                 setAssigningUser(null);
+                // Refresh users and assigned students
+                (async () => {
+                  try {
+                    const response = await axios.get('http://localhost:3000/api/admin/users');
+                    setUsers(response.data);
+                    const studentRes = await axios.get('http://localhost:3000/api/student/student-display');
+                    const assigned = {};
+                    (studentRes.data || []).forEach(stu => {
+                      if (stu.user_info && stu.user_info.id) {
+                        assigned[stu.user_info.id] = true;
+                      }
+                    });
+                    setAssignedStudents(assigned);
+                  } catch {}
+                })();
               }}
             />
           )}

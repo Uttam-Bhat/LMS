@@ -1,138 +1,113 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { FaPencilAlt, FaTrashAlt, FaUserCircle, FaUserGraduate } from 'react-icons/fa';
 import './UserManagement.css';
-import { FaUserPlus, FaSearch, FaUserCircle, FaPencilAlt, FaTrashAlt } from 'react-icons/fa';
 
 const StudentsManagement = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [editStudent, setEditStudent] = useState(null);
-  const [students, setStudents] = useState([
-    { id: 1, name: 'Mike Johnson', class: '10A', exam: 'Math Final', score: '92%', course: 'Mathematics' },
-    { id: 2, name: 'Sarah Williams', class: '9B', exam: 'Physics Midterm', score: '85%', course: 'Physics' },
-  ]);
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const filteredStudents = students.filter(student =>
-    student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    student.class.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    student.exam.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    student.course.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const handleSave = (student) => {
-    if (editStudent) {
-      setStudents(students.map(s => s.id === editStudent.id ? { ...student, id: editStudent.id } : s));
-    } else {
-      setStudents([...students, { ...student, id: Date.now() }]);
-    }
-    setShowModal(false);
-    setEditStudent(null);
-  };
+  useEffect(() => {
+    const fetchStudents = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get('http://localhost:3000/api/student/student-display');
+        setStudents(response.data || []);
+      } catch (err) {
+        setError('Failed to load students');
+      }
+      setLoading(false);
+    };
+    fetchStudents();
+  }, []);
 
   const handleEdit = (student) => {
-    setEditStudent(student);
-    setShowModal(true);
+    // Implement edit logic/modal here
+    alert('Edit student: ' + student.user_info.fullname);
   };
 
-  const handleDelete = (id) => {
-    setStudents(students.filter(s => s.id !== id));
+  const handleDelete = (student) => {
+    // Implement delete logic/modal here
+    alert('Delete student: ' + student.user_info.fullname);
   };
 
   return (
     <div className="user-management">
-      <div className="page-header">
-        <h1>Students Management</h1>
-        <button 
-          className="add-user-btn"
-          onClick={() => { setShowModal(true); setEditStudent(null); }}
-        >
-          <FaUserPlus />
-          Add New Student
-        </button>
-      </div>
-      <div className="dashboard-stats" style={{marginBottom: '2rem'}}>
-        <div className="stat-card">
-          <i className="fas fa-user-graduate"></i>
-          <div className="stat-content">
-            <h3>Total Students</h3>
-            <p>{students.length}</p>
+      <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+          <FaUserGraduate size={38} color="#377dff" style={{ flexShrink: 0 }} />
+          <div>
+            <h1 style={{ fontSize: '2.1rem', fontWeight: 700, color: '#377dff', margin: 0 }}>Assigned Students</h1>
+            <div style={{ color: '#5b6b7a', fontSize: '1.08rem', marginTop: 2 }}>View, edit, and manage assigned students</div>
           </div>
         </div>
-      </div>
-      <div className="user-filters">
-        <div className="search-box">
-          <span className="search-icon"><FaSearch /></span>
-          <input
-            type="text"
-            placeholder="Search students..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-          />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+          {/* <button className="add-user-btn" style={{ fontWeight: 600, fontSize: 17, padding: '0.7rem 1.7rem', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <FaUserPlus style={{ fontSize: 18 }} /> Add Student
+          </button> */}
+          <div style={{ background: '#f8fafd', borderRadius: 16, padding: '0.7rem 1.5rem', boxShadow: '0 2px 8px rgba(30,34,90,0.06)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <span style={{ color: '#377dff', fontWeight: 700, fontSize: 22 }}>{students.length}</span>
+            <span style={{ color: '#5b6b7a', fontSize: 14 }}>Total Students</span>
+          </div>
         </div>
       </div>
       <div className="users-table-container">
         <table className="users-table">
           <thead>
-            <tr></tr>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Class</th>
+              <th>Stream</th>
+              <th style={{ textAlign: 'center' }}>Actions</th>
+            </tr>
           </thead>
           <tbody>
+            {loading ? (
+              <tr><td colSpan="5">Loading...</td></tr>
+            ) : error ? (
+              <tr><td colSpan="5">{error}</td></tr>
+            ) : students.length === 0 ? (
+              <tr><td colSpan="5">No assigned students found.</td></tr>
+            ) : students.map(student => (
+              <tr key={student.st_id}>
+                <td>
+                  <div className="user-info">
+                    <FaUserCircle />
+                    <span>{student.user_info.fullname}</span>
+                  </div>
+                </td>
+                <td>{student.user_info.email}</td>
+                <td>{student.user_info.class_info.class_name}</td>
+                <td>{student.user_info.class_info.stream_info.sname}</td>
+                <td style={{ textAlign: 'center' }}>
+                  <div className="action-buttons">
+                    <button
+                      className="edit-btn"
+                      title="Edit student"
+                      aria-label="Edit student"
+                      onClick={() => handleEdit(student)}
+                    >
+                      <FaPencilAlt />
+                    </button>
+                    <button
+                      className="delete-btn"
+                      title="Delete student"
+                      aria-label="Delete student"
+                      onClick={() => handleDelete(student)}
+                    >
+                      <FaTrashAlt />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
-      {showModal && (
-        <StudentModal
-          onClose={() => { setShowModal(false); setEditStudent(null); }}
-          onSave={handleSave}
-          student={editStudent}
-        />
-      )}
     </div>
   );
 };
-
-function StudentModal({ onClose, onSave, student }) {
-  const [form, setForm] = useState({
-    name: student?.name || '',
-    class: student?.class || '',
-    exam: student?.exam || '',
-    score: student?.score || '',
-    course: student?.course || '',
-  });
-  return (
-    <div className="modal-overlay">
-      <div className="create-user-modal">
-        <div className="modal-header">
-          <h2>{student ? 'Edit Student' : 'Add New Student'}</h2>
-          <button className="close-button" onClick={onClose}>×</button>
-        </div>
-        <form onSubmit={e => { e.preventDefault(); onSave(form); }}>
-          <div className="form-group">
-            <label>Name</label>
-            <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
-          </div>
-          <div className="form-group">
-            <label>Class</label>
-            <input type="text" value={form.class} onChange={e => setForm({ ...form, class: e.target.value })} required />
-          </div>
-          <div className="form-group">
-            <label>Exam</label>
-            <input type="text" value={form.exam} onChange={e => setForm({ ...form, exam: e.target.value })} required />
-          </div>
-          <div className="form-group">
-            <label>Score</label>
-            <input type="text" value={form.score} onChange={e => setForm({ ...form, score: e.target.value })} required />
-          </div>
-          <div className="form-group">
-            <label>Course (Currently Doing)</label>
-            <input type="text" value={form.course} onChange={e => setForm({ ...form, course: e.target.value })} required />
-          </div>
-          <div className="modal-footer">
-            <button type="button" className="cancel-btn" onClick={onClose}>Cancel</button>
-            <button type="submit" className="add-btn">{student ? 'Save' : 'Add Student'}</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
 
 export default StudentsManagement; 
