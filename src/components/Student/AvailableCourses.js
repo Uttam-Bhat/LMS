@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import './StudentDashboard.css';
 import StudentLayout from './StudentLayout';
+import { FaBookOpen } from 'react-icons/fa';
 
 const AvailableCourses = () => {
   const [courses, setCourses] = useState([]);
@@ -57,10 +58,13 @@ const AvailableCourses = () => {
     <StudentLayout>
       <div className="dashboard-main-content">
         {/* Header */}
-        <div className="page-header">
-          <div className="header-content">
-            <h1>Available Courses</h1>
-            <p>Browse and enroll in new courses</p>
+        <div className="page-header" style={{ display: 'flex', alignItems: 'center', gap: 18, marginBottom: 32, justifyContent: 'flex-start' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 18, width: 'fit-content' }}>
+            <FaBookOpen size={38} color="#2563eb" style={{ flexShrink: 0 }} />
+            <div>
+              <h1 style={{ fontSize: '2.1rem', fontWeight: 700, color: '#2563eb', margin: 0 }}>Available Courses</h1>
+              <div style={{ color: '#6b7280', fontSize: '1.08rem', marginTop: 2 }}>Browse and enroll in new courses</div>
+            </div>
           </div>
         </div>
 

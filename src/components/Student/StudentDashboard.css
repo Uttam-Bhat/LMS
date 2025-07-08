@@ -558,4 +558,290 @@
     margin: 1rem 0;
     border-radius: 8px;
   }
+}
+
+/* Modern student UI enhancements */
+
+.student-dashboard, .student-dashboard-main, .student-dashboard-content {
+  background: #f8fafd;
+  font-family: 'Inter', 'Roboto', Arial, sans-serif;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(30,34,90,0.08);
+  padding: 32px 28px;
+  margin: 32px auto;
+  max-width: 1200px;
+}
+
+.student-dashboard-header, .student-dashboard-title {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+.student-dashboard-header h1, .student-dashboard-title h1 {
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: #2563eb;
+  margin: 0;
+}
+
+.student-dashboard-header div, .student-dashboard-title div {
+  color: #6b7280;
+  font-size: 1.08rem;
+  margin-top: 2px;
+}
+
+.student-card, .student-table-container {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(30,34,90,0.04);
+  padding: 24px 18px;
+  margin-bottom: 24px;
+}
+
+.student-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(30,34,90,0.04);
+}
+
+.student-table th {
+  background: #f8fafd;
+  color: #2563eb;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 16px 10px;
+  border-bottom: 2px solid #e5e7eb;
+  text-align: left;
+}
+
+.student-table td {
+  padding: 14px 10px;
+  border-bottom: 1px solid #f0f1f5;
+  font-size: 1.01rem;
+}
+
+.student-table tr:nth-child(even) {
+  background: #f8fafd;
+}
+
+.student-table tr:hover {
+  background: #e8f0fe;
+}
+
+.student-action-btn, .student-edit-btn, .student-save-btn, .student-logout-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.55em 1.3em;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  margin: 0 2px;
+  outline: none;
+  box-shadow: 0 1px 4px rgba(30,34,90,0.06);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.student-edit-btn {
+  background: #e0e7ff;
+  color: #2563eb;
+}
+.student-edit-btn:hover, .student-edit-btn:focus {
+  background: #2563eb;
+  color: #fff;
+}
+
+.student-save-btn {
+  background: #059669;
+  color: #fff;
+}
+.student-save-btn:hover, .student-save-btn:focus {
+  background: #047857;
+  color: #fff;
+}
+
+.student-logout-btn {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.student-logout-btn:hover, .student-logout-btn:focus {
+  background: #dc2626;
+  color: #fff;
+}
+
+input[type="text"], select {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.7rem 1.1rem;
+  font-size: 1rem;
+  background: #f9fafb;
+  color: #1a1a1a;
+  outline: none;
+  margin-bottom: 0.5rem;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+input[type="text"]:focus, select:focus {
+  border: 1.5px solid #2563eb;
+  box-shadow: 0 0 0 2px #e0e7ff;
+}
+
+/* Icon button visibility */
+.student-action-btn svg, .student-edit-btn svg, .student-save-btn svg, .student-logout-btn svg {
+  font-size: 1.25em;
+  color: inherit;
+  vertical-align: middle;
+  transition: color 0.18s;
+}
+.student-edit-btn:hover svg, .student-edit-btn:focus svg,
+.student-save-btn:hover svg, .student-save-btn:focus svg,
+.student-logout-btn:hover svg, .student-logout-btn:focus svg {
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .student-dashboard, .student-dashboard-main, .student-dashboard-content {
+    padding: 16px 4px;
+  }
+  .student-card, .student-table-container {
+    padding: 10px 2px;
+  }
+}
+
+/* Modernize available/enrolled courses UI */
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 28px;
+  margin-top: 24px;
+}
+
+.course-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(30,34,90,0.08);
+  padding: 24px 20px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: box-shadow 0.18s;
+}
+.course-card:hover {
+  box-shadow: 0 6px 24px rgba(30,34,90,0.13);
+}
+
+.course-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.course-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2563eb;
+  margin: 0;
+}
+.status-badge {
+  background: #e0e7ff;
+  color: #2563eb;
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-size: 0.98rem;
+  font-weight: 600;
+  margin-left: 8px;
+}
+.status-badge.active { background: #d1fae5; color: #059669; }
+.status-badge.completed { background: #e7f0fe; color: #1877f2; }
+
+.course-info .info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #374151;
+  font-size: 1.01rem;
+  margin-bottom: 2px;
+}
+
+.completion-bar {
+  margin: 10px 0 0 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.completion-track {
+  background: #e5e7eb;
+  border-radius: 8px;
+  width: 100px;
+  height: 8px;
+  overflow: hidden;
+}
+.completion-fill {
+  background: #2563eb;
+  height: 100%;
+  border-radius: 8px;
+}
+.completion-text {
+  color: #2563eb;
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+.course-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.student-action-btn, .view-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.55em 1.3em;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  outline: none;
+  box-shadow: 0 1px 4px rgba(30,34,90,0.06);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #2563eb;
+  color: #fff;
+}
+.student-action-btn.apply[disabled], .student-action-btn[disabled] {
+  background: #e0e7ff;
+  color: #2563eb;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.student-action-btn:hover, .view-btn:hover, .student-action-btn:focus, .view-btn:focus {
+  background: #1749b1;
+  color: #fff;
+}
+
+.view-btn {
+  background: #f3f4f6;
+  color: #2563eb;
+  border: 1.5px solid #e0e7ff;
+  margin: 0 2px;
+}
+.view-btn.active, .view-btn:active {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+@media (max-width: 900px) {
+  .courses-grid {
+    gap: 12px;
+  }
 } 

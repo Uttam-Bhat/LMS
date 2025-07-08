@@ -35,6 +35,8 @@ const LoginForm = () => {
       localStorage.setItem('token', user._id); // or use a real token if available
       const expiry = Date.now() + 60 * 60 * 1000; // 1 hour from now
       localStorage.setItem('token_expiry', expiry);
+      // Store user email for student exam filtering
+      localStorage.setItem('user_email', user.email);
 
       // Role-based redirection
       if (user.user_type === 'admin') {

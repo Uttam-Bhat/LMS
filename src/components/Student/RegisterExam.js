@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import DashboardLayout from '../Student/StudentLayout';
 import './StudentDashboard.css'; // Corrected path
+import axios from 'axios';
 
 const RegisterExam = () => {
   const [tab, setTab] = useState('register');
@@ -9,9 +10,38 @@ const RegisterExam = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch available exams here (replace with real API call)
-    setLoading(false);
-    setExams([]); // Replace with fetched data
+    const fetchExamsForStudent = async () => {
+      setLoading(true);
+      try {
+        const userRes = await axios.get('http://localhost:3000/api/admin/users');
+        const loggedInEmail = localStorage.getItem('user_email');
+        const userList = Array.isArray(userRes.data) ? userRes.data : [userRes.data];
+        const user = userList.find(u => u.email === loggedInEmail);
+        if (!user) { setExams([]); setLoading(false); return; }
+        const studentRes = await axios.get('http://localhost:3000/api/student/student-display');
+        const studentList = Array.isArray(studentRes.data) ? studentRes.data : [studentRes.data];
+        const student = studentList.find(s => s.user_info.id === user.id);
+        const studentClassName = student?.user_info?.class_info?.class_name;
+        const studentStreamName = student?.user_info?.class_info?.stream_info?.sname;
+        const examsRes = await axios.get('http://localhost:3000/api/exam/display');
+        const allExams = Array.isArray(examsRes.data) ? examsRes.data : [examsRes.data];
+        console.log('studentClassName:', studentClassName);
+        console.log('studentStreamName:', studentStreamName);
+        console.log('allExams:', allExams.map(e => e.e_name));
+        const normalize = str => (str || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
+        const filtered = allExams.filter(
+          exam =>
+            exam.e_name &&
+            normalize(exam.e_name).includes(normalize(studentClassName)) &&
+            normalize(exam.e_name).includes(normalize(studentStreamName))
+        );
+        setExams(filtered);
+      } catch (err) {
+        setExams([]);
+      }
+      setLoading(false);
+    };
+    fetchExamsForStudent();
   }, [subTab]);
 
   return (
@@ -83,7 +113,7 @@ const RegisterExam = () => {
                 Register for Upcoming Exam
               </button>
             </div>
-            <div className="stream-table-container" style={{ minHeight: 250, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="stream-table-container" style={{ minHeight: 250, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', boxShadow: 'none' }}>
               {loading ? (
                 <p>Loading...</p>
               ) : exams.length === 0 ? (
@@ -93,10 +123,52 @@ const RegisterExam = () => {
                   <div style={{ color: '#666', marginTop: 5 }}>There are no available exams at the moment</div>
                 </div>
               ) : (
-                // Render exams table here
-                <table className="stream-table">
-                  {/* ... */}
-                </table>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+                  gap: 28,
+                  width: '100%',
+                  justifyContent: 'center',
+                  margin: '0 auto',
+                  maxWidth: 900
+                }}>
+                  {exams.map(exam => (
+                    <div key={exam.e_id} style={{
+                      background: '#fff',
+                      borderRadius: 18,
+                      boxShadow: '0 2px 12px rgba(30,34,90,0.10)',
+                      padding: '1.7rem 1.3rem',
+                      minHeight: 210,
+                      minWidth: 0,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      justifyContent: 'center',
+                      position: 'relative'
+                    }}>
+                      <div style={{ fontWeight: 700, color: '#2563eb', fontSize: '1.13rem', marginBottom: 6 }}>{exam.e_name}</div>
+                      <span style={{ position: 'absolute', top: 18, right: 18, background: '#d1fae5', color: '#059669', borderRadius: 12, fontWeight: 600, fontSize: 13, padding: '2px 14px' }}>Available</span>
+                      <div style={{ color: '#5b6b7a', fontSize: '0.98rem', margin: '10px 0 2px 0' }}><i className="fas fa-calendar-alt"></i> {exam.e_date}</div>
+                      <div style={{ color: '#5b6b7a', fontSize: '0.98rem', marginBottom: 2 }}><i className="fas fa-clock"></i> {exam.e_time}</div>
+                      <div style={{ color: '#6b7280', fontSize: '0.97rem', marginBottom: 2 }}><i className="fas fa-hourglass-half"></i> {exam.duration}</div>
+                      <div style={{ color: '#6b7280', fontSize: '0.97rem', marginBottom: 2 }}><i className="fas fa-file-alt"></i> Template: {exam.t_name}</div>
+                      <div style={{ color: '#6b7280', fontSize: '0.97rem', marginBottom: 2 }}><i className="fas fa-info-circle"></i> {exam.des}</div>
+                      <button style={{
+                        marginTop: 14,
+                        background: '#2563eb',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: 999,
+                        padding: '0.6em 1.7em',
+                        fontWeight: 600,
+                        fontSize: '1.05rem',
+                        cursor: 'pointer',
+                        boxShadow: '0 1px 4px rgba(30,34,90,0.06)',
+                        transition: 'background 0.18s, color 0.18s'
+                      }}>Apply</button>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </>
