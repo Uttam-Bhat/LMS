@@ -78,56 +78,80 @@ const StudentDashboard = () => {
             <div style={{display: 'flex', alignItems: 'center', marginTop: 6}}><span style={{marginLeft: 4}}><i className="fas fa-check-circle"></i></span></div>
           </div>
         </div>
-        <div style={{display: 'flex', gap: '2rem', flexWrap: 'wrap'}}>
-          <div style={{background: '#fff', borderRadius: '12px', flex: 1, minWidth: 340, padding: '2.2rem 1.5rem', boxShadow: '0 2px 8px rgba(30,34,90,0.06)'}}>
-            <div style={{fontWeight: 600, fontSize: '1.18rem', marginBottom: 8}}>Recent Content</div>
-            <div style={{color: '#6b7a90', fontSize: '0.98rem', marginBottom: 16}}>Latest learning materials</div>
-            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 120}}>
-              <span style={{fontSize: '2.5rem', color: '#b0b8c1', marginBottom: 8}}>+</span>
-              <div style={{fontWeight: 600, color: '#222'}}>No content available</div>
-              <div style={{color: '#6b7a90', fontSize: '0.98rem'}}>Check back later for new content.</div>
-            </div>
+        <div style={{ width: '100%', maxWidth: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
+          {/* Recent Content Card */}
+          <div style={{
+            background: '#fff',
+            borderRadius: '12px',
+            boxShadow: '0 2px 8px rgba(30,34,90,0.07)',
+            padding: '2.5rem 2vw',
+            marginBottom: '1.5rem',
+            width: '100%',
+            maxWidth: '100%',
+            minHeight: 220,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            boxSizing: 'border-box',
+          }}>
+            <div style={{ fontWeight: 700, fontSize: '1.2rem', color: '#2563eb', marginBottom: 6 }}>Recent Content</div>
+            <div style={{ color: '#6b7a90', fontSize: '1.05rem', marginBottom: 16 }}>Latest learning materials</div>
+            <div style={{ fontWeight: 600, color: '#222', fontSize: '1.08rem', marginBottom: 6 }}>No content available</div>
+            <div style={{ color: '#6b7a90', fontSize: '1rem' }}>Check back later for new content.</div>
           </div>
-          <div className="student-dashboard-upcoming-box" style={{ background: 'none', boxShadow: 'none', padding: 0, maxWidth: '100%', margin: '0 auto 32px auto', textAlign: 'center' }}>
-            <div style={{ fontWeight: 700, fontSize: '1.35rem', marginBottom: 4, color: '#222' }}>Upcoming Exams</div>
-            <div style={{ color: '#6b7280', fontSize: '1.08rem', marginBottom: 18 }}>Your next scheduled examinations</div>
+          {/* Upcoming Exams Card */}
+          <div style={{
+            background: '#fff',
+            borderRadius: '12px',
+            boxShadow: '0 2px 8px rgba(30,34,90,0.07)',
+            padding: '2.5rem 2vw',
+            marginBottom: '1.5rem',
+            width: '100%',
+            maxWidth: '100%',
+            minHeight: 220,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            boxSizing: 'border-box',
+          }}>
+            <div style={{ fontWeight: 700, fontSize: '1.2rem', color: '#059669', marginBottom: 6 }}>Upcoming Exams</div>
+            <div style={{ color: '#6b7280', fontSize: '1.05rem', marginBottom: 18 }}>Your next scheduled examinations</div>
             {upcomingExams.length === 0 ? (
-              <>
-                <div style={{ fontSize: 54, color: '#b0b7c3', marginBottom: 10 }}>
-                  <i className="fas fa-calendar-alt"></i>
-                </div>
-                <div style={{ fontWeight: 600, fontSize: 20 }}>No upcoming exams</div>
-                <div style={{ color: '#6b7280', marginTop: 5 }}>Check back later for scheduled exams.</div>
-              </>
+              <div style={{ color: '#6b7280', fontSize: '1rem', marginTop: 12 }}>No upcoming exams. Check back later for scheduled exams.</div>
             ) : (
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                gap: 24,
-                justifyContent: 'center',
-                margin: '0 auto',
-                maxWidth: 500
-              }}>
-                {upcomingExams.map(exam => (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 18, width: '100%' }}>
+                {upcomingExams.map((exam) => (
                   <div key={exam.e_id} style={{
-                    background: '#fff',
-                    borderRadius: 18,
-                    boxShadow: '0 2px 12px rgba(30,34,90,0.10)',
-                    padding: '1.5rem 1.1rem',
-                    minHeight: 180,
-                    minWidth: 0,
+                    background: '#f8fafc',
+                    borderRadius: 10,
+                    boxShadow: '0 1px 4px rgba(30,34,90,0.04)',
+                    padding: '1.5rem 2vw',
+                    width: '100%',
+                    maxWidth: '100%',
+                    minHeight: 120,
                     display: 'flex',
-                    flexDirection: 'column',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    aspectRatio: '1 / 1',
-                    position: 'relative'
+                    position: 'relative',
+                    boxSizing: 'border-box',
                   }}>
-                    <div style={{ fontWeight: 700, color: '#2563eb', fontSize: '1.08rem', marginBottom: 6 }}>{exam.e_name}</div>
-                    <span style={{ position: 'absolute', top: 16, right: 16, background: '#d1fae5', color: '#059669', borderRadius: 12, fontWeight: 600, fontSize: 13, padding: '2px 14px' }}>Upcoming</span>
-                    <div style={{ color: '#5b6b7a', fontSize: '0.98rem', margin: '10px 0 2px 0' }}>{exam.e_date} &bull; {exam.e_time}</div>
-                    <div style={{ color: '#6b7280', fontSize: '0.97rem', marginBottom: 2 }}>Duration: {exam.duration}</div>
-                    <div style={{ color: '#6b7280', fontSize: '0.97rem', marginBottom: 2 }}>Template: {exam.t_name}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 700, color: '#2563eb', fontSize: '1.08rem', marginBottom: 6 }}>{exam.e_name}</div>
+                      <div style={{ color: '#374151', fontSize: '1.01rem', display: 'flex', alignItems: 'center', gap: 16 }}>
+                        <i className="far fa-calendar-alt" style={{ marginRight: 4 }}></i> {exam.e_date}
+                        <i className="far fa-clock" style={{ margin: '0 4px' }}></i> {exam.e_time}
+                        <span style={{ marginLeft: 14 }}><i className="fas fa-hourglass-half" style={{ marginRight: 4 }}></i> {exam.duration}</span>
+                      </div>
+                      <div style={{ color: '#6b7280', fontSize: '0.99rem', marginTop: 6 }}>Template: {exam.t_name}</div>
+                    </div>
+                    <span style={{
+                      background: '#d1fae5',
+                      color: '#059669',
+                      borderRadius: 8,
+                      fontWeight: 600,
+                      fontSize: 14,
+                      padding: '4px 18px',
+                      marginLeft: 18,
+                    }}>Upcoming</span>
                   </div>
                 ))}
               </div>
