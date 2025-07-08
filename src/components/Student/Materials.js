@@ -2,14 +2,13 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import StudentLayout from './StudentLayout';
 import './StudentDashboard.css';
-import { FaFolderOpen, FaSearch, FaBook, FaInfoCircle, FaImage, FaEye, FaChevronDown } from 'react-icons/fa';
+import { FaFolderOpen, FaSearch, FaBook, FaInfoCircle, FaImage, FaEye } from 'react-icons/fa';
 
 const Materials = () => {
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('course'); // 'course' or 'subject'
-  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     axios.get('http://localhost:3000/api/content/display')
@@ -66,74 +65,48 @@ const Materials = () => {
             </div>
           </div>
         </div>
-        {/* Dropdown for Materials Type */}
-        <div style={{ position: 'relative', margin: '0 0 1.5rem 0', width: 'fit-content' }}>
+        {/* Sub-navbar for Course/Subject Materials */}
+        <div style={{ display: 'flex', gap: 0, margin: '0 0 1.5rem 0', borderBottom: '2px solid #e5e7eb', width: '100%' }}>
           <button
-            onClick={() => setDropdownOpen(v => !v)}
+            onClick={() => setActiveTab('course')}
             style={{
-              border: '1px solid #e5e7eb',
-              background: '#fff',
+              border: 'none',
+              background: 'none',
               fontWeight: 600,
               fontSize: '1.08rem',
-              color: '#2563eb',
-              padding: '0.7rem 2.2rem 0.7rem 1.2rem',
-              borderRadius: 8,
+              color: activeTab === 'course' ? '#2563eb' : '#6b7280',
+              borderBottom: activeTab === 'course' ? '3px solid #2563eb' : '3px solid transparent',
+              padding: '0.7rem 2.2rem',
               cursor: 'pointer',
               outline: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              boxShadow: '0 2px 8px #2563eb11',
-              minWidth: 180,
-              position: 'relative',
-              zIndex: 2
+              transition: 'color 0.2s, border-bottom 0.2s',
+              backgroundColor: activeTab === 'course' ? '#f6f8fb' : 'transparent',
+              borderTopLeftRadius: 8,
+              borderTopRightRadius: 8
             }}
           >
-            Materials
-            <FaChevronDown style={{ marginLeft: 8, fontSize: 16, transition: 'transform 0.2s', transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+            Course Materials
           </button>
-          {dropdownOpen && (
-            <div style={{
-              position: 'absolute',
-              top: '110%',
-              left: 0,
-              background: '#fff',
-              border: '1px solid #e5e7eb',
-              borderRadius: 8,
-              boxShadow: '0 4px 16px #2563eb18',
-              minWidth: 180,
-              zIndex: 10,
-              padding: '0.5rem 0',
-            }}>
-              <div
-                onClick={() => { setActiveTab('course'); setDropdownOpen(false); }}
-                style={{
-                  padding: '0.7rem 1.5rem',
-                  cursor: 'pointer',
-                  color: activeTab === 'course' ? '#2563eb' : '#222',
-                  fontWeight: activeTab === 'course' ? 700 : 500,
-                  background: activeTab === 'course' ? '#f6f8fb' : 'transparent',
-                  borderBottom: '1px solid #f0f0f0',
-                  transition: 'background 0.2s, color 0.2s',
-                }}
-              >
-                Course Materials
-              </div>
-              <div
-                onClick={() => { setActiveTab('subject'); setDropdownOpen(false); }}
-                style={{
-                  padding: '0.7rem 1.5rem',
-                  cursor: 'pointer',
-                  color: activeTab === 'subject' ? '#2563eb' : '#222',
-                  fontWeight: activeTab === 'subject' ? 700 : 500,
-                  background: activeTab === 'subject' ? '#f6f8fb' : 'transparent',
-                  transition: 'background 0.2s, color 0.2s',
-                }}
-              >
-                Subject Materials
-              </div>
-            </div>
-          )}
+          <button
+            onClick={() => setActiveTab('subject')}
+            style={{
+              border: 'none',
+              background: 'none',
+              fontWeight: 600,
+              fontSize: '1.08rem',
+              color: activeTab === 'subject' ? '#2563eb' : '#6b7280',
+              borderBottom: activeTab === 'subject' ? '3px solid #2563eb' : '3px solid transparent',
+              padding: '0.7rem 2.2rem',
+              cursor: 'pointer',
+              outline: 'none',
+              transition: 'color 0.2s, border-bottom 0.2s',
+              backgroundColor: activeTab === 'subject' ? '#f6f8fb' : 'transparent',
+              borderTopLeftRadius: 8,
+              borderTopRightRadius: 8
+            }}
+          >
+            Subject Materials
+          </button>
         </div>
         <div className="materials-section">
           {loading ? (
