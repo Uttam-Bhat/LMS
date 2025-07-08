@@ -37,6 +37,12 @@ const LoginForm = () => {
       localStorage.setItem('token_expiry', expiry);
       // Store user email for student exam filtering
       localStorage.setItem('user_email', user.email);
+      // Store student_id for enrollment and other student actions (use st_id if present)
+      if (user.user_type === 'student' && user.st_id) {
+        localStorage.setItem('student_id', user.st_id);
+      } else {
+        localStorage.removeItem('student_id');
+      }
 
       // Role-based redirection
       if (user.user_type === 'admin') {

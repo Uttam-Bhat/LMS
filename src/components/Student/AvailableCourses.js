@@ -9,6 +9,9 @@ const AvailableCourses = () => {
   const [enrolled, setEnrolled] = useState([]);
   const [search, setSearch] = useState('');
   const [teachers, setTeachers] = useState([]);
+  const [enrollLoading, setEnrollLoading] = useState(null); // courseId or null
+  const [successMsg, setSuccessMsg] = useState('');
+  const [enrollError, setEnrollError] = useState('');
 
   // ✅ Fetch courses from backend
   useEffect(() => {
@@ -38,6 +41,24 @@ const AvailableCourses = () => {
     fetchTeachers();
   }, []);
 
+  // ✅ Fetch enrolled courses for this student
+  useEffect(() => {
+    const fetchEnrolled = async () => {
+      try {
+        const studentId = localStorage.getItem('student_id');
+        const response = await axios.get('http://localhost:3000/api/enroll/enroll-display');
+        // Filter for this student
+        const enrolledIds = response.data
+          .filter(e => String(e.student_id) === String(studentId))
+          .map(e => String(e.course_id));
+        setEnrolled(enrolledIds);
+      } catch (error) {
+        setEnrolled([]);
+      }
+    };
+    fetchEnrolled();
+  }, []);
+
   // ✅ Filter courses
   const filteredCourses = courses.filter(course => {
     const teacher = teachers.find(t => String(t.id) === String(course.ass_teacher));
@@ -49,9 +70,30 @@ const AvailableCourses = () => {
     return matchesSearch;
   });
 
-  const handleEnroll = (id) => {
-    setEnrolled(prev => [...prev, id]);
-    alert('Enrolled in course!');
+  const handleEnroll = async (courseId) => {
+    const studentId = localStorage.getItem('student_id');
+    console.log('ENROLL DEBUG:', { studentId, courseId }); // Debug log
+    if (!studentId) {
+      console.error('Student ID not found in localStorage.');
+      setEnrollError('Student ID not found. Please log in again.');
+      return;
+    }
+    setEnrollLoading(courseId);
+    setEnrollError('');
+    try {
+      await axios.post('http://localhost:3000/api/enroll/enroll-add', {
+        student_id: studentId,
+        course_id: courseId
+      });
+      setEnrolled(prev => [...prev.map(String), String(courseId)]);
+      setSuccessMsg('Enrolled successfully!');
+      setTimeout(() => setSuccessMsg(''), 2000);
+    } catch (err) {
+      console.error('Failed to enroll:', err);
+      setEnrollError('Failed to enroll. Please try again.');
+    } finally {
+      setEnrollLoading(null);
+    }
   };
 
   return (
@@ -67,6 +109,13 @@ const AvailableCourses = () => {
             </div>
           </div>
         </div>
+
+        {/* Success/Error Message */}
+        {(successMsg || enrollError) && (
+          <div style={{ background: successMsg ? '#d1fae5' : '#ffeaea', color: successMsg ? '#059669' : '#d32f2f', padding: '0.7rem 1.2rem', borderRadius: 8, marginBottom: 18, fontWeight: 600, fontSize: '1.08rem', boxShadow: successMsg ? '0 2px 8px #05966922' : '0 2px 8px #d32f2f22' }}>
+            {successMsg || enrollError}
+          </div>
+        )}
 
         {/* Search and View Options */}
         <div className="courses-header">
@@ -89,6 +138,7 @@ const AvailableCourses = () => {
             filteredCourses.map(course => {
               const teacher = teachers.find(t => String(t.id) === String(course.ass_teacher));
               const teacherName = teacher?.fullname || 'Not Assigned';
+              const isEnrolled = enrolled.map(String).includes(String(course.courseId));
 
               return (
                 <div key={course.courseId} className="course-card">
@@ -121,11 +171,12 @@ const AvailableCourses = () => {
                   <div className="course-actions">
                     <button
                       className="student-action-btn apply"
-                      title="Enroll in course"
+                      title={isEnrolled ? 'Already enrolled' : 'Enroll in course'}
                       onClick={() => handleEnroll(course.courseId)}
-                      disabled={enrolled.includes(course.courseId)}
+                      disabled={isEnrolled || enrollLoading === course.courseId}
+                      style={{ background: isEnrolled ? '#e0e7ef' : undefined, color: isEnrolled ? '#2563eb' : undefined, cursor: isEnrolled ? 'not-allowed' : undefined }}
                     >
-                      {enrolled.includes(course.courseId) ? 'Enrolled' : 'Enroll'}
+                      {isEnrolled ? 'Enrolled' : (enrollLoading === course.courseId ? 'Enrolling...' : 'Enroll')}
                     </button>
                   </div>
                 </div>
