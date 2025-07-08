@@ -2,13 +2,13 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { FaPencilAlt, FaSearch, FaTrashAlt, FaUserCircle, FaUserPlus } from 'react-icons/fa';
 import CreateUserModal from './CreateUserModal';
-import DashboardLayout from './DashboardLayout';
 import './UserManagement.css';
 import AssignStudentModal from './AssignStudentModal';
 import toast from 'react-hot-toast';
 import ConfirmDialog from './ConfirmDialog';
+import StudentsManagement from './StudentsManagement';
 
-const UserManagement = () => {
+const UserManagement = ({ activeSubPage = 'all-users' }) => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
@@ -76,142 +76,147 @@ const UserManagement = () => {
   };
 
   return (
-    <DashboardLayout>
-      <div className="user-management">
-        <div className="page-header">
-          <h1>User Management</h1>
-          <button 
-            className="add-user-btn"
-            onClick={() => setShowCreateUserModal(true)}
-          >
-            <FaUserPlus />
-            Add New User
-          </button>
-        </div>
-
-        <div className="user-filters">
-          <div className="search-box">
-            <span className="search-icon"><FaSearch /></span>
-            <input
-              type="text"
-              placeholder="Search users..."
-              value={searchQuery}
-              onChange={handleSearch}
-            />
-          </div>
-          <div className="filter-buttons">
-            <button
-              className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
-              onClick={() => handleFilterChange('all')}
+    <>
+      {activeSubPage === 'all-users' && (
+        <div className="user-management">
+          <div className="page-header">
+            <h1>User Management</h1>
+            <button 
+              className="add-user-btn"
+              onClick={() => setShowCreateUserModal(true)}
             >
-              All Users
-            </button>
-            <button
-              className={`filter-btn ${activeFilter === 'teacher' ? 'active' : ''}`}
-              onClick={() => handleFilterChange('teacher')}
-            >
-              Teachers
-            </button>
-            <button
-              className={`filter-btn ${activeFilter === 'student' ? 'active' : ''}`}
-              onClick={() => handleFilterChange('student')}
-            >
-              Students
+              <FaUserPlus />
+              Add New User
             </button>
           </div>
-        </div>
 
-        <div className="users-table-container">
-          <table className="users-table">
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Actions</th>
-                {filteredUsers.some(u => u.user_type === 'student') && <th>Assign</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map(user => (
-                <tr key={user.id}>
-                  <td>
-                    <div className="user-info">
-                      <FaUserCircle />
-                      <span>{user.fullname}</span>
-                    </div>
-                  </td>
-                  <td>{user.email}</td>
-                  <td>
-                    <span className={`role-badge ${user.user_type || 'unknown'}`}>
-                      {(user.user_type || 'unknown').charAt(0).toUpperCase() + (user.user_type || 'unknown').slice(1)}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="action-buttons">
-                      <button className="edit-btn" title="Edit user" onClick={() => { setEditUserData(user); setShowCreateUserModal(true); }}>
-                        <FaPencilAlt />
-                      </button>
-                      <button className="delete-btn" title="Delete user" onClick={() => handleDelete(user.id)}>
-                        <FaTrashAlt />
-                      </button>
-                    </div>
-                  </td>
-                  {user.user_type === 'student' && (
-                    <td>
-                      {assignedStudents[user.id] ? (
-                        <button className="assigned-btn" disabled>Assigned</button>
-                      ) : (
-                        <button className="assign-btn" onClick={() => { setAssigningUser(user); setShowAssignModal(true); }}>Assign</button>
-                      )}
-                    </td>
-                  )}
+          <div className="user-filters">
+            <div className="search-box">
+              <span className="search-icon"><FaSearch /></span>
+              <input
+                type="text"
+                placeholder="Search users..."
+                value={searchQuery}
+                onChange={handleSearch}
+              />
+            </div>
+            <div className="filter-buttons">
+              <button
+                className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
+                onClick={() => handleFilterChange('all')}
+              >
+                All Users
+              </button>
+              <button
+                className={`filter-btn ${activeFilter === 'teacher' ? 'active' : ''}`}
+                onClick={() => handleFilterChange('teacher')}
+              >
+                Teachers
+              </button>
+              <button
+                className={`filter-btn ${activeFilter === 'student' ? 'active' : ''}`}
+                onClick={() => handleFilterChange('student')}
+              >
+                Students
+              </button>
+            </div>
+          </div>
+
+          <div className="users-table-container">
+            <table className="users-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Actions</th>
+                  {filteredUsers.some(u => u.user_type === 'student') && <th>Assign</th>}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredUsers.map(user => (
+                  <tr key={user.id}>
+                    <td>
+                      <div className="user-info">
+                        <FaUserCircle />
+                        <span>{user.fullname}</span>
+                      </div>
+                    </td>
+                    <td>{user.email}</td>
+                    <td>
+                      <span className={`role-badge ${user.user_type || 'unknown'}`}>
+                        {(user.user_type || 'unknown').charAt(0).toUpperCase() + (user.user_type || 'unknown').slice(1)}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="action-buttons">
+                        <button className="edit-btn" title="Edit user" onClick={() => { setEditUserData(user); setShowCreateUserModal(true); }}>
+                          <FaPencilAlt />
+                        </button>
+                        <button className="delete-btn" title="Delete user" onClick={() => handleDelete(user.id)}>
+                          <FaTrashAlt />
+                        </button>
+                      </div>
+                    </td>
+                    {user.user_type === 'student' && (
+                      <td>
+                        {assignedStudents[user.id] ? (
+                          <button className="assigned-btn" disabled>Assigned</button>
+                        ) : (
+                          <button className="assign-btn" onClick={() => { setAssigningUser(user); setShowAssignModal(true); }}>Assign</button>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {(showCreateUserModal || editUserData) && (
+            <CreateUserModal
+              onClose={() => {
+                setShowCreateUserModal(false);
+                setEditUserData(null);
+              }}
+              editUser={editUserData}
+              onUpdate={async () => {
+                try {
+                  const response = await axios.get('http://localhost:3000/api/admin/users');
+                  setUsers(response.data);
+                } catch (err) {
+                  console.error('Failed to refresh users:', err);
+                }
+              }}
+            />
+          )}
+
+          {showAssignModal && assigningUser && (
+            <AssignStudentModal
+              user={assigningUser}
+              onClose={() => { setShowAssignModal(false); setAssigningUser(null); }}
+              onAssigned={() => {
+                setAssignedStudents(prev => ({ ...prev, [assigningUser.id]: true }));
+                setShowAssignModal(false);
+                setAssigningUser(null);
+              }}
+            />
+          )}
+
+          <ConfirmDialog
+            open={confirmOpen}
+            title="Delete User?"
+            message="Are you sure you want to delete this user? This action cannot be undone."
+            onConfirm={confirmDelete}
+            onCancel={() => { setConfirmOpen(false); setPendingDeleteId(null); }}
+          />
+
         </div>
-
-        {(showCreateUserModal || editUserData) && (
-          <CreateUserModal
-            onClose={() => {
-              setShowCreateUserModal(false);
-              setEditUserData(null);
-            }}
-            editUser={editUserData}
-            onUpdate={async () => {
-              try {
-                const response = await axios.get('http://localhost:3000/api/admin/users');
-                setUsers(response.data);
-              } catch (err) {
-                console.error('Failed to refresh users:', err);
-              }
-            }}
-          />
-        )}
-
-        {showAssignModal && assigningUser && (
-          <AssignStudentModal
-            user={assigningUser}
-            onClose={() => { setShowAssignModal(false); setAssigningUser(null); }}
-            onAssigned={() => {
-              setAssignedStudents(prev => ({ ...prev, [assigningUser.id]: true }));
-              setShowAssignModal(false);
-              setAssigningUser(null);
-            }}
-          />
-        )}
-
-        <ConfirmDialog
-          open={confirmOpen}
-          title="Delete User?"
-          message="Are you sure you want to delete this user? This action cannot be undone."
-          onConfirm={confirmDelete}
-          onCancel={() => { setConfirmOpen(false); setPendingDeleteId(null); }}
-        />
-
-      </div>
-    </DashboardLayout>
+      )}
+      {activeSubPage === 'students' && (
+        <StudentsManagement />
+      )}
+    </>
   );
 };
 

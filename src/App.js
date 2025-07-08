@@ -25,6 +25,7 @@ import AdminProfile from './components/Dashboard/AdminProfile';
 import AdminSettings from './components/Dashboard/AdminSettings';
 import ProtectedRoute from './components/ProtectedRoute';
 import Materials from './components/Student/Materials';
+import DashboardLayout from './components/Dashboard/DashboardLayout';
 
 function App() {
   return (
@@ -35,7 +36,8 @@ function App() {
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-          <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
+          <Route path="/admin/users/all" element={<ProtectedRoute><DashboardLayout><UserManagement activeSubPage="all-users" /></DashboardLayout></ProtectedRoute>} />
+          <Route path="/admin/users/students" element={<ProtectedRoute><DashboardLayout><UserManagement activeSubPage="students" /></DashboardLayout></ProtectedRoute>} />
           <Route path="/admin/teachers" element={<ProtectedRoute><TeachersManagement /></ProtectedRoute>} />
           <Route path="/admin/students" element={<ProtectedRoute><StudentsManagement /></ProtectedRoute>} />
           <Route path="/admin/courses" element={<ProtectedRoute><CourseManagement /></ProtectedRoute>} />

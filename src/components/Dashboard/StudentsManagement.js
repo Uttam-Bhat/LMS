@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './UserManagement.css';
 import { FaUserPlus, FaSearch, FaUserCircle, FaPencilAlt, FaTrashAlt } from 'react-icons/fa';
-import DashboardLayout from './DashboardLayout';
 
 const StudentsManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,56 +38,54 @@ const StudentsManagement = () => {
   };
 
   return (
-    <DashboardLayout>
-      <div className="user-management">
-        <div className="page-header">
-          <h1>Students Management</h1>
-          <button 
-            className="add-user-btn"
-            onClick={() => { setShowModal(true); setEditStudent(null); }}
-          >
-            <FaUserPlus />
-            Add New Student
-          </button>
-        </div>
-        <div className="dashboard-stats" style={{marginBottom: '2rem'}}>
-          <div className="stat-card">
-            <i className="fas fa-user-graduate"></i>
-            <div className="stat-content">
-              <h3>Total Students</h3>
-              <p>{students.length}</p>
-            </div>
-          </div>
-        </div>
-        <div className="user-filters">
-          <div className="search-box">
-            <span className="search-icon"><FaSearch /></span>
-            <input
-              type="text"
-              placeholder="Search students..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="users-table-container">
-          <table className="users-table">
-            <thead>
-              <tr></tr>
-            </thead>
-            <tbody>
-            </tbody>
-          </table>
-        </div>
-        {showModal && (
-          <StudentModal
-            onClose={() => { setShowModal(false); setEditStudent(null); }}
-            onSave={handleSave}
-            student={editStudent}
-          />
-        )}
+    <div className="user-management">
+      <div className="page-header">
+        <h1>Students Management</h1>
+        <button 
+          className="add-user-btn"
+          onClick={() => { setShowModal(true); setEditStudent(null); }}
+        >
+          <FaUserPlus />
+          Add New Student
+        </button>
       </div>
-    </DashboardLayout>
+      <div className="dashboard-stats" style={{marginBottom: '2rem'}}>
+        <div className="stat-card">
+          <i className="fas fa-user-graduate"></i>
+          <div className="stat-content">
+            <h3>Total Students</h3>
+            <p>{students.length}</p>
+          </div>
+        </div>
+      </div>
+      <div className="user-filters">
+        <div className="search-box">
+          <span className="search-icon"><FaSearch /></span>
+          <input
+            type="text"
+            placeholder="Search students..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+          />
+        </div>
+      </div>
+      <div className="users-table-container">
+        <table className="users-table">
+          <thead>
+            <tr></tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+      {showModal && (
+        <StudentModal
+          onClose={() => { setShowModal(false); setEditStudent(null); }}
+          onSave={handleSave}
+          student={editStudent}
+        />
+      )}
+    </div>
   );
 };
 

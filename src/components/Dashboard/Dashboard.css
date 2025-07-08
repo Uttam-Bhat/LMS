@@ -418,8 +418,11 @@
   background: none;
   transition: background 0.2s, color 0.2s;
 }
-.submenu a:hover, .submenu a.active {
+.submenu a:hover,
+.submenu a.active {
   background: #e7f0fe;
   color: #1877f2;
   border-left-color: #1877f2;
+  font-weight: 600;
+  border-radius: 8px;
 } 
