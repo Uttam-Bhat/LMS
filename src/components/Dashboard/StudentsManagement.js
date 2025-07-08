@@ -2,34 +2,80 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FaPencilAlt, FaTrashAlt, FaUserCircle, FaUserGraduate } from 'react-icons/fa';
 import './UserManagement.css';
+import toast from 'react-hot-toast';
+import ConfirmDialog from './ConfirmDialog';
 
 const StudentsManagement = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [editStudent, setEditStudent] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({ class_id: '', stream_id: '' });
+  const [editLoading, setEditLoading] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDeleteStudent, setPendingDeleteStudent] = useState(null);
 
   useEffect(() => {
-    const fetchStudents = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get('http://localhost:3000/api/student/student-display');
-        setStudents(response.data || []);
-      } catch (err) {
-        setError('Failed to load students');
-      }
-      setLoading(false);
-    };
     fetchStudents();
   }, []);
 
+  const fetchStudents = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get('http://localhost:3000/api/student/student-display');
+      setStudents(response.data || []);
+    } catch (err) {
+      setError('Failed to load students');
+    }
+    setLoading(false);
+  };
+
   const handleEdit = (student) => {
-    // Implement edit logic/modal here
-    alert('Edit student: ' + student.user_info.fullname);
+    setEditStudent(student);
+    setEditForm({
+      class_id: student.user_info.class_info.cls_id,
+      stream_id: student.user_info.class_info.stream_info.sid,
+    });
+    setShowEditModal(true);
+  };
+
+  const handleEditSave = async () => {
+    setEditLoading(true);
+    try {
+      const updatePayload = {
+        user_id: editStudent.user_info.id,
+        class_id: Number(editForm.class_id),
+        stream_id: Number(editForm.stream_id),
+      };
+      await axios.put(`http://localhost:3000/api/student/student-edit/${editStudent.st_id}`, updatePayload);
+      toast.success('Student updated successfully!');
+      setShowEditModal(false);
+      setEditStudent(null);
+      setEditForm({ class_id: '', stream_id: '' });
+      await fetchStudents();
+    } catch (err) {
+      toast.error('Failed to update student');
+    }
+    setEditLoading(false);
   };
 
   const handleDelete = (student) => {
-    // Implement delete logic/modal here
-    alert('Delete student: ' + student.user_info.fullname);
+    setPendingDeleteStudent(student);
+    setConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteStudent) return;
+    try {
+      await axios.delete(`http://localhost:3000/api/student/student-delete/${pendingDeleteStudent.st_id}`);
+      toast.success('Student deleted successfully!');
+      fetchStudents();
+    } catch (err) {
+      toast.error('Failed to delete student');
+    }
+    setConfirmOpen(false);
+    setPendingDeleteStudent(null);
   };
 
   return (
@@ -106,8 +152,96 @@ const StudentsManagement = () => {
           </tbody>
         </table>
       </div>
+      {showEditModal && editStudent && (
+        <EditStudentModal
+          student={editStudent}
+          form={editForm}
+          setForm={setEditForm}
+          onClose={() => { setShowEditModal(false); setEditStudent(null); setEditForm({ class_id: '', stream_id: '' }); }}
+          onSave={handleEditSave}
+          loading={editLoading}
+        />
+      )}
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => { setConfirmOpen(false); setPendingDeleteStudent(null); }}
+        onConfirm={confirmDelete}
+        onCancel={() => { setConfirmOpen(false); setPendingDeleteStudent(null); }}
+        message="Are you sure you want to delete this student?"
+      />
     </div>
   );
 };
+
+function EditStudentModal({ student, form, setForm, onClose, onSave, loading }) {
+  const [classes, setClasses] = useState([]);
+  const [streams, setStreams] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const classRes = await axios.get('http://localhost:3000/api/class/display');
+        setClasses(classRes.data || []);
+        if (form.class_id) {
+          const streamRes = await axios.get(`http://localhost:3000/api/stream/display?class_id=${form.class_id}`);
+          setStreams(streamRes.data || []);
+        } else {
+          setStreams([]);
+        }
+      } catch {}
+    };
+    fetchData();
+  }, [form.class_id]);
+  return (
+    <div className="modal-overlay">
+      <div className="create-user-modal assign-modal">
+        <div className="modal-header">
+          <h2>Edit Assigned Student</h2>
+          <button className="close-button" onClick={onClose}>&times;</button>
+        </div>
+        <div className="modal-body">
+          <div className="student-info">
+            <div><strong>Name:</strong> {student.user_info.fullname}</div>
+            <div><strong>Email:</strong> {student.user_info.email}</div>
+          </div>
+          <div className="form-group">
+            <label htmlFor="edit-class">Class</label>
+            <select
+              id="edit-class"
+              value={form.class_id}
+              onChange={e => setForm(f => ({ ...f, class_id: e.target.value, stream_id: '' }))}
+            >
+              <option value="">Select Class</option>
+              {classes.map(cls => (
+                <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label htmlFor="edit-stream">Stream</label>
+            <select
+              id="edit-stream"
+              value={form.stream_id}
+              onChange={e => setForm(f => ({ ...f, stream_id: e.target.value }))}
+              disabled={!form.class_id}
+            >
+              <option value="">Select Stream</option>
+              {streams
+                .filter(stream => String(stream.class_details?.cls_id) === String(form.class_id))
+                .map(stream => (
+                  <option key={stream.sid} value={stream.sid}>{stream.sname}</option>
+                ))}
+            </select>
+          </div>
+        </div>
+        <div className="modal-footer">
+          <button className="cancel-btn" onClick={onClose} disabled={loading}>Cancel</button>
+          <button className="add-btn" onClick={onSave} disabled={loading || !form.class_id || !form.stream_id}>
+            {loading ? 'Saving...' : 'Save'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default StudentsManagement; 
