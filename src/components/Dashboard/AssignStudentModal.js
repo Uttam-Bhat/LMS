@@ -12,22 +12,41 @@ const AssignStudentModal = ({ user, onClose, onAssigned }) => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchClasses = async () => {
       setLoading(true);
       try {
-        const [classRes, streamRes] = await Promise.all([
-          axios.get('http://localhost:3000/api/class/display'),
-          axios.get('http://localhost:3000/api/stream/display'),
-        ]);
+        const classRes = await axios.get('http://localhost:3000/api/class/display');
         setClasses(classRes.data || []);
-        setStreams(streamRes.data || []);
       } catch (err) {
-        setError('Failed to fetch classes or streams');
+        setError('Failed to fetch classes');
       }
       setLoading(false);
     };
-    fetchData();
+    fetchClasses();
   }, []);
+
+  useEffect(() => {
+    if (!selectedClass) {
+      setStreams([]);
+      setSelectedStream('');
+      return;
+    }
+    const fetchStreams = async () => {
+      setLoading(true);
+      try {
+        const streamRes = await axios.get(`http://localhost:3000/api/stream/display?class_id=${selectedClass}`);
+        const uniqueStreams = (streamRes.data || []).filter((stream, idx, arr) =>
+          arr.findIndex(s => s.sid === stream.sid) === idx
+        );
+        setStreams(uniqueStreams);
+      } catch (err) {
+        setError('Failed to fetch streams');
+      }
+      setLoading(false);
+    };
+    fetchStreams();
+    setSelectedStream('');
+  }, [selectedClass]);
 
   const handleAssign = async () => {
     if (!selectedClass || !selectedStream) {
@@ -76,11 +95,20 @@ const AssignStudentModal = ({ user, onClose, onAssigned }) => {
               </div>
               <div className="form-group">
                 <label htmlFor="assign-stream">Stream</label>
-                <select id="assign-stream" value={selectedStream} onChange={e => setSelectedStream(e.target.value)}>
+                <select
+                  id="assign-stream"
+                  value={selectedStream}
+                  onChange={e => setSelectedStream(e.target.value)}
+                  disabled={!selectedClass}
+                >
                   <option value="">Select Stream</option>
-                  {streams.map(stream => (
-                    <option key={stream.sid} value={stream.sid}>{stream.sname}</option>
-                  ))}
+                  {streams
+                    .filter(stream => String(stream.class_details.cls_id) === String(selectedClass))
+                    .map(stream => (
+                      <option key={stream.sid} value={stream.sid}>
+                        {stream.sname}
+                      </option>
+                    ))}
                 </select>
               </div>
               {error && <div style={{ color: 'red', marginTop: 8 }}>{error}</div>}
