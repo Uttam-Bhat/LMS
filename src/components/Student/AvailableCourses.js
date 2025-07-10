@@ -4,6 +4,8 @@ import './StudentDashboard.css';
 import StudentLayout from './StudentLayout';
 import { FaBookOpen } from 'react-icons/fa';
 
+console.log('AvailableCourses component rendered');
+
 const AvailableCourses = () => {
   const [courses, setCourses] = useState([]);
   const [enrolled, setEnrolled] = useState([]);
@@ -42,20 +44,22 @@ const AvailableCourses = () => {
   }, []);
 
   // ✅ Fetch enrolled courses for this student
+  const fetchEnrolled = async () => {
+    try {
+      const studentId = localStorage.getItem('student_id');
+      const response = await axios.get('http://localhost:3000/api/enroll/enroll-display');
+      // Filter for this student
+      const enrolledIds = response.data
+        .filter(e => String(e.student_id) === String(studentId))
+        .map(e => String(e.course_id));
+      setEnrolled(enrolledIds);
+      console.log('FETCHED ENROLLED IDS:', enrolledIds);
+    } catch (error) {
+      setEnrolled([]);
+    }
+  };
+
   useEffect(() => {
-    const fetchEnrolled = async () => {
-      try {
-        const studentId = localStorage.getItem('student_id');
-        const response = await axios.get('http://localhost:3000/api/enroll/enroll-display');
-        // Filter for this student
-        const enrolledIds = response.data
-          .filter(e => String(e.student_id) === String(studentId))
-          .map(e => String(e.course_id));
-        setEnrolled(enrolledIds);
-      } catch (error) {
-        setEnrolled([]);
-      }
-    };
     fetchEnrolled();
   }, []);
 
@@ -85,7 +89,7 @@ const AvailableCourses = () => {
         student_id: studentId,
         course_id: courseId
       });
-      setEnrolled(prev => [...prev.map(String), String(courseId)]);
+      await fetchEnrolled(); // Re-fetch from backend after enrolling
       setSuccessMsg('Enrolled successfully!');
       setTimeout(() => setSuccessMsg(''), 2000);
     } catch (err) {
@@ -136,6 +140,7 @@ const AvailableCourses = () => {
             <div style={{ color: '#6b7a90', fontSize: '1.1rem' }}>No courses found.</div>
           ) : (
             filteredCourses.map(course => {
+              console.log('COURSE:', course);
               const teacher = teachers.find(t => String(t.id) === String(course.ass_teacher));
               const teacherName = teacher?.fullname || 'Not Assigned';
               const isEnrolled = enrolled.map(String).includes(String(course.courseId));
