@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../services/authService';
 import { useEffect, useState } from 'react';
 import './CreateCourseModal.css';
 import toast from 'react-hot-toast';
@@ -54,9 +54,9 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
   const [selectedStream, setSelectedStream] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:3000/api/class/display').then(res => setClasses(res.data));
-    axios.get('http://localhost:3000/api/stream/display').then(res => setStreams(res.data));
-    axios.get('http://localhost:3000/api/subject/subject-display').then(res => setSubjects(res.data));
+    api.get('http://localhost:3000/api/class/display').then(res => setClasses(res.data));
+    api.get('http://localhost:3000/api/stream/display').then(res => setStreams(res.data));
+    api.get('http://localhost:3000/api/subject/subject-display').then(res => setSubjects(res.data));
   }, []);
 
   // Remove the old subject effect and use only one effect for all three fields
@@ -99,7 +99,7 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
     const question = form.questions[idx];
     if ((question.q_id || question.id) && template && template.t_id) {
       try {
-        await axios.delete(`http://localhost:3000/api/question/delete/${question.q_id || question.id}`);
+        await api.delete(`http://localhost:3000/api/question/delete/${question.q_id || question.id}`);
         setForm({
           ...form,
           questions: form.questions.filter((_, i) => i !== idx)
@@ -160,10 +160,10 @@ const CreateTemplateModal = ({ onClose, template, refreshTemplates }) => {
 
     try {
       if (template && template.t_id) {
-        await axios.put(`http://localhost:3000/api/question/edit-by-template/${template.t_id}`, payload);
+        await api.put(`http://localhost:3000/api/question/edit-by-template/${template.t_id}`, payload);
         toast.success('Template updated successfully!');
       } else {
-        await axios.post('http://localhost:3000/api/question/add', payload);
+        await api.post('http://localhost:3000/api/question/add', payload);
         toast.success('Template created successfully!');
       }
       if (refreshTemplates) await refreshTemplates();

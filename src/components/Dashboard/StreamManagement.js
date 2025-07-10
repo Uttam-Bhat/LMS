@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../services/authService';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaPlus, FaSearch, FaStream } from 'react-icons/fa';
@@ -18,7 +18,7 @@ const StreamManagement = () => {
 
   const fetchStreams = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/stream/display');
+      const response = await api.get('/stream/display');
       setStreamList(response.data);
     } catch (error) {
       console.error('Error fetching streams', error);
@@ -30,7 +30,7 @@ const StreamManagement = () => {
     // Fetch classes for dropdown
     const fetchClasses = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/class/display');
+        const response = await api.get('/class/display');
         setClasses(response.data);
       } catch (error) {
         console.error('Error fetching classes', error);
@@ -97,7 +97,7 @@ const StreamManagement = () => {
         return `${dd}-${mm}-${yyyy}`;
       };
   
-      await axios.post('http://localhost:3000/api/stream/add', {
+      await api.post('/stream/add', {
         sname: form.name,
         des: form.description,
         cdate: formatDate(form.created),
@@ -108,7 +108,7 @@ const StreamManagement = () => {
       setForm({ name: '', description: '', created: '', classId: '' });
   
       // Refresh stream list
-      const response = await axios.get('http://localhost:3000/api/stream/display');
+      const response = await api.get('/stream/display');
       setStreamList(response.data);
     } catch (error) {
       console.error('Failed to add stream:', error);
@@ -121,7 +121,7 @@ const StreamManagement = () => {
   };
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/api/stream/delete/${pendingDeleteId}`);
+      await api.delete(`/stream/delete/${pendingDeleteId}`);
       fetchStreams();
       toast.success('Stream deleted successfully!');
     } catch (err) {
@@ -150,10 +150,10 @@ const StreamManagement = () => {
     try {
       if (editItem) {
         // Edit mode
-        await axios.put(`http://localhost:3000/api/stream/edit/${editItem.sid}`, payload);
+        await api.put(`/stream/edit/${editItem.sid}`, payload);
       } else {
         // Add mode
-        await axios.post('http://localhost:3000/api/stream/add', payload);
+        await api.post('/stream/add', payload);
       }
 
       setShowModal(false);
@@ -161,7 +161,7 @@ const StreamManagement = () => {
       setEditItem(null);
 
       // Refresh list
-      const response = await axios.get('http://localhost:3000/api/stream/display');
+      const response = await api.get('/stream/display');
       setStreamList(response.data);
     } catch (error) {
       console.error(editItem ? 'Failed to update stream:' : 'Failed to add stream:', error);

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../services/authService';
 import { useEffect, useState } from 'react';
 import { FaPencilAlt, FaSearch, FaTrashAlt, FaUserCircle, FaUserPlus } from 'react-icons/fa';
 import CreateUserModal from './CreateUserModal';
@@ -28,10 +28,10 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/admin/users');
+        const response = await api.get('/admin/users');
         setUsers(response.data);
         // Fetch assigned students and update assignedStudents state
-        const studentRes = await axios.get('http://localhost:3000/api/student/student-display');
+        const studentRes = await api.get('/student/student-display');
         const assigned = {};
         (studentRes.data || []).forEach(stu => {
           if (stu.user_info && stu.user_info.id) {
@@ -72,7 +72,7 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/api/admin/delete/${pendingDeleteId}`);
+      await api.delete(`/admin/delete/${pendingDeleteId}`);
       setUsers(prevUsers => prevUsers.filter(user => user.id !== pendingDeleteId));
       toast.success('User deleted successfully');
     } catch (error) {
@@ -201,7 +201,7 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
               editUser={editUserData}
               onUpdate={async () => {
                 try {
-                  const response = await axios.get('http://localhost:3000/api/admin/users');
+                  const response = await api.get('/admin/users');
                   setUsers(response.data);
                 } catch (err) {
                   console.error('Failed to refresh users:', err);
@@ -220,9 +220,9 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
                 // Refresh users and assigned students
                 (async () => {
                   try {
-                    const response = await axios.get('http://localhost:3000/api/admin/users');
+                    const response = await api.get('/admin/users');
                     setUsers(response.data);
-                    const studentRes = await axios.get('http://localhost:3000/api/student/student-display');
+                    const studentRes = await api.get('/student/student-display');
                     const assigned = {};
                     (studentRes.data || []).forEach(stu => {
                       if (stu.user_info && stu.user_info.id) {

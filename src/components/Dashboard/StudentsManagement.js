@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../services/authService';
 import { FaPencilAlt, FaTrashAlt, FaUserCircle, FaUserGraduate } from 'react-icons/fa';
 import './UserManagement.css';
 import toast from 'react-hot-toast';
@@ -23,7 +23,7 @@ const StudentsManagement = () => {
   const fetchStudents = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:3000/api/student/student-display');
+      const response = await api.get('/student/student-display');
       setStudents(response.data || []);
     } catch (err) {
       setError('Failed to load students');
@@ -48,7 +48,7 @@ const StudentsManagement = () => {
         class_id: Number(editForm.class_id),
         stream_id: Number(editForm.stream_id),
       };
-      await axios.put(`http://localhost:3000/api/student/student-edit/${editStudent.st_id}`, updatePayload);
+      await api.put(`/student/student-edit/${editStudent.st_id}`, updatePayload);
       toast.success('Student updated successfully!');
       setShowEditModal(false);
       setEditStudent(null);
@@ -68,7 +68,7 @@ const StudentsManagement = () => {
   const confirmDelete = async () => {
     if (!pendingDeleteStudent) return;
     try {
-      await axios.delete(`http://localhost:3000/api/student/student-delete/${pendingDeleteStudent.st_id}`);
+      await api.delete(`/student/student-delete/${pendingDeleteStudent.st_id}`);
       toast.success('Student deleted successfully!');
       fetchStudents();
     } catch (err) {
@@ -179,10 +179,10 @@ function EditStudentModal({ student, form, setForm, onClose, onSave, loading }) 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const classRes = await axios.get('http://localhost:3000/api/class/display');
+        const classRes = await api.get('/class/display');
         setClasses(classRes.data || []);
         if (form.class_id) {
-          const streamRes = await axios.get(`http://localhost:3000/api/stream/display?class_id=${form.class_id}`);
+          const streamRes = await api.get(`/stream/display?class_id=${form.class_id}`);
           setStreams(streamRes.data || []);
         } else {
           setStreams([]);

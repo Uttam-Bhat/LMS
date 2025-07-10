@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
+import api from '../../services/authService';
 import StudentLayout from './StudentLayout';
 import './StudentDashboard.css';
 import { FaFolderOpen, FaSearch, FaBook, FaInfoCircle, FaImage, FaEye } from 'react-icons/fa';
@@ -11,7 +11,7 @@ const Materials = () => {
   const [activeTab, setActiveTab] = useState('course'); // 'course' or 'subject'
 
   useEffect(() => {
-    axios.get('http://localhost:3000/api/content/display')
+    api.get('/content/display')
       .then(res => setMaterials(res.data.content || []))
       .catch(() => setMaterials([]))
       .finally(() => setLoading(false));

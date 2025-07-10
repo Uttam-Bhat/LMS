@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../services/authService';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CreateCourseModal from './CreateCourseModal';
@@ -23,7 +23,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchUserCount = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/admin/users');
+        const response = await api.get('/admin/users');
         setTotalUsers(response.data.length); // assuming it returns array of users
       } catch (error) {
         console.error('Failed to fetch total users:', error);
@@ -33,7 +33,7 @@ const AdminDashboard = () => {
     fetchUserCount();
     const fetchCourseCount = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/course/display');
+        const response = await api.get('/course/display');
         setTotalCourses(response.data.length); // assuming response.data is an array of courses
       } catch (error) {
         console.error('Failed to fetch total courses:', error);
@@ -42,7 +42,7 @@ const AdminDashboard = () => {
     fetchCourseCount();
     const fetchExamCount = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/exam/display');
+        const response = await api.get('/exam/display');
         setTotalExams(Array.isArray(response.data) ? response.data.length : 0);
       } catch (error) {
         console.error('Failed to fetch total exams:', error);
@@ -52,7 +52,7 @@ const AdminDashboard = () => {
     // Fetch templates for CreateExamModal
     const fetchTemplates = async () => {
       try {
-        const templatesRes = await axios.get('http://localhost:3000/api/question/display');
+        const templatesRes = await api.get('/question/display');
         setTemplates(Array.isArray(templatesRes.data) ? templatesRes.data : []);
       } catch (error) {
         console.error('Failed to fetch templates:', error);
@@ -64,7 +64,7 @@ const AdminDashboard = () => {
   const handleExamCreated = () => {
     setShowCreateExamModal(false);
     // Refresh exam count after creating an exam
-    axios.get('http://localhost:3000/api/exam/display')
+    api.get('/exam/display')
       .then(res => setTotalExams(Array.isArray(res.data) ? res.data.length : 0));
   };
 

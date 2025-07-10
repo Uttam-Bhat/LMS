@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../services/authService';
 import { useEffect, useState } from 'react';
 import './StudentDashboard.css';
 import StudentLayout from './StudentLayout';
@@ -19,7 +19,7 @@ const AvailableCourses = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/course/display');
+        const response = await api.get('/course/display');
         setCourses(response.data);
       } catch (error) {
         console.error('Error fetching courses:', error);
@@ -33,7 +33,7 @@ const AvailableCourses = () => {
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/course/teachers');
+        const response = await api.get('/course/teachers');
         setTeachers(response.data);
       } catch (error) {
         console.error('Failed to fetch teachers:', error);
@@ -47,11 +47,11 @@ const AvailableCourses = () => {
   const fetchEnrolled = async () => {
     try {
       const studentId = localStorage.getItem('student_id');
-      const response = await axios.get('http://localhost:3000/api/enroll/enroll-display');
-      // Filter for this student
+      const response = await api.get('/enroll/enroll-display');
+      // Use camelCase if that's what your backend returns
       const enrolledIds = response.data
-        .filter(e => String(e.student_id) === String(studentId))
-        .map(e => String(e.course_id));
+        .filter(e => String(e.studentId) === String(studentId))
+        .map(e => String(e.courseId));
       setEnrolled(enrolledIds);
       console.log('FETCHED ENROLLED IDS:', enrolledIds);
     } catch (error) {
@@ -85,7 +85,7 @@ const AvailableCourses = () => {
     setEnrollLoading(courseId);
     setEnrollError('');
     try {
-      await axios.post('http://localhost:3000/api/enroll/enroll-add', {
+      await api.post('/enroll/enroll-add', {
         student_id: studentId,
         course_id: courseId
       });
@@ -143,7 +143,8 @@ const AvailableCourses = () => {
               console.log('COURSE:', course);
               const teacher = teachers.find(t => String(t.id) === String(course.ass_teacher));
               const teacherName = teacher?.fullname || 'Not Assigned';
-              const isEnrolled = enrolled.map(String).includes(String(course.courseId));
+              // Use courseId for comparison, as returned by backend
+              const isEnrolled = enrolled.includes(String(course.courseId));
 
               return (
                 <div key={course.courseId} className="course-card">

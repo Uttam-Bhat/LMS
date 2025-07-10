@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../services/authService';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
@@ -33,10 +33,10 @@ const ContentManagement = () => {
     const fetchData = async () => {
       try {
         if (association === 'course') {
-          const res = await axios.get('http://localhost:3000/api/course/display');
+          const res = await api.get('http://localhost:3000/api/course/display');
           setCourses(res.data.courses || res.data);
         } else if (association === 'subject') {
-          const res = await axios.get('http://localhost:3000/api/subject/subject-display');
+          const res = await api.get('http://localhost:3000/api/subject/subject-display');
           // Try to handle both array and object response
           if (Array.isArray(res.data)) {
             setSubjects(res.data);
@@ -58,7 +58,7 @@ const ContentManagement = () => {
 
   const fetchContents = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/api/content/display');
+      const res = await api.get('http://localhost:3000/api/content/display');
       console.log('Raw API response:', res.data);
       let contentArr = [];
       if (Array.isArray(res.data)) {
@@ -102,12 +102,12 @@ const ContentManagement = () => {
     }
     try {
       if (editContent) {
-        await axios.put(`http://localhost:3000/api/content/update/${editContent.ct_id}`, formData, {
+        await api.put(`http://localhost:3000/api/content/update/${editContent.ct_id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" }
         });
         toast.success('Content updated successfully');
       } else {
-        await axios.post("http://localhost:3000/api/content/add", formData, {
+        await api.post("http://localhost:3000/api/content/add", formData, {
           headers: { "Content-Type": "multipart/form-data" }
         });
         toast.success('Content added successfully');
@@ -128,7 +128,7 @@ const ContentManagement = () => {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/api/content/delete/${pendingDeleteId}`);
+      await api.delete(`http://localhost:3000/api/content/delete/${pendingDeleteId}`);
       fetchContents();
       toast.success('Content deleted successfully!');
     } catch (err) {

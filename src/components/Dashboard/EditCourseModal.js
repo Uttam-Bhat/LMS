@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import './CreateCourseModal.css';
-import axios from 'axios';
+import api from '../../services/authService';
 import toast from 'react-hot-toast';
 
 const EditCourseModal = ({ onClose, course, onUpdate }) => {
@@ -33,7 +33,7 @@ const EditCourseModal = ({ onClose, course, onUpdate }) => {
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/course/teachers');
+        const response = await api.get('/course/teachers');
         setTeachers(response.data);
       } catch (error) {
         setTeachers([]);
@@ -77,7 +77,7 @@ const EditCourseModal = ({ onClose, course, onUpdate }) => {
     
     try {
       // Call the backend API to update the course
-      const response = await axios.put(`http://localhost:3000/api/course/edit/${formData.courseId}`, payload);
+      const response = await api.put(`/course/edit/${formData.courseId}`, payload);
       
       if (response.status === 200) {
         // Call the onUpdate callback to update the parent component

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../services/authService';
 import { useEffect, useState } from 'react';
 import AddUserToCourseModal from './AddUserToCourseModal';
 import './CourseManagement.css';
@@ -22,7 +22,7 @@ const CourseManagement = () => {
 
   const fetchTeachers = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/course/teachers');
+      const response = await api.get('/course/teachers');
       setTeachers(response.data);
       console.log("Fetched data:", response.data);
     } catch (error) {
@@ -32,7 +32,7 @@ const CourseManagement = () => {
 
   const fetchCourses = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/course/display');
+      const response = await api.get('/course/display');
       // Map backend fields to UI structure
       const mapped = response.data.map(course => ({
         courseId: course.courseId,
@@ -74,7 +74,7 @@ const CourseManagement = () => {
   const handleCourseUpdate = async (updatedData) => {
     try {
       // Update the course in the backend
-      const response = await axios.put(`http://localhost:3000/api/course/edit/${updatedData.courseId}`, updatedData);
+      const response = await api.put(`/course/edit/${updatedData.courseId}`, updatedData);
       
       if (response.status === 200) {
         // Refresh both courses and teachers data to ensure everything is in sync

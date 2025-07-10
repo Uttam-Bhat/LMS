@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaTimes, FaExclamationTriangle, FaTrashAlt } from 'react-icons/fa';
 import './CreateCourseModal.css';
-import axios from 'axios';
+import api from '../../services/authService';
 import toast from 'react-hot-toast';
 
 const DeleteCourseModal = ({ onClose, course, onDelete }) => {
@@ -11,7 +11,7 @@ const DeleteCourseModal = ({ onClose, course, onDelete }) => {
       return;
     }
     try {
-      await axios.delete(`http://localhost:3000/api/course/delete/${course.courseId}`);
+      await api.delete(`/course/delete/${course.courseId}`);
       toast.success('Course deleted successfully!');
       onDelete && onDelete(course.courseId);
       onClose();

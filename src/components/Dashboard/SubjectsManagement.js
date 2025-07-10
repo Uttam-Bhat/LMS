@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../services/authService';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaBookOpen, FaPlus, FaSearch } from 'react-icons/fa';
@@ -24,7 +24,7 @@ const SubjectsManagement = () => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const classRes = await axios.get('http://localhost:3000/api/class/display');
+        const classRes = await api.get('http://localhost:3000/api/class/display');
         setClasses(classRes.data);
         await fetchStreams();
         await fetchSubjects();
@@ -39,7 +39,7 @@ const SubjectsManagement = () => {
 
   const fetchStreams = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/stream/display');
+      const response = await api.get('http://localhost:3000/api/stream/display');
       console.log('Fetched streams:', response.data);
       setStreams(response.data);
     } catch (error) {
@@ -50,7 +50,7 @@ const SubjectsManagement = () => {
 
   const fetchSubjects = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/subject/subject-display');
+      const response = await api.get('http://localhost:3000/api/subject/subject-display');
       console.log('Fetched subjects:', response.data);
       setSubjects(response.data);
     } catch (error) {
@@ -137,10 +137,10 @@ const SubjectsManagement = () => {
     try {
       if (editItem) {
         // Edit mode
-        await axios.put(`http://localhost:3000/api/subject/subject-edit/${editItem.su_id || editItem.id}`, payload);
+        await api.put(`http://localhost:3000/api/subject/subject-edit/${editItem.su_id || editItem.id}`, payload);
       } else {
         // Add mode
-        await axios.post('http://localhost:3000/api/subject/subject-add', payload);
+        await api.post('http://localhost:3000/api/subject/subject-add', payload);
       }
       fetchSubjects();
       setShowModal(false);
@@ -159,7 +159,7 @@ const SubjectsManagement = () => {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/api/subject/delete/${pendingDeleteId}`);
+      await api.delete(`http://localhost:3000/api/subject/delete/${pendingDeleteId}`);
       fetchSubjects();
       toast.success('Subject deleted successfully!');
     } catch (err) {

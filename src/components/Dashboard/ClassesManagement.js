@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../services/authService';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaChalkboardTeacher, FaPlus, FaSearch } from 'react-icons/fa';
@@ -64,7 +64,7 @@ const ClassesManagement = () => {
         return;
       }
       try {
-        await axios.put(`http://localhost:3000/api/class/edit/${editItem.cls_id}`, changedFields);
+        await api.put(`/class/edit/${editItem.cls_id}`, changedFields);
         setClasses(prev =>
           prev.map(cls =>
             cls.cls_id === editItem.cls_id ? { ...cls, ...changedFields } : cls
@@ -88,7 +88,7 @@ const ClassesManagement = () => {
         cdate: formatDateForBackend(form.cdate),
       };
       try {
-        const response = await axios.post('http://localhost:3000/api/class/add', payload);
+        const response = await api.post('/class/add', payload);
         const newClass = {
           ...payload,
           cls_id: response.data.cls_id || Date.now(),
@@ -113,7 +113,7 @@ const ClassesManagement = () => {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/api/class/delete/${pendingDeleteId}`);
+      await api.delete(`/class/delete/${pendingDeleteId}`);
       fetchClasses();
       toast.success('Class deleted successfully!');
     } catch (err) {
@@ -132,7 +132,7 @@ const ClassesManagement = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/class/display');
+      const response = await api.get('/class/display');
       // Ensure every class object has a cls_id property and map start_date/end_date
       const dataWithIds = (response.data || []).map((cls, idx) => ({
         ...cls,

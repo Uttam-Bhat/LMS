@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../services/authService';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaBook, FaPlus, FaSearch } from 'react-icons/fa';
@@ -42,10 +42,10 @@ const ChaptersManagement = () => {
       setLoading(true);
       try {
         // Fetch classes
-        const classRes = await axios.get('http://localhost:3000/api/class/display');
+        const classRes = await api.get('http://localhost:3000/api/class/display');
         setClasses(classRes.data);
         // Fetch streams
-        const streamRes = await axios.get('http://localhost:3000/api/stream/display');
+        const streamRes = await api.get('http://localhost:3000/api/stream/display');
         setStreams(streamRes.data);
         await fetchSubjects();
         await fetchChapters();
@@ -60,7 +60,7 @@ const ChaptersManagement = () => {
 
   const fetchSubjects = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/subject/subject-display');
+      const response = await api.get('http://localhost:3000/api/subject/subject-display');
       console.log('Fetched subjects:', response.data);
       setSubjects(response.data);
     } catch (error) {
@@ -71,7 +71,7 @@ const ChaptersManagement = () => {
 
   const fetchChapters = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/chapter/display');
+      const response = await api.get('http://localhost:3000/api/chapter/display');
       console.log('Fetched chapters:', response.data);
       setChapters(response.data);
     } catch (error) {
@@ -160,10 +160,10 @@ const ChaptersManagement = () => {
     try {
       if (editItem) {
         // Edit mode
-        await axios.put(`http://localhost:3000/api/chapter/edit/${editItem.ch_id}`, payload);
+        await api.put(`http://localhost:3000/api/chapter/edit/${editItem.ch_id}`, payload);
       } else {
         // Add mode
-        await axios.post('http://localhost:3000/api/chapter/add', payload);
+        await api.post('http://localhost:3000/api/chapter/add', payload);
       }
       fetchChapters();
       setShowModal(false);
@@ -184,7 +184,7 @@ const ChaptersManagement = () => {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/api/chapter/delete/${pendingDeleteId}`);
+      await api.delete(`http://localhost:3000/api/chapter/delete/${pendingDeleteId}`);
       fetchChapters();
       toast.success('Chapter deleted successfully!');
     } catch (err) {

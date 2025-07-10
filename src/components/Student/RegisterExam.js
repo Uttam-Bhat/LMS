@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import DashboardLayout from '../Student/StudentLayout';
 import './StudentDashboard.css'; // Corrected path
-import axios from 'axios';
+import api from '../../services/authService';
 
 const RegisterExam = () => {
   const [tab, setTab] = useState('register');
@@ -13,17 +13,17 @@ const RegisterExam = () => {
     const fetchExamsForStudent = async () => {
       setLoading(true);
       try {
-        const userRes = await axios.get('http://localhost:3000/api/admin/users');
+        const userRes = await api.get('/admin/users');
         const loggedInEmail = localStorage.getItem('user_email');
         const userList = Array.isArray(userRes.data) ? userRes.data : [userRes.data];
         const user = userList.find(u => u.email === loggedInEmail);
         if (!user) { setExams([]); setLoading(false); return; }
-        const studentRes = await axios.get('http://localhost:3000/api/student/student-display');
+        const studentRes = await api.get('/student/student-display');
         const studentList = Array.isArray(studentRes.data) ? studentRes.data : [studentRes.data];
         const student = studentList.find(s => s.user_info.id === user.id);
         const studentClassName = student?.user_info?.class_info?.class_name;
         const studentStreamName = student?.user_info?.class_info?.stream_info?.sname;
-        const examsRes = await axios.get('http://localhost:3000/api/exam/display');
+        const examsRes = await api.get('/exam/display');
         const allExams = Array.isArray(examsRes.data) ? examsRes.data : [examsRes.data];
         console.log('studentClassName:', studentClassName);
         console.log('studentStreamName:', studentStreamName);

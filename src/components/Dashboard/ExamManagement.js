@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import {
   FaClock,
@@ -15,6 +14,7 @@ import CreateTemplateModal from './CreateTemplateModal';
 import DashboardLayout from './DashboardLayout';
 import './ExamManagement.css';
 import toast from 'react-hot-toast';
+import api from '../../services/authService';
 
 const ExamManagement = () => {
   const [showCreateExamModal, setShowCreateExamModal] = useState(false);
@@ -35,7 +35,7 @@ const ExamManagement = () => {
   }, []);
   const fetchFiles = async () => {
   try {
-    const res = await axios.get('http://localhost:3000/api/file/display');
+    const res = await api.get('/file/display');
     setUploadedFiles(res.data);
   } catch (err) {
     console.error('Error fetching files:', err);
@@ -43,7 +43,7 @@ const ExamManagement = () => {
 };
   const refreshTemplates = async () => {
     try {
-      const templatesRes = await axios.get('http://localhost:3000/api/question/display');
+      const templatesRes = await api.get('/question/display');
       console.log('API /api/question/display response:', templatesRes.data); // Debug log
       const templatesData = Array.isArray(templatesRes.data) ? templatesRes.data : [];
       // Ensure t_id is included and pass all properties
@@ -65,7 +65,7 @@ const ExamManagement = () => {
 
   const refreshExams = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/api/exam/display');
+      const res = await api.get('/exam/display');
       // Map t_id or templateId to template_id for modal compatibility
       const exams = (Array.isArray(res.data) ? res.data : []).map(exam => ({
         ...exam,
@@ -102,7 +102,7 @@ const ExamManagement = () => {
   const handleDeleteTemplate = async (templateId) => {
   if (!window.confirm('Are you sure you want to delete this template?')) return;
   try {
-    await axios.delete(`http://localhost:3000/api/question/delete-template/${templateId}`);
+    await api.delete(`/question/delete-template/${templateId}`);
     await refreshTemplates();
     toast.success('Template deleted successfully!');
   } catch (error) {
@@ -123,7 +123,7 @@ const ExamManagement = () => {
   const handleDeleteExam = async (examId) => {
     if (!window.confirm('Are you sure you want to delete this exam?')) return;
     try {
-      await axios.delete(`http://localhost:3000/api/exam/delete/${examId}`);
+      await api.delete(`/exam/delete/${examId}`);
       await refreshExams();
       toast.success('Exam deleted successfully!');
     } catch (error) {
@@ -137,7 +137,7 @@ const ExamManagement = () => {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await axios.post("http://localhost:3000/api/file/upload", formData, {
+    const response = await api.post("/file/upload", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -153,7 +153,7 @@ const ExamManagement = () => {
 };
 const handleDelete = async (fileId) => {
   try {
-    await axios.delete(`http://localhost:3000/api/file/delete/${fileId}`);
+    await api.delete(`/file/delete/${fileId}`);
     fetchFiles(); // Refresh list after delete
   } catch (err) {
     console.error('Delete error:', err);

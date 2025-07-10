@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import StudentLayout from './StudentLayout';
 import './StudentDashboard.css';
 import { FaBook } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/authService';
 
 const MyCourses = () => {
   const [enrollments, setEnrollments] = useState([]);
@@ -16,7 +16,7 @@ const MyCourses = () => {
       setLoading(true);
       try {
         const studentId = localStorage.getItem('student_id');
-        const res = await axios.get('http://localhost:3000/api/enroll/enroll-display');
+        const res = await api.get('/enroll/enroll-display');
         // Filter for this student
         const filtered = res.data.filter(e => String(e.st_id) === String(studentId));
         setEnrollments(filtered);
@@ -43,7 +43,7 @@ const MyCourses = () => {
     if (!window.confirm('Are you sure you want to cancel this enrollment?')) return;
     setCancelLoading(er_id);
     try {
-      await axios.delete(`http://localhost:3000/api/enroll/enroll-delete/${er_id}`);
+      await api.delete(`/enroll/enroll-delete/${er_id}`);
       setEnrollments(prev => prev.filter(e => e.er_id !== er_id));
     } catch (err) {
       alert('Failed to cancel enrollment.');

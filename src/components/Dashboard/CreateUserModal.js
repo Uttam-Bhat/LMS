@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../services/authService';
 import { useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import './CreateUserModal.css';
@@ -54,10 +54,10 @@ const CreateUserModal = ({ onClose = () => {}, editUser = null, onUpdate = () =>
       console.log('Sending payload:', payload);
       
       if (editUser) {
-        await axios.put(`http://localhost:3000/api/admin/edit/${editUser.id}`, payload);
+        await api.put(`/admin/edit/${editUser.id}`, payload);
         toast.success('User updated successfully');
       } else {
-        await axios.post('http://localhost:3000/api/admin/register', payload);
+        await api.post('/admin/register', payload);
         toast.success('User added successfully');
       }
       onUpdate(); // Refresh user list

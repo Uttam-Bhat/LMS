@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../services/authService';
 import { useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import './CreateCourseModal.css';
@@ -26,7 +26,7 @@ const CreateCourseModal = ({ onClose, onCourseAdded }) => {
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/course/teachers');
+        const response = await api.get('/course/teachers');
         setTeachers(response.data);
         console.log("Fetched data:", response.data);
       } catch (error) {
@@ -58,7 +58,7 @@ const CreateCourseModal = ({ onClose, onCourseAdded }) => {
     console.log(payload);
 
     try {
-      const response = await axios.post('http://localhost:3000/api/course/add', payload);
+      const response = await api.post('/course/add', payload);
       console.log('Course created:', response.data);
       toast.success('Course created successfully!');
       // Map backend response to UI structure if needed

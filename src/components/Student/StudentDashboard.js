@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Exam from './Exam';
 import StudentLayout from './StudentLayout';
 import styles from './StudentDashboard.module.css';
-import axios from 'axios';
+import api from '../../services/authService';
 
 const StudentDashboard = () => {
   // Example student info (replace with real data as needed)
@@ -21,27 +21,26 @@ const StudentDashboard = () => {
   useEffect(() => {
     const fetchExamsForStudent = async () => {
       try {
-        const userRes = await axios.get('http://localhost:3000/api/admin/users');
+        const userRes = await api.get('/admin/users');
         const loggedInEmail = localStorage.getItem('user_email');
         const userList = Array.isArray(userRes.data) ? userRes.data : [userRes.data];
         const user = userList.find(u => u.email === loggedInEmail);
         if (!user) { setUpcomingExams([]); return; }
-        const studentRes = await axios.get('http://localhost:3000/api/student/student-display');
+        const studentRes = await api.get('/student/student-display');
         const studentList = Array.isArray(studentRes.data) ? studentRes.data : [studentRes.data];
         const student = studentList.find(s => s.user_info.id === user.id);
-        const studentClassName = student?.user_info?.class_info?.class_name;
-        const studentStreamName = student?.user_info?.class_info?.stream_info?.sname;
-        const examsRes = await axios.get('http://localhost:3000/api/exam/display');
+        const studentClassId = student?.user_info?.class_info?.class_id;
+        const studentStreamId = student?.user_info?.class_info?.stream_info?.stream_id;
+        const examsRes = await api.get('/exam/display');
         const allExams = Array.isArray(examsRes.data) ? examsRes.data : [examsRes.data];
-        console.log('studentClassName:', studentClassName);
-        console.log('studentStreamName:', studentStreamName);
-        console.log('allExams:', allExams.map(e => e.e_name));
-        const normalize = str => (str || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
+        // Debug: log student and exam structure
+        console.log('DEBUG student:', student);
+        console.log('DEBUG first exam:', allExams[0]);
+        // Filter exams by class_id and stream_id
         const filtered = allExams.filter(
           exam =>
-            exam.e_name &&
-            normalize(exam.e_name).includes(normalize(studentClassName)) &&
-            normalize(exam.e_name).includes(normalize(studentStreamName))
+            exam.class_id === studentClassId &&
+            exam.stream_id === studentStreamId
         );
         setUpcomingExams(filtered);
       } catch (err) {

@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { login } from '../../services/authService';
 import './loginform.css';
 
 const LoginForm = () => {
@@ -9,6 +9,7 @@ const LoginForm = () => {
     email: '',
     password: ''
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,34 +21,32 @@ const LoginForm = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:3000/api/user/login', {
-        email: formData.email,
-        password: formData.password
-      });
-
-      const user = response.data.user;
+      const { user, token } = await login(formData.email, formData.password);
 
       alert(`Welcome ${user.fullname}!`);
 
-      // Store token or flag for authentication
-      localStorage.setItem('token', user._id); // or use a real token if available
-      const expiry = Date.now() + 60 * 60 * 1000; // 1 hour from now
-      localStorage.setItem('token_expiry', expiry);
-      // Store user email for student exam filtering
+      // Store user information
       localStorage.setItem('user_email', user.email);
-      // Store student_id for enrollment and other student actions (use st_id if present)
+      localStorage.setItem('user_type', user.user_type);
+      
+      // Store student_id for enrollment and other student actions
       if (user.user_type === 'student' && user.st_id) {
         localStorage.setItem('student_id', user.st_id);
       } else {
         localStorage.removeItem('student_id');
       }
 
+      // Set token expiry (1 hour from now)
+      const expiry = Date.now() + 60 * 60 * 1000;
+      localStorage.setItem('token_expiry', expiry);
+
       // Role-based redirection
       if (user.user_type === 'admin') {
         navigate('/admin');
-      }else if (user.user_type === 'student') {
+      } else if (user.user_type === 'student') {
         navigate('/student');
       } else {
         alert('Unknown user type');
@@ -56,6 +55,8 @@ const LoginForm = () => {
     } catch (error) {
       console.error(error);
       alert(error.response?.data?.message || 'Login failed');
+    } finally {
+      setLoading(false);
     }
   };
 
