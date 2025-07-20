@@ -90,10 +90,20 @@ const StudentDashboard = () => {
         const contentRes = await api.get('/content/display');
         const allMaterials = contentRes.data.content || contentRes.data || [];
         console.log('FIRST MATERIAL:', allMaterials[0]);
-        // Show materials for enrolled courses by name
-        const relevantMaterials = allMaterials.filter(item =>
-          item.coursename && enrolledCourseNames.includes(item.coursename)
-        );
+        // Collect student subject names
+        const studentSubjectNames = studentSubjects.map(subject => subject.su_name);
+        console.log('STUDENT SUBJECT NAMES:', studentSubjectNames);
+        allMaterials.forEach(item => {
+          if (item.su_name) {
+            console.log('SUBJECT MATERIAL:', item.title, '| su_name:', item.su_name);
+          }
+        });
+        const normalize = str => (str || '').toLowerCase().trim();
+        const relevantMaterials = allMaterials.filter(item => {
+          const courseMatch = item.coursename && enrolledCourseNames.some(name => normalize(name) === normalize(item.coursename));
+          const subjectMatch = item.su_name && studentSubjectNames.some(name => normalize(name) === normalize(item.su_name));
+          return courseMatch || subjectMatch;
+        });
         // Show latest 3
         const latestMaterials = relevantMaterials
           .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
