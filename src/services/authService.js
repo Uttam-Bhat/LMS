@@ -48,12 +48,13 @@ api.interceptors.request.use(
 
 // Axios interceptor to handle token expiration
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid
+    // Only redirect to login for 401s if not on update-password endpoint
+    if (
+      error.response?.status === 401 &&
+      !(error.config && error.config.url && error.config.url.includes('/user/update-password'))
+    ) {
       removeToken();
       window.location.href = '/login';
     }

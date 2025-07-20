@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import DashboardLayout from './DashboardLayout';
+import api from '../../services/authService';
 
 const AdminSettings = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -7,8 +8,9 @@ const AdminSettings = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
@@ -20,7 +22,22 @@ const AdminSettings = () => {
       setError('New passwords do not match.');
       return;
     }
-    setSuccess('Password updated (UI only).');
+    setLoading(true);
+    try {
+      await api.put('/user/update-password', {
+        currentPassword,
+        newPassword,
+        confirmPassword
+      });
+      setSuccess('Password updated successfully!');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update password.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLogout = () => {
@@ -38,7 +55,7 @@ const AdminSettings = () => {
             <input type="password" placeholder="Confirm New Password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} style={{ padding: '0.7rem', borderRadius: 8, border: '1px solid #e2e8f0' }} />
             {error && <div style={{ color: '#e11d48', fontSize: '0.98rem' }}>{error}</div>}
             {success && <div style={{ color: '#16a34a', fontSize: '0.98rem' }}>{success}</div>}
-            <button type="submit" style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, padding: '0.7rem', fontWeight: 600, fontSize: '1.05rem', cursor: 'pointer', marginTop: 8 }}>Update Password</button>
+            <button type="submit" disabled={loading} style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, padding: '0.7rem', fontWeight: 600, fontSize: '1.05rem', cursor: 'pointer', marginTop: 8 }}>{loading ? 'Updating...' : 'Update Password'}</button>
           </form>
           <hr style={{ margin: '2rem 0' }} />
           <button onClick={handleLogout} style={{ background: '#e11d48', color: '#fff', border: 'none', borderRadius: 8, padding: '0.7rem', fontWeight: 600, fontSize: '1.05rem', cursor: 'pointer', width: '100%' }}>Logout</button>
