@@ -48,10 +48,10 @@ const AvailableCourses = () => {
     try {
       const studentId = localStorage.getItem('student_id');
       const response = await api.get('/enroll/enroll-display');
-      // Use camelCase if that's what your backend returns
+      // Only keep course_info.cid for this student
       const enrolledIds = response.data
-        .filter(e => String(e.studentId) === String(studentId))
-        .map(e => String(e.courseId));
+        .filter(e => String(e.st_id) === String(studentId))
+        .map(e => String(e.course_info.cid));
       setEnrolled(enrolledIds);
       console.log('FETCHED ENROLLED IDS:', enrolledIds);
     } catch (error) {
@@ -89,7 +89,8 @@ const AvailableCourses = () => {
         student_id: studentId,
         course_id: courseId
       });
-      await fetchEnrolled(); // Re-fetch from backend after enrolling
+      // Immediately update local state to disable the button
+      setEnrolled(prev => [...prev, String(courseId)]);
       setSuccessMsg('Enrolled successfully!');
       setTimeout(() => setSuccessMsg(''), 2000);
     } catch (err) {
