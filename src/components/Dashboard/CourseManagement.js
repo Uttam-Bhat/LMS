@@ -32,20 +32,27 @@ const CourseManagement = () => {
 
   const fetchCourses = async () => {
     try {
-      const response = await api.get('/course/display');
+      const [courseRes, enrollRes] = await Promise.all([
+        api.get('/course/display'),
+        api.get('/enroll/enroll-display')
+      ]);
+      const enrollments = enrollRes.data || [];
       // Map backend fields to UI structure
-      const mapped = response.data.map(course => ({
-        courseId: course.courseId,
-        coursename: course.coursename || '',
-        course_type: course.course_type || '',
-        ass_teacher: course.ass_teacher || '',
-        start_date: course.start_date || '',
-        end_date: course.end_date || '',
-        des: course.des || '',
-        students: course.students || 0,
-        completion: course.completion || 0,
-        status: 'active',
-      }));
+      const mapped = courseRes.data.map(course => {
+        const studentCount = enrollments.filter(e => String(e.course_info.cid) === String(course.courseId)).length;
+        return {
+          courseId: course.courseId,
+          coursename: course.coursename || '',
+          course_type: course.course_type || '',
+          ass_teacher: course.ass_teacher || '',
+          start_date: course.start_date || '',
+          end_date: course.end_date || '',
+          des: course.des || '',
+          students: studentCount,
+          completion: course.completion || 0,
+          status: 'active',
+        };
+      });
       setCourses(mapped);
       setTotalCourses(mapped.length); // Update total courses count
     } catch (error) {
