@@ -1,17 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { FaTimes, FaSearch, FaUserPlus } from 'react-icons/fa';
 import './CreateCourseModal.css';
+import api from '../../services/authService';
+import toast from 'react-hot-toast';
 
 const AddUserToCourseModal = ({ onClose, course, onUpdate }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStudents, setSelectedStudents] = useState([]);
-  const [availableStudents, setAvailableStudents] = useState([
-    { id: 1, name: 'Mike Johnson', email: 'mike@example.com', class: '10A' },
-    { id: 2, name: 'Sarah Williams', email: 'sarah@example.com', class: '9B' },
-    { id: 3, name: 'David Brown', email: 'david@example.com', class: '11A' },
-    { id: 4, name: 'Emily Davis', email: 'emily@example.com', class: '10B' },
-    { id: 5, name: 'James Wilson', email: 'james@example.com', class: '12A' },
-  ]);
+  const [availableStudents, setAvailableStudents] = useState([]);
+  const [enrolledStudentIds, setEnrolledStudentIds] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStudentsAndEnrollments = async () => {
+      setLoading(true);
+      try {
+        const res = await api.get('/student/student-display');
+        const mapped = (res.data || []).map(s => ({
+          id: s.user_info.id,
+          st_id: s.st_id,
+          name: s.user_info.fullname,
+          email: s.user_info.email,
+          class: s.user_info.class_info?.class_name || ''
+        }));
+        setAvailableStudents(mapped);
+        // Fetch enrollments for this course
+        if (course && course.courseId) {
+          const enrollRes = await api.get('/enroll/enroll-display');
+          const enrolled = (enrollRes.data || []).filter(e => String(e.course_info.cid) === String(course.courseId));
+          setEnrolledStudentIds(enrolled.map(e => String(e.st_id)));
+        }
+      } catch (err) {
+        toast.error('Failed to fetch students or enrollments');
+        setAvailableStudents([]);
+        setEnrolledStudentIds([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStudentsAndEnrollments();
+  }, [course]);
 
   const filteredStudents = availableStudents.filter(student =>
     student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -20,6 +48,10 @@ const AddUserToCourseModal = ({ onClose, course, onUpdate }) => {
   );
 
   const handleStudentSelect = (student) => {
+    if (enrolledStudentIds.includes(String(student.st_id))) {
+      toast.error('Student already enrolled in this course');
+      return;
+    }
     if (selectedStudents.find(s => s.id === student.id)) {
       setSelectedStudents(selectedStudents.filter(s => s.id !== student.id));
     } else {
@@ -31,9 +63,28 @@ const AddUserToCourseModal = ({ onClose, course, onUpdate }) => {
     setSelectedStudents(selectedStudents.filter(s => s.id !== studentId));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Adding students to course:', selectedStudents);
+    if (!course || !course.courseId) return;
+    let successCount = 0;
+    let errorCount = 0;
+    for (const student of selectedStudents) {
+      if (enrolledStudentIds.includes(String(student.st_id))) {
+        toast.error(`Student ${student.name} already enrolled in this course`);
+        continue;
+      }
+      try {
+        await api.post('/enroll/enroll-add', {
+          student_id: student.st_id,
+          course_id: course.courseId
+        });
+        successCount++;
+      } catch (err) {
+        errorCount++;
+      }
+    }
+    if (successCount > 0) toast.success(`${successCount} student(s) enrolled to ${course.coursename}`);
+    if (errorCount > 0) toast.error(`${errorCount} failed to enroll`);
     onUpdate && onUpdate(selectedStudents);
     onClose();
   };
@@ -50,9 +101,8 @@ const AddUserToCourseModal = ({ onClose, course, onUpdate }) => {
 
         <div style={{ padding: '1rem 0' }}>
           <h3 style={{ marginBottom: '1rem', color: '#1877f2' }}>
-            Course: {course?.name || 'Unknown Course'}
+            Course: {course?.coursename || 'Unknown Course'}
           </h3>
-          
           <div className="form-group">
             <label>Search Students</label>
             <div style={{ position: 'relative' }}>
@@ -84,7 +134,9 @@ const AddUserToCourseModal = ({ onClose, course, onUpdate }) => {
                 borderRadius: '8px',
                 padding: '0.5rem'
               }}>
-                {filteredStudents.length === 0 ? (
+                {loading ? (
+                  <p style={{ textAlign: 'center', color: '#666', padding: '1rem' }}>Loading...</p>
+                ) : filteredStudents.length === 0 ? (
                   <p style={{ textAlign: 'center', color: '#666', padding: '1rem' }}>
                     No students found
                   </p>
@@ -97,14 +149,18 @@ const AddUserToCourseModal = ({ onClose, course, onUpdate }) => {
                         border: '1px solid #e1e1e1',
                         borderRadius: '6px',
                         marginBottom: '0.5rem',
-                        cursor: 'pointer',
-                        backgroundColor: selectedStudents.find(s => s.id === student.id) ? '#e7f0fe' : 'white',
-                        transition: 'background-color 0.2s'
+                        cursor: enrolledStudentIds.includes(String(student.st_id)) ? 'not-allowed' : 'pointer',
+                        backgroundColor: selectedStudents.find(s => s.id === student.id) ? '#e7f0fe' : (enrolledStudentIds.includes(String(student.st_id)) ? '#f8d7da' : 'white'),
+                        transition: 'background-color 0.2s',
+                        opacity: enrolledStudentIds.includes(String(student.st_id)) ? 0.6 : 1
                       }}
                       onClick={() => handleStudentSelect(student)}
                     >
                       <div style={{ fontWeight: '500', color: '#1a1a1a' }}>
                         {student.name}
+                        {enrolledStudentIds.includes(String(student.st_id)) && (
+                          <span style={{ color: '#d32f2f', fontSize: '0.85rem', marginLeft: 8 }}>(Already Enrolled)</span>
+                        )}
                       </div>
                       <div style={{ fontSize: '0.85rem', color: '#666' }}>
                         {student.email} • {student.class}

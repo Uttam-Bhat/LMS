@@ -98,7 +98,7 @@ const DashboardLayout = ({ children }) => {
                   <FaChartBar /><span>Results</span>
                 </Link>
                 <Link to="/admin/send-message" className={location.pathname === '/admin/send-message' ? 'active' : ''}>
-                  <FaEnvelope /><span>Send Message</span>
+                  <FaEnvelope /><span>Send Notification</span>
                 </Link>
               </div>
             </nav>

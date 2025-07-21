@@ -100,9 +100,7 @@ const CourseManagement = () => {
 
   const handleAddStudents = (students) => {
     console.log('Students added to course:', students);
-    // Here you would typically update the backend
-    // For now, we'll just show an alert
-    toast.success(`${students.length} student(s) added to ${selectedCourse.coursename}`);
+    // No toast here; handled in the modal
   };
 
   useEffect(() => {
