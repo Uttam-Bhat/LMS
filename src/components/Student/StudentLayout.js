@@ -7,11 +7,16 @@ const StudentLayout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [courseMenuOpen, setCourseMenuOpen] = useState(false);
+  const [courseMenuOpen, setCourseMenuOpen] = useState(location.pathname.startsWith('/student/available-courses') || location.pathname.startsWith('/student/my-courses'));
 
   const handleLogout = () => {
     // Add logout logic here
     navigate('/');
+  };
+
+  // Close course menu when another main nav is clicked
+  const handleMainNavClick = (nav) => {
+    if (nav !== 'course') setCourseMenuOpen(false);
   };
 
   return (
@@ -51,7 +56,7 @@ const StudentLayout = ({ children }) => {
         <aside className="dashboard-sidebar">
           <nav className="sidebar-nav">
             <div className="nav-section">
-              <Link to="/student" className={location.pathname === '/student' ? 'active' : ''}>
+              <Link to="/student" className={location.pathname === '/student' ? 'active' : ''} onClick={() => handleMainNavClick('dashboard')}>
                 <i className="fas fa-home"></i>
                 <span>Dashboard</span>
               </Link>
@@ -72,19 +77,19 @@ const StudentLayout = ({ children }) => {
                   </div>
                 )}
               </div>
-              <Link to="/student/materials" className={location.pathname === '/student/materials' ? 'active' : ''}>
+              <Link to="/student/materials" className={location.pathname === '/student/materials' ? 'active' : ''} onClick={() => handleMainNavClick('materials')}>
                 <FaFolderOpen style={{marginRight:6}} />
                 <span>Materials</span>
               </Link>
-              <Link to="/student/exam" className={location.pathname === '/student/exam' ? 'active' : ''}>
+              <Link to="/student/exam" className={location.pathname === '/student/exam' ? 'active' : ''} onClick={() => handleMainNavClick('exam')}>
                 <FaChalkboardTeacher style={{marginRight:6}} />
                 <span>Exam</span>
               </Link>
-              <Link to="/student/notifications" className={location.pathname === '/student/notifications' ? 'active' : ''}>
+              <Link to="/student/notifications" className={location.pathname === '/student/notifications' ? 'active' : ''} onClick={() => handleMainNavClick('notifications')}>
                 <FaBell style={{marginRight:6}} />
                 <span>Notifications</span>
               </Link>
-              <Link to="/student/result" className={location.pathname === '/student/result' ? 'active' : ''}>
+              <Link to="/student/result" className={location.pathname === '/student/result' ? 'active' : ''} onClick={() => handleMainNavClick('result')}>
                 <FaChartBar style={{marginRight:6}} />
                 <span>Result</span>
               </Link>
