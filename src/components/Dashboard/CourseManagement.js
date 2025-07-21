@@ -19,6 +19,7 @@ const CourseManagement = () => {
   const [courses, setCourses] = useState([]); 
    const [totalCourses, setTotalCourses] = useState(0);
    const [teachers, setTeachers] = useState([]);
+   const [enrolledStudentCount, setEnrolledStudentCount] = useState(0);
 
   const fetchTeachers = async () => {
     try {
@@ -37,6 +38,9 @@ const CourseManagement = () => {
         api.get('/enroll/enroll-display')
       ]);
       const enrollments = enrollRes.data || [];
+      // Unique student count
+      const uniqueStudentIds = Array.from(new Set(enrollments.map(e => String(e.st_id))));
+      setEnrolledStudentCount(uniqueStudentIds.length);
       // Map backend fields to UI structure
       const mapped = courseRes.data.map(course => {
         const studentCount = enrollments.filter(e => String(e.course_info.cid) === String(course.courseId)).length;
@@ -182,7 +186,7 @@ const CourseManagement = () => {
             </div>
             <div className="stat-content">
               <h3>Enrolled Students</h3>
-              <p>360</p>
+              <p>{enrolledStudentCount}</p>
             </div>
           </div>
           <div className="stat-card">
