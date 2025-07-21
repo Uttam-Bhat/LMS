@@ -243,15 +243,18 @@ const CourseManagement = () => {
                     <i className="fas fa-users"></i>
                     <span>{course.students} Students</span>
                   </div>
-                </div>
-                <div className="completion-bar">
-                  <div className="completion-track">
-                    <div 
-                      className="completion-fill" 
-                      style={{ width: `${course.completion}%` }}
-                    ></div>
+                  <div className="info-item">
+                    <i className="fas fa-calendar-alt"></i>
+                    <span>Start: {course.start_date}</span>
                   </div>
-                  <span className="completion-text">{course.completion}% Completed</span>
+                  <div className="info-item">
+                    <i className="fas fa-calendar-check"></i>
+                    <span>End: {course.end_date}</span>
+                  </div>
+                  <div className="info-item">
+                    <i className="fas fa-info-circle"></i>
+                    <span>Description: {course.des}</span>
+                  </div>
                 </div>
                 <div className="course-actions">
                   <button className="action-btn edit" title="Edit course" onClick={() => openModal('edit', course)}>
