@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import {
   FaAngleDown, FaHome, FaUsers, FaBook, FaChalkboardTeacher, FaUserGraduate, FaFileAlt,
-  FaChartBar, FaStream, FaLayerGroup, FaListAlt, FaBookOpen, FaThList, FaFolderOpen, FaUserCircle
+  FaChartBar, FaStream, FaLayerGroup, FaListAlt, FaBookOpen, FaThList, FaFolderOpen, FaUserCircle, FaEnvelope
 } from 'react-icons/fa';
 import './Dashboard.css';
 import { Toaster } from 'react-hot-toast';
@@ -96,6 +96,9 @@ const DashboardLayout = ({ children }) => {
                 </Link>
                 <Link to="/admin/results" className={location.pathname === '/admin/results' ? 'active' : ''}>
                   <FaChartBar /><span>Results</span>
+                </Link>
+                <Link to="/admin/send-message" className={location.pathname === '/admin/send-message' ? 'active' : ''}>
+                  <FaEnvelope /><span>Send Message</span>
                 </Link>
               </div>
             </nav>

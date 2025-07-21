@@ -26,6 +26,7 @@ import AdminSettings from './components/Dashboard/AdminSettings';
 import ProtectedRoute from './components/ProtectedRoute';
 import Materials from './components/Student/Materials';
 import DashboardLayout from './components/Dashboard/DashboardLayout';
+import SendMessage from './components/Dashboard/SendMessage';
 
 function App() {
   return (
@@ -49,6 +50,7 @@ function App() {
           <Route path="/admin/chapters" element={<ProtectedRoute><ChaptersManagement /></ProtectedRoute>} />
           <Route path="/admin/content" element={<ProtectedRoute><ContentManagement /></ProtectedRoute>} />
           <Route path="/admin/classes" element={<ProtectedRoute><ClassesManagement /></ProtectedRoute>} />
+          <Route path="/admin/send-message" element={<ProtectedRoute><DashboardLayout><SendMessage /></DashboardLayout></ProtectedRoute>} />
           <Route path="/student" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
           <Route path="/student/exam" element={<ProtectedRoute><RegisterExam /></ProtectedRoute>} />
           <Route path="/student/notifications" element={<ProtectedRoute><Notification /></ProtectedRoute>} />
