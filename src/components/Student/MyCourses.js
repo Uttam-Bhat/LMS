@@ -88,11 +88,33 @@ const MyCourses = () => {
           ) : (
             filteredCourses.map(enroll => {
               const course = enroll.course_info;
+              // Dynamic completion and status
+              const today = new Date();
+              const start = course.start_date ? new Date(course.start_date.split('-').reverse().join('-')) : null;
+              const end = course.end_date ? new Date(course.end_date.split('-').reverse().join('-')) : null;
+              let completion = 0;
+              let status = 'active';
+              if (start && end && start < end) {
+                if (today < start) {
+                  completion = 0;
+                } else if (today > end) {
+                  completion = 100;
+                  status = 'completed';
+                } else {
+                  const total = end - start;
+                  const elapsed = today - start;
+                  completion = Math.round((elapsed / total) * 100);
+                  if (completion >= 100) {
+                    completion = 100;
+                    status = 'completed';
+                  }
+                }
+              }
               return (
                 <div key={enroll.er_id} className="course-card">
                   <div className="course-header">
                     <h3>{course.coursename}</h3>
-                    <span className="status-badge active">Active</span>
+                    <span className={`status-badge ${status}`}>{status.charAt(0).toUpperCase() + status.slice(1)}</span>
                   </div>
                   <div className="course-info">
                     <div className="info-item">
@@ -111,6 +133,15 @@ const MyCourses = () => {
                       <i className="fas fa-info-circle"></i>
                       <span>Description: {course.des}</span>
                     </div>
+                  </div>
+                  <div className="completion-bar">
+                    <div className="completion-track">
+                      <div 
+                        className="completion-fill" 
+                        style={{ width: `${completion}%` }}
+                      ></div>
+                    </div>
+                    <span className="completion-text">{completion}% Completed</span>
                   </div>
                   <div className="course-actions">
                     <button
