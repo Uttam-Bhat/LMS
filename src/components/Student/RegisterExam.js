@@ -253,7 +253,7 @@ const RegisterExam = () => {
                   boxShadow: '0 1px 4px rgba(30,34,90,0.10)',
                   transition: 'background 0.18s, color 0.18s',
                 }}
-                onClick={() => { /* Start test logic here */ setDialogOpen(false); }}
+                onClick={() => { setDialogOpen(false); window.location.href = `/student/exam/take/${selectedExam.e_id}`; }}
               >
                 Take Test
               </button>

@@ -205,22 +205,22 @@ const Materials = () => {
                             <span style={{ marginLeft: 8, color: '#059669', fontSize: '1.1em', verticalAlign: 'middle' }} title="Viewed">✔</span>
                           )}
                         </td>
-                        <td style={{ padding: '10px 8px', color: '#2563eb', fontWeight: 600 }}>
-                          {item.c_type === 'image' ? <FaImage style={{ marginRight: 6 }} /> : <FaFolderOpen style={{ marginRight: 6 }} />}
-                          {item.c_type}
-                        </td>
-                        <td style={{ padding: '10px 8px', color: '#222', fontWeight: 500 }}>
-                          {activeTab === 'course'
-                            ? (item.coursename && item.coursename.trim() !== '' ? item.coursename : '-')
-                            : (item.su_name && item.su_name.trim() !== '' ? item.su_name : '-')}
-                        </td>
-                        <td style={{ padding: '10px 8px', color: '#555' }}>{item.des}</td>
-                        <td style={{ padding: '10px 8px', textAlign: 'center' }}>
-                          {item.file_path ? (
-                            <a
-                              href={`http://localhost:3000/${item.file_path.replace('\\', '/').replace('\\', '/')}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                      <td style={{ padding: '10px 8px', color: '#2563eb', fontWeight: 600 }}>
+                        {item.c_type === 'image' ? <FaImage style={{ marginRight: 6 }} /> : <FaFolderOpen style={{ marginRight: 6 }} />}
+                        {item.c_type}
+                      </td>
+                      <td style={{ padding: '10px 8px', color: '#222', fontWeight: 500 }}>
+                        {activeTab === 'course'
+                          ? (item.coursename && item.coursename.trim() !== '' ? item.coursename : '-')
+                          : (item.su_name && item.su_name.trim() !== '' ? item.su_name : '-')}
+                      </td>
+                      <td style={{ padding: '10px 8px', color: '#555' }}>{item.des}</td>
+                      <td style={{ padding: '10px 8px', textAlign: 'center' }}>
+                        {item.file_path ? (
+                          <a
+                            href={`http://localhost:3000/${item.file_path.replace('\\', '/').replace('\\', '/')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
                               onClick={e => {
                                 const didUpdate = updateCourseCompletion(item.coursename, item.ct_id);
                                 if (!didUpdate) {
@@ -228,29 +228,29 @@ const Materials = () => {
                                   // e.preventDefault();
                                 }
                               }}
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                background: '#2563eb',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: 8,
-                                padding: '6px 16px',
-                                fontWeight: 600,
-                                textDecoration: 'none',
-                                fontSize: '1rem',
-                                boxShadow: '0 2px 8px #2563eb22',
-                                cursor: 'pointer',
-                                transition: 'background 0.2s'
-                              }}
-                            >
-                              <FaEye style={{ marginRight: 6 }} /> View
-                            </a>
-                          ) : (
-                            <span style={{ color: '#aaa' }}>No file</span>
-                          )}
-                        </td>
-                      </tr>
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              background: '#2563eb',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: 8,
+                              padding: '6px 16px',
+                              fontWeight: 600,
+                              textDecoration: 'none',
+                              fontSize: '1rem',
+                              boxShadow: '0 2px 8px #2563eb22',
+                              cursor: 'pointer',
+                              transition: 'background 0.2s'
+                            }}
+                          >
+                            <FaEye style={{ marginRight: 6 }} /> View
+                          </a>
+                        ) : (
+                          <span style={{ color: '#aaa' }}>No file</span>
+                        )}
+                      </td>
+                    </tr>
                     );
                   })}
                 </tbody>

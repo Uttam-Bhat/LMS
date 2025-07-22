@@ -27,6 +27,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Materials from './components/Student/Materials';
 import DashboardLayout from './components/Dashboard/DashboardLayout';
 import SendMessage from './components/Dashboard/SendMessage';
+import TakeExam from './components/Student/TakeExam';
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
           <Route path="/admin/send-message" element={<ProtectedRoute><DashboardLayout><SendMessage /></DashboardLayout></ProtectedRoute>} />
           <Route path="/student" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
           <Route path="/student/exam" element={<ProtectedRoute><RegisterExam /></ProtectedRoute>} />
+          <Route path="/student/exam/take/:examId" element={<TakeExam />} />
           <Route path="/student/notifications" element={<ProtectedRoute><Notification /></ProtectedRoute>} />
           <Route path="/student/result" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
           <Route path="/student/Logout" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
