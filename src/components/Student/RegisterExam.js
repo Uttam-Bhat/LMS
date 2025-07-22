@@ -63,7 +63,7 @@ const RegisterExam = () => {
         </p>
         <div className="stream-filters" style={{ marginBottom: 0 }}>
           <div style={{ display: 'flex', gap: '2rem', borderBottom: '1px solid #eee' }}>
-            {['register', 'upcoming', 'inprogress', 'completed'].map(t => (
+            {['register', 'completed'].map(t => (
               <button
                 key={t}
                 className="stream-tab-btn"
@@ -80,8 +80,6 @@ const RegisterExam = () => {
                 onClick={() => setTab(t)}
               >
                 {t === 'register' && 'Register for Exam'}
-                {t === 'upcoming' && 'Upcoming'}
-                {t === 'inprogress' && 'In Progress'}
                 {t === 'completed' && 'Completed'}
               </button>
             ))}
