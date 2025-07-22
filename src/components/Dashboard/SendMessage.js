@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import api from '../../services/authService';
+import toast from 'react-hot-toast';
 
 const SendMessage = () => {
   const [mode, setMode] = useState('email'); // 'email' or 'class'
@@ -6,23 +8,76 @@ const SendMessage = () => {
   const [message, setMessage] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedStream, setSelectedStream] = useState('');
+  const [userList, setUserList] = useState([]);
+  const [classOptions, setClassOptions] = useState([]);
+  const [streamOptions, setStreamOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // Dummy class/stream options for UI
-  const classOptions = [
-    { value: '', label: 'Select Class' },
-    { value: '1', label: 'I PUC' },
-    { value: '2', label: 'II PUC' }
-  ];
-  const streamOptions = [
-    { value: '', label: 'Select Stream' },
-    { value: '9', label: 'Commerce' },
-    { value: '10', label: 'Science' }
-  ];
+  // Fetch user list for email lookup
+  useEffect(() => {
+    api.get('/admin/users').then(res => {
+      setUserList(Array.isArray(res.data) ? res.data : [res.data]);
+    });
+    // Fetch class options (correct endpoint)
+    api.get('/class/display').then(res => {
+      setClassOptions([{ value: '', label: 'Select Class' }, ...res.data.map(cls => ({ value: cls.cls_id, label: cls.class_name }))]);
+    });
+  }, []);
 
-  const handleSubmit = (e) => {
+  // Fetch streams for selected class only, and ensure uniqueness
+  useEffect(() => {
+    if (!selectedClass) {
+      setStreamOptions([{ value: '', label: 'Select Stream' }]);
+      setSelectedStream('');
+      return;
+    }
+    api.get(`/stream/display?class_id=${selectedClass}`).then(res => {
+      console.log('Raw streams:', res.data);
+      // Remove duplicate streams by sname (case-insensitive, trimmed)
+      const seenNames = new Set();
+      const unique = res.data.filter(s => {
+        const name = (s.sname || '').trim().toLowerCase();
+        if (seenNames.has(name)) return false;
+        seenNames.add(name);
+        return true;
+      }).map(s => ({ value: s.sid, label: `${s.sname} (${s.class_details?.class_name || ''})` }));
+      console.log('Unique streams:', unique);
+      setStreamOptions([{ value: '', label: 'Select Stream' }, ...unique]);
+    });
+    setSelectedStream('');
+  }, [selectedClass]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Implement backend integration
-    alert('Message sent! (UI only)');
+    setLoading(true);
+    try {
+      if (mode === 'email') {
+        // Find user by email
+        const user = userList.find(u => u.email === email);
+        if (!user) {
+          toast.error('No user found with that email.');
+          setLoading(false);
+          return;
+        }
+        await api.post('/message/msg-add', { user_id: user.id, msg: message });
+        toast.success('Message sent to user!');
+      } else {
+        if (!selectedClass || !selectedStream) {
+          toast.error('Please select both class and stream.');
+          setLoading(false);
+          return;
+        }
+        await api.post('/message/msg-add', { class_id: selectedClass, stream_id: selectedStream, msg: message });
+        toast.success('Message sent to all students in class/stream!');
+      }
+      setEmail('');
+      setMessage('');
+      setSelectedClass('');
+      setSelectedStream('');
+    } catch (err) {
+      toast.error('Failed to send message.');
+    }
+    setLoading(false);
   };
 
   return (
@@ -53,7 +108,11 @@ const SendMessage = () => {
               required
               placeholder="Enter email address"
               style={{ width: '100%', padding: 10, borderRadius: 8, border: '1px solid #e2e8f0', marginBottom: 16 }}
+              list="user-emails"
             />
+            <datalist id="user-emails">
+              {userList.map(u => <option key={u.id} value={u.email}>{u.fullname}</option>)}
+            </datalist>
             <label style={{ fontWeight: 600, marginBottom: 6, display: 'block' }}>Message</label>
             <textarea
               value={message}
@@ -95,8 +154,8 @@ const SendMessage = () => {
             />
           </>
         )}
-        <button type="submit" style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 32px', fontWeight: 600, fontSize: '1rem', cursor: 'pointer' }}>
-          Send
+        <button type="submit" disabled={loading} style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 32px', fontWeight: 600, fontSize: '1rem', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}>
+          {loading ? 'Sending...' : 'Send'}
         </button>
       </form>
     </div>
