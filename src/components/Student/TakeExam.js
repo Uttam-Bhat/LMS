@@ -80,9 +80,29 @@ const TakeExam = () => {
   return (
     <StudentLayout>
       <div className="dashboard-main-content" style={{ position: 'relative', minHeight: '80vh', padding: 0, margin: 0 }}>
-        {/* Timer at top right of main content */}
-        <div style={{ position: 'absolute', top: 18, right: 32, background: '#fff', color: '#2563eb', fontWeight: 700, fontSize: 22, borderRadius: 8, boxShadow: '0 2px 8px #2563eb22', padding: '0.7rem 2.2rem', zIndex: 10 }}>
-          ⏰ {formatTime(timer)}
+        {/* Timer and End Test button at top right of main content */}
+        <div style={{ position: 'absolute', top: 18, right: 32, display: 'flex', alignItems: 'center', gap: 16, zIndex: 10 }}>
+          <div style={{ background: '#fff', color: '#2563eb', fontWeight: 700, fontSize: 22, borderRadius: 8, boxShadow: '0 2px 8px #2563eb22', padding: '0.7rem 2.2rem' }}>
+            ⏰ {formatTime(timer)}
+          </div>
+          <button
+            onClick={handleSubmit}
+            style={{
+              background: '#d32f2f',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              padding: '0.7em 1.7em',
+              fontWeight: 700,
+              fontSize: '1.08rem',
+              cursor: 'pointer',
+              boxShadow: '0 1px 4px rgba(30,34,90,0.10)',
+              transition: 'background 0.18s, color 0.18s',
+              marginLeft: 8
+            }}
+          >
+            End Test
+          </button>
         </div>
         <div style={{ maxWidth: 700, margin: '0 auto', padding: '2.5rem 0 0 0' }}>
           <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 2px 12px #2563eb18', padding: '2.2rem 2.5rem', marginBottom: 24 }}>
