@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../services/authService';
 import StudentLayout from './StudentLayout';
+import toast from 'react-hot-toast';
 
 const TakeExam = () => {
   const { examId } = useParams();
@@ -60,7 +61,7 @@ const TakeExam = () => {
 
   const handleSubmit = () => {
     // Submit answers to API here
-    alert('Exam submitted!');
+    toast.success('Exam submitted!');
     navigate('/student/exam');
   };
 

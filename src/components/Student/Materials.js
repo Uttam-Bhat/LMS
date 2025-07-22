@@ -4,6 +4,7 @@ import StudentLayout from './StudentLayout';
 import './StudentDashboard.css';
 import { FaFolderOpen, FaSearch, FaBook, FaInfoCircle, FaImage, FaEye } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const Materials = () => {
   const [materials, setMaterials] = useState([]);
@@ -19,7 +20,7 @@ const Materials = () => {
   useEffect(() => {
     const studentId = localStorage.getItem('student_id');
     if (!studentId) {
-      alert('Session expired. Please log in again.');
+      toast.error('Session expired. Please log in again.');
       navigate('/login');
       return;
     }

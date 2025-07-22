@@ -5,6 +5,7 @@ import StudentLayout from './StudentLayout';
 import styles from './StudentDashboard.module.css';
 import api from '../../services/authService';
 import { FaFolderOpen, FaImage, FaEye } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 
 const StudentDashboard = () => {
   const [showCourse, setShowCourse] = useState(false);
@@ -19,7 +20,7 @@ const StudentDashboard = () => {
   useEffect(() => {
     const email = localStorage.getItem('user_email');
     if (!email) {
-      alert('Session expired. Please log in again.');
+      toast.error('Session expired. Please log in again.');
       navigate('/login');
       return;
     }

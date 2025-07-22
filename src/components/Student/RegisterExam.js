@@ -3,6 +3,7 @@ import DashboardLayout from '../Student/StudentLayout';
 import './StudentDashboard.css'; // Corrected path
 import api from '../../services/authService';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const RegisterExam = () => {
   const [tab, setTab] = useState('register');
@@ -16,7 +17,7 @@ const RegisterExam = () => {
   useEffect(() => {
     const email = localStorage.getItem('user_email');
     if (!email) {
-      alert('Session expired. Please log in again.');
+      toast.error('Session expired. Please log in again.');
       navigate('/login');
       return;
     }

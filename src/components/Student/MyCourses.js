@@ -4,6 +4,7 @@ import './StudentDashboard.css';
 import { FaBook } from 'react-icons/fa';
 import api from '../../services/authService';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const MyCourses = () => {
   const [enrollments, setEnrollments] = useState([]);
@@ -29,7 +30,7 @@ const MyCourses = () => {
   useEffect(() => {
     const studentId = localStorage.getItem('student_id');
     if (!studentId) {
-      alert('Session expired. Please log in again.');
+      toast.error('Session expired. Please log in again.');
       navigate('/login');
       return;
     }
@@ -66,7 +67,7 @@ const MyCourses = () => {
       await api.delete(`/enroll/enroll-delete/${er_id}`);
       setEnrollments(prev => prev.filter(e => e.er_id !== er_id));
     } catch (err) {
-      alert('Failed to cancel enrollment.');
+      toast.error('Failed to cancel enrollment.');
     } finally {
       setCancelLoading(null);
     }

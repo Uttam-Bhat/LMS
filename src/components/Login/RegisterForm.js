@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './loginform.css';
+import toast from 'react-hot-toast';
 
 const RegisterForm = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const RegisterForm = () => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      toast.error('Passwords do not match!');
       return;
     }
 
@@ -39,14 +40,14 @@ const RegisterForm = () => {
       });
 
       console.log('Registration successful:', response.data);
-      alert('Registration successful!');
+      toast.success('Registration successful!');
       navigate('/');
     } catch (error) {
       if (error.response?.status === 409) {
-        alert('Email or Username already exists!');
+        toast.error('Email or Username already exists!');
       } else {
         console.error('Registration failed:', error.response?.data || error.message);
-        alert('Registration failed!');
+        toast.error('Registration failed!');
       }
     }
   };
