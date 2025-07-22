@@ -17,6 +17,9 @@ const MyCourses = () => {
     const saved = localStorage.getItem('courseCompletion');
     return saved ? JSON.parse(saved) : {};
   });
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingCancelId, setPendingCancelId] = useState(null);
+  const [cancelMsg, setCancelMsg] = useState('');
 
   // Keep completionMap in sync with localStorage (in case Materials.js updates it)
   useEffect(() => {
@@ -60,21 +63,36 @@ const MyCourses = () => {
     return matchesSearch;
   });
 
-  const handleCancel = async (er_id) => {
-    if (!window.confirm('Are you sure you want to cancel this enrollment?')) return;
-    setCancelLoading(er_id);
+  const handleCancel = (er_id) => {
+    setPendingCancelId(er_id);
+    setConfirmOpen(true);
+  };
+
+  const doCancel = async () => {
+    if (!pendingCancelId) return;
+    setCancelLoading(pendingCancelId);
+    setConfirmOpen(false);
     try {
-      await api.delete(`/enroll/enroll-delete/${er_id}`);
-      setEnrollments(prev => prev.filter(e => e.er_id !== er_id));
+      await api.delete(`/enroll/enroll-delete/${pendingCancelId}`);
+      setEnrollments(prev => prev.filter(e => e.er_id !== pendingCancelId));
+      toast.success('Enrollment cancelled.');
+      setCancelMsg('Enrollment cancelled successfully.');
+      setTimeout(() => setCancelMsg(''), 3500);
     } catch (err) {
       toast.error('Failed to cancel enrollment.');
     } finally {
       setCancelLoading(null);
+      setPendingCancelId(null);
     }
   };
 
   return (
     <StudentLayout>
+      {cancelMsg && (
+        <div style={{ background: '#d1fae5', color: '#059669', padding: '0.7rem 1.2rem', borderRadius: 8, margin: '24px auto 0 auto', fontWeight: 600, fontSize: '1.08rem', boxShadow: '0 2px 8px #05966922', textAlign: 'center', maxWidth: 600 }}>
+          {cancelMsg}
+        </div>
+      )}
       <div className="dashboard-main-content">
         {/* Header */}
         <div className="page-header" style={{ display: 'flex', alignItems: 'center', gap: 18, marginBottom: 32, justifyContent: 'flex-start' }}>
@@ -172,6 +190,17 @@ const MyCourses = () => {
           )}
         </div>
       </div>
+      {confirmOpen && (
+        <div className="modal-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(30,34,90,0.18)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 2px 12px #2563eb18', padding: '2.2rem 2.5rem', minWidth: 320, maxWidth: 380, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ fontWeight: 700, fontSize: '1.15rem', color: '#d32f2f', marginBottom: 18 }}>Are you sure you want to cancel this enrollment?</div>
+            <div style={{ display: 'flex', gap: 18, marginTop: 8 }}>
+              <button onClick={doCancel} style={{ background: '#d32f2f', color: '#fff', border: 'none', borderRadius: 8, padding: '0.7em 2.2em', fontWeight: 700, fontSize: '1.08rem', cursor: 'pointer' }}>Yes</button>
+              <button onClick={() => setConfirmOpen(false)} style={{ background: '#e5e7eb', color: '#222', border: 'none', borderRadius: 8, padding: '0.7em 2.2em', fontWeight: 600, fontSize: '1.08rem', cursor: 'pointer' }}>No</button>
+            </div>
+          </div>
+        </div>
+      )}
     </StudentLayout>
   );
 };
