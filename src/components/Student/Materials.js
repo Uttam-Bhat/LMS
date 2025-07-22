@@ -3,19 +3,39 @@ import api from '../../services/authService';
 import StudentLayout from './StudentLayout';
 import './StudentDashboard.css';
 import { FaFolderOpen, FaSearch, FaBook, FaInfoCircle, FaImage, FaEye } from 'react-icons/fa';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Materials = () => {
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('course'); // 'course' or 'subject'
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const highlightCourse = params.get('highlightCourse');
+  const [highlight, setHighlight] = useState(!!highlightCourse);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const studentId = localStorage.getItem('student_id');
+    if (!studentId) {
+      alert('Session expired. Please log in again.');
+      navigate('/login');
+      return;
+    }
     api.get('/content/display')
       .then(res => setMaterials(res.data.content || []))
       .catch(() => setMaterials([]))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (highlightCourse) {
+      setHighlight(true);
+      const timer = setTimeout(() => setHighlight(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [highlightCourse]);
 
   // Tab filtering
   const tabFilteredMaterials = materials.filter(item => {
@@ -33,6 +53,32 @@ const Materials = () => {
     (item.coursename || '').toLowerCase().includes(search.toLowerCase()) ||
     (item.des || '').toLowerCase().includes(search.toLowerCase())
   );
+
+  const updateCourseCompletion = (courseName, materialId, delta = 10) => {
+    if (!courseName || !materialId) return;
+    const key = 'courseCompletion';
+    const viewedKey = 'viewedMaterials';
+    // Track viewed materials per course
+    const viewedRaw = localStorage.getItem(viewedKey);
+    const viewed = viewedRaw ? JSON.parse(viewedRaw) : {};
+    if (!viewed[courseName]) viewed[courseName] = [];
+    if (viewed[courseName].includes(materialId)) return; // Already viewed
+    viewed[courseName].push(materialId);
+    localStorage.setItem(viewedKey, JSON.stringify(viewed));
+    // Update completion
+    const saved = localStorage.getItem(key);
+    const map = saved ? JSON.parse(saved) : {};
+    map[courseName] = Math.min(100, (map[courseName] || 0) + delta);
+    localStorage.setItem(key, JSON.stringify(map));
+  };
+
+  // Helper to get viewed materials for the current course
+  const getViewedMaterials = (courseName) => {
+    const viewedKey = 'viewedMaterials';
+    const viewedRaw = localStorage.getItem(viewedKey);
+    const viewed = viewedRaw ? JSON.parse(viewedRaw) : {};
+    return viewed[courseName] || [];
+  };
 
   return (
     <StudentLayout>
@@ -138,49 +184,68 @@ const Materials = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredMaterials.map(item => (
-                    <tr key={item.ct_id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                      <td style={{ padding: '10px 8px', fontWeight: 600, color: '#222' }}>{item.title}</td>
-                      <td style={{ padding: '10px 8px', color: '#2563eb', fontWeight: 600 }}>
-                        {item.c_type === 'image' ? <FaImage style={{ marginRight: 6 }} /> : <FaFolderOpen style={{ marginRight: 6 }} />}
-                        {item.c_type}
-                      </td>
-                      <td style={{ padding: '10px 8px', color: '#222', fontWeight: 500 }}>
-                        {activeTab === 'course'
-                          ? (item.coursename && item.coursename.trim() !== '' ? item.coursename : '-')
-                          : (item.su_name && item.su_name.trim() !== '' ? item.su_name : '-')}
-                      </td>
-                      <td style={{ padding: '10px 8px', color: '#555' }}>{item.des}</td>
-                      <td style={{ padding: '10px 8px', textAlign: 'center' }}>
-                        {item.file_path ? (
-                          <a
-                            href={`http://localhost:3000/${item.file_path.replace('\\', '/').replace('\\', '/')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              background: '#2563eb',
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: 8,
-                              padding: '6px 16px',
-                              fontWeight: 600,
-                              textDecoration: 'none',
-                              fontSize: '1rem',
-                              boxShadow: '0 2px 8px #2563eb22',
-                              cursor: 'pointer',
-                              transition: 'background 0.2s'
-                            }}
-                          >
-                            <FaEye style={{ marginRight: 6 }} /> View
-                          </a>
-                        ) : (
-                          <span style={{ color: '#aaa' }}>No file</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                  {filteredMaterials.map(item => {
+                    const isHighlighted =
+                      highlight && highlightCourse && item.coursename && item.coursename === highlightCourse;
+                    const viewedMaterials = getViewedMaterials(item.coursename);
+                    const isViewed = viewedMaterials.includes(item.ct_id);
+                    return (
+                      <tr
+                        key={item.ct_id}
+                        style={{
+                          borderBottom: '1px solid #e5e7eb',
+                          background: isHighlighted ? '#ffe066' : undefined,
+                          transition: 'background 0.5s'
+                        }}
+                      >
+                        <td style={{ padding: '10px 8px', fontWeight: 600, color: '#222' }}>
+                          {item.title}
+                          {isViewed && (
+                            <span style={{ marginLeft: 8, color: '#059669', fontSize: '1.1em', verticalAlign: 'middle' }} title="Viewed">✔</span>
+                          )}
+                        </td>
+                        <td style={{ padding: '10px 8px', color: '#2563eb', fontWeight: 600 }}>
+                          {item.c_type === 'image' ? <FaImage style={{ marginRight: 6 }} /> : <FaFolderOpen style={{ marginRight: 6 }} />}
+                          {item.c_type}
+                        </td>
+                        <td style={{ padding: '10px 8px', color: '#222', fontWeight: 500 }}>
+                          {activeTab === 'course'
+                            ? (item.coursename && item.coursename.trim() !== '' ? item.coursename : '-')
+                            : (item.su_name && item.su_name.trim() !== '' ? item.su_name : '-')}
+                        </td>
+                        <td style={{ padding: '10px 8px', color: '#555' }}>{item.des}</td>
+                        <td style={{ padding: '10px 8px', textAlign: 'center' }}>
+                          {item.file_path ? (
+                            <a
+                              href={`http://localhost:3000/${item.file_path.replace('\\', '/').replace('\\', '/')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => updateCourseCompletion(item.coursename, item.ct_id)}
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                background: '#2563eb',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: 8,
+                                padding: '6px 16px',
+                                fontWeight: 600,
+                                textDecoration: 'none',
+                                fontSize: '1rem',
+                                boxShadow: '0 2px 8px #2563eb22',
+                                cursor: 'pointer',
+                                transition: 'background 0.2s'
+                              }}
+                            >
+                              <FaEye style={{ marginRight: 6 }} /> View
+                            </a>
+                          ) : (
+                            <span style={{ color: '#aaa' }}>No file</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

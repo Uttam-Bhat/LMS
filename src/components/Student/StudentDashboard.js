@@ -17,6 +17,12 @@ const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const email = localStorage.getItem('user_email');
+    if (!email) {
+      alert('Session expired. Please log in again.');
+      navigate('/login');
+      return;
+    }
     const fetchDashboardData = async () => {
       try {
         setLoading(true);

@@ -2,14 +2,22 @@ import { useEffect, useState } from 'react';
 import DashboardLayout from '../Student/StudentLayout';
 import './StudentDashboard.css'; // Corrected path
 import api from '../../services/authService';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterExam = () => {
   const [tab, setTab] = useState('register');
   const [subTab, setSubTab] = useState('available');
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const email = localStorage.getItem('user_email');
+    if (!email) {
+      alert('Session expired. Please log in again.');
+      navigate('/login');
+      return;
+    }
     const fetchExamsForStudent = async () => {
       setLoading(true);
       try {

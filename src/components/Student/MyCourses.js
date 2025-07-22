@@ -3,6 +3,7 @@ import StudentLayout from './StudentLayout';
 import './StudentDashboard.css';
 import { FaBook } from 'react-icons/fa';
 import api from '../../services/authService';
+import { useNavigate } from 'react-router-dom';
 
 const MyCourses = () => {
   const [enrollments, setEnrollments] = useState([]);
@@ -10,12 +11,31 @@ const MyCourses = () => {
   const [search, setSearch] = useState('');
   const [view, setView] = useState('all'); // all | active | completed
   const [cancelLoading, setCancelLoading] = useState(null); // er_id or null
+  const navigate = useNavigate();
+  const [completionMap, setCompletionMap] = useState(() => {
+    const saved = localStorage.getItem('courseCompletion');
+    return saved ? JSON.parse(saved) : {};
+  });
+
+  // Keep completionMap in sync with localStorage (in case Materials.js updates it)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const saved = localStorage.getItem('courseCompletion');
+      setCompletionMap(saved ? JSON.parse(saved) : {});
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
+    const studentId = localStorage.getItem('student_id');
+    if (!studentId) {
+      alert('Session expired. Please log in again.');
+      navigate('/login');
+      return;
+    }
     const fetchEnrollments = async () => {
       setLoading(true);
       try {
-        const studentId = localStorage.getItem('student_id');
         const res = await api.get('/enroll/enroll-display');
         // Filter for this student
         const filtered = res.data.filter(e => String(e.st_id) === String(studentId));
@@ -88,28 +108,9 @@ const MyCourses = () => {
           ) : (
             filteredCourses.map(enroll => {
               const course = enroll.course_info;
-              // Dynamic completion and status
-              const today = new Date();
-              const start = course.start_date ? new Date(course.start_date.split('-').reverse().join('-')) : null;
-              const end = course.end_date ? new Date(course.end_date.split('-').reverse().join('-')) : null;
-              let completion = 0;
-              let status = 'active';
-              if (start && end && start < end) {
-                if (today < start) {
-                  completion = 0;
-                } else if (today > end) {
-                  completion = 100;
-                  status = 'completed';
-                } else {
-                  const total = end - start;
-                  const elapsed = today - start;
-                  completion = Math.round((elapsed / total) * 100);
-                  if (completion >= 100) {
-                    completion = 100;
-                    status = 'completed';
-                  }
-                }
-              }
+              const courseId = course.courseId || course.cid || enroll.er_id;
+              let completion = completionMap[course.coursename] || 0;
+              let status = completion >= 100 ? 'completed' : 'active';
               return (
                 <div key={enroll.er_id} className="course-card">
                   <div className="course-header">
@@ -147,7 +148,10 @@ const MyCourses = () => {
                     <button
                       className="student-action-btn view"
                       title="View Course"
-                      onClick={() => alert('View course details')}
+                      onClick={() => {
+                        // Navigate to materials page with highlight param
+                        window.location.href = `/student/materials?highlightCourse=${encodeURIComponent(course.coursename)}`;
+                      }}
                     >
                       View
                     </button>
