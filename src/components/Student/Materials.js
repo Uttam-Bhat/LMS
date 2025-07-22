@@ -62,7 +62,7 @@ const Materials = () => {
     const viewedRaw = localStorage.getItem(viewedKey);
     const viewed = viewedRaw ? JSON.parse(viewedRaw) : {};
     if (!viewed[courseName]) viewed[courseName] = [];
-    if (viewed[courseName].includes(materialId)) return; // Already viewed
+    if (viewed[courseName].includes(materialId)) return false; // Already viewed, do nothing
     viewed[courseName].push(materialId);
     localStorage.setItem(viewedKey, JSON.stringify(viewed));
     // Update completion
@@ -70,6 +70,7 @@ const Materials = () => {
     const map = saved ? JSON.parse(saved) : {};
     map[courseName] = Math.min(100, (map[courseName] || 0) + delta);
     localStorage.setItem(key, JSON.stringify(map));
+    return true;
   };
 
   // Helper to get viewed materials for the current course
@@ -220,7 +221,13 @@ const Materials = () => {
                               href={`http://localhost:3000/${item.file_path.replace('\\', '/').replace('\\', '/')}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              onClick={() => updateCourseCompletion(item.coursename, item.ct_id)}
+                              onClick={e => {
+                                const didUpdate = updateCourseCompletion(item.coursename, item.ct_id);
+                                if (!didUpdate) {
+                                  // Prevent navigation if you want, or just do nothing
+                                  // e.preventDefault();
+                                }
+                              }}
                               style={{
                                 display: 'inline-flex',
                                 alignItems: 'center',
