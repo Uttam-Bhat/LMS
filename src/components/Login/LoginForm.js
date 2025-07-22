@@ -1,8 +1,8 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../services/authService';
 import './loginform.css';
-import toast from 'react-hot-toast';
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -28,6 +28,7 @@ const LoginForm = () => {
       const { user, token } = await login(formData.email, formData.password);
 
       toast.success(`Welcome ${user.fullname}!`);
+      localStorage.setItem('token', token);
       // Store user information
       localStorage.setItem('user_email', user.email);
       localStorage.setItem('user_type', user.user_type);
