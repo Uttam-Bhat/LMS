@@ -114,7 +114,16 @@ const StudentDashboard = () => {
         const latestMaterials = relevantMaterials
           .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
           .slice(0, 3);
-        setRecentContent(latestMaterials);
+        // Find most recent course and subject material
+        let recentCourse = null;
+        let recentSubject = null;
+        relevantMaterials.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+        for (const item of relevantMaterials) {
+          if (!recentCourse && item.coursename) recentCourse = item;
+          if (!recentSubject && item.su_name) recentSubject = item;
+          if (recentCourse && recentSubject) break;
+        }
+        setRecentContent([recentCourse, recentSubject].filter(Boolean));
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
       } finally {
@@ -189,22 +198,41 @@ const StudentDashboard = () => {
                 <div style={{ color: '#6b7a90', fontSize: '1rem' }}>Check back later for new content.</div>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
-                {recentContent.map((item) => (
+              <div style={{ display: 'flex', gap: '1.5rem', width: '100%', flexWrap: 'wrap' }}>
+                {recentContent.map((item, idx) => (
                   <div key={item.ct_id} style={{
-                    background: '#f8fafc',
-                    borderRadius: 8,
-                    padding: '1rem',
-                    border: '1px solid #e5e7eb',
-                    marginBottom: 8
+                    background: idx === 0 ? '#eaf1ff' : '#f7f3ff',
+                    borderRadius: 10,
+                    boxShadow: '0 1px 4px rgba(30,34,90,0.04)',
+                    padding: '1.1rem 1.3rem',
+                    minWidth: 180,
+                    maxWidth: 240,
+                    flex: '1 1 180px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    border: idx === 0 ? '2px solid #2563eb' : '2px solid #a259ff',
+                    position: 'relative',
+                    marginBottom: 8,
                   }}>
-                    <div style={{ fontWeight: 600, color: '#2563eb', fontSize: '1rem', marginBottom: 4 }}>
+                    <div style={{
+                      fontWeight: 700,
+                      fontSize: '1.01rem',
+                      color: idx === 0 ? '#2563eb' : '#a259ff',
+                      marginBottom: 4,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                    }}>
+                      {idx === 0 ? 'Course' : 'Subject'}
+                    </div>
+                    <div style={{ fontWeight: 600, color: '#222', fontSize: '1.01rem', marginBottom: 2, minHeight: 22 }}>
                       {item.title}
                     </div>
-                    <div style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: 4 }}>
-                      Type: {item.c_type} • {item.coursename || item.su_name}
+                    <div style={{ color: '#6b7280', fontSize: '0.93rem', marginBottom: 2 }}>
+                      {item.coursename ? `Course: ${item.coursename}` : `Subject: ${item.su_name}`}
                     </div>
-                    <div style={{ color: '#374151', fontSize: '0.9rem', marginBottom: 4 }}>
+                    <div style={{ color: '#374151', fontSize: '0.91rem', marginBottom: 4, minHeight: 18 }}>
                       {item.des}
                     </div>
                     <div>
@@ -216,21 +244,21 @@ const StudentDashboard = () => {
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            background: '#2563eb',
+                            background: idx === 0 ? '#2563eb' : '#a259ff',
                             color: '#fff',
                             border: 'none',
                             borderRadius: 8,
-                            padding: '6px 16px',
+                            padding: '4px 12px',
                             fontWeight: 600,
                             textDecoration: 'none',
-                            fontSize: '1rem',
+                            fontSize: '0.97rem',
                             boxShadow: '0 2px 8px #2563eb22',
                             cursor: 'pointer',
                             transition: 'background 0.2s',
-                            marginTop: 8
+                            marginTop: 4
                           }}
                         >
-                          <FaEye style={{ marginRight: 6 }} /> View
+                          <FaEye style={{ marginRight: 5 }} /> View
                         </a>
                       ) : (
                         <span style={{ color: '#aaa' }}>No file</span>
