@@ -14,12 +14,25 @@ const NotificationBell = ({ count }) => (
   </div>
 );
 
+const getHiddenMsgIds = (studentId) => {
+  const raw = localStorage.getItem(`hiddenMsgs_${studentId}`);
+  return raw ? JSON.parse(raw) : [];
+};
+const addHiddenMsgId = (studentId, msgId) => {
+  const ids = getHiddenMsgIds(studentId);
+  if (!ids.includes(msgId)) {
+    ids.push(msgId);
+    localStorage.setItem(`hiddenMsgs_${studentId}`, JSON.stringify(ids));
+  }
+};
+
 const Notification = () => {
   const [tab, setTab] = useState('direct');
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [student, setStudent] = useState(null);
   const [unseenCount, setUnseenCount] = useState(0);
+  const [hiddenMsgIds, setHiddenMsgIds] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,9 +61,11 @@ const Notification = () => {
           classMsgs = msgRes.data.filter(m => m.cls_id === myClassId && m.sid === myStreamId);
         }
         setUnseenCount(directMsgs.length + classMsgs.length);
+        setHiddenMsgIds(getHiddenMsgIds(studentObj?.user_info?.id));
       } catch (err) {
         setMessages([]);
         setUnseenCount(0);
+        setHiddenMsgIds([]);
       }
       setLoading(false);
     };
@@ -63,9 +78,16 @@ const Notification = () => {
     const myId = student.user_info.id;
     const myClassId = student.user_info.class_info.cls_id;
     const myStreamId = student.user_info.class_info.stream_info.sid;
-    directMsgs = messages.filter(m => m.id === myId);
-    classMsgs = messages.filter(m => m.cls_id === myClassId && m.sid === myStreamId);
+    const hidden = getHiddenMsgIds(myId);
+    directMsgs = messages.filter(m => m.id === myId && !hidden.includes(m.m_id));
+    classMsgs = messages.filter(m => m.cls_id === myClassId && m.sid === myStreamId && !hidden.includes(m.m_id));
   }
+
+  const handleDeleteMsg = (msgId) => {
+    if (!student) return;
+    addHiddenMsgId(student.user_info.id, msgId);
+    setHiddenMsgIds(getHiddenMsgIds(student.user_info.id));
+  };
 
   const renderMessages = (list, type) => (
     <div className="notifications-list">
@@ -73,8 +95,8 @@ const Notification = () => {
         <div className="no-notifications">No notifications yet.</div>
       ) : (
         list.map((n, idx) => (
-          <div key={n.m_id || idx} className={`notification-card admin`}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div key={n.m_id || idx} className={`notification-card admin`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
               <div style={{ fontSize: 28, color: type === 'direct' ? '#2563eb' : '#059669', marginRight: 8 }}>
                 {type === 'direct' ? <FaUserShield /> : <FaUsers />}
               </div>
@@ -90,6 +112,12 @@ const Notification = () => {
                 </div>
               </div>
             </div>
+            <span
+              onClick={() => handleDeleteMsg(n.m_id)}
+              style={{ color: '#d32f2f', cursor: 'pointer', fontWeight: 600, fontSize: '0.97rem', marginLeft: 18, alignSelf: 'center', textDecoration: 'underline', whiteSpace: 'nowrap' }}
+            >
+              Delete for me
+            </span>
           </div>
         ))
       )}
