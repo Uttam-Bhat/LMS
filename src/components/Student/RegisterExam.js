@@ -10,6 +10,8 @@ const RegisterExam = () => {
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedExam, setSelectedExam] = useState(null);
 
   useEffect(() => {
     const email = localStorage.getItem('user_email');
@@ -36,13 +38,29 @@ const RegisterExam = () => {
         console.log('studentClassName:', studentClassName);
         console.log('studentStreamName:', studentStreamName);
         console.log('allExams:', allExams.map(e => e.e_name));
-        const normalize = str => (str || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
-        const filtered = allExams.filter(
-          exam =>
+        const studentClassId = student?.user_info?.class_info?.cls_id;
+        const studentStreamId = student?.user_info?.class_info?.stream_info?.sid;
+        // Prefer filtering by class_id and stream_id if available
+        const filtered = allExams.filter(exam => {
+          // If exam has class_id and stream_id fields, use them
+          if (exam.class_id && exam.stream_id) {
+            return String(exam.class_id) === String(studentClassId) && String(exam.stream_id) === String(studentStreamId);
+          }
+          // Fallback: try to match by class_name and stream_name if available
+          if (exam.class_name && exam.stream_name) {
+            return (
+              (exam.class_name === student?.user_info?.class_info?.class_name) &&
+              (exam.stream_name === student?.user_info?.class_info?.stream_info?.sname)
+            );
+          }
+          // Fallback: old logic (not recommended, but as last resort)
+          const normalize = str => (str || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
+          return (
             exam.e_name &&
-            normalize(exam.e_name).includes(normalize(studentClassName)) &&
-            normalize(exam.e_name).includes(normalize(studentStreamName))
-        );
+            normalize(exam.e_name).includes(normalize(student?.user_info?.class_info?.class_name)) &&
+            normalize(exam.e_name).includes(normalize(student?.user_info?.class_info?.stream_info?.sname))
+          );
+        });
         setExams(filtered);
       } catch (err) {
         setExams([]);
@@ -171,7 +189,11 @@ const RegisterExam = () => {
                         cursor: 'pointer',
                         boxShadow: '0 1px 4px rgba(30,34,90,0.06)',
                         transition: 'background 0.18s, color 0.18s'
-                      }}>Apply</button>
+                      }}
+                      onClick={() => { setSelectedExam(exam); setDialogOpen(true); }}
+                      >
+                        Take Test
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -180,6 +202,65 @@ const RegisterExam = () => {
           </>
         )}
       </div>
+      {dialogOpen && selectedExam && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(30,34,90,0.18)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: 16,
+            boxShadow: '0 4px 24px rgba(30,34,90,0.18)',
+            padding: '2.5rem 2.5rem 2.5rem 2.5rem',
+            minWidth: 340,
+            maxWidth: 420,
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+          }}>
+            <button onClick={() => setDialogOpen(false)} style={{ position: 'absolute', top: 16, right: 18, background: 'none', border: 'none', fontSize: 22, color: '#aaa', cursor: 'pointer' }}>&times;</button>
+            <h2 style={{ color: '#2563eb', fontWeight: 700, fontSize: '1.35rem', marginBottom: 8 }}>{selectedExam.e_name}</h2>
+            <div style={{ color: '#5b6b7a', fontSize: '1.05rem', marginBottom: 10 }}>Please read the instructions carefully before starting the test.</div>
+            <ul style={{ color: '#374151', fontSize: '1.01rem', marginBottom: 18, paddingLeft: 18 }}>
+              <li><b>Date:</b> {selectedExam.e_date}</li>
+              <li><b>Time:</b> {selectedExam.e_time}</li>
+              <li><b>Duration:</b> {selectedExam.duration}</li>
+              <li><b>Template:</b> {selectedExam.t_name}</li>
+              <li><b>Description:</b> {selectedExam.des}</li>
+              <li><b>Subject:</b> {selectedExam.su_name || 'N/A'}</li>
+              <li><b>Instructions:</b> Ensure a stable internet connection. Do not refresh or close the browser during the test. All answers will be auto-submitted when time is up.</li>
+            </ul>
+            <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
+              <button
+                style={{
+                  background: '#2563eb',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 8,
+                  padding: '0.7em 2.2em',
+                  fontWeight: 700,
+                  fontSize: '1.08rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 1px 4px rgba(30,34,90,0.10)',
+                  transition: 'background 0.18s, color 0.18s',
+                }}
+                onClick={() => { /* Start test logic here */ setDialogOpen(false); }}
+              >
+                Take Test
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 };
