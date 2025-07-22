@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../services/authService';
 import './loginform.css';
+import toast from 'react-hot-toast';
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -26,8 +27,7 @@ const LoginForm = () => {
     try {
       const { user, token } = await login(formData.email, formData.password);
 
-      alert(`Welcome ${user.fullname}!`);
-
+      toast.success(`Welcome ${user.fullname}!`);
       // Store user information
       localStorage.setItem('user_email', user.email);
       localStorage.setItem('user_type', user.user_type);
@@ -54,7 +54,7 @@ const LoginForm = () => {
 
     } catch (error) {
       console.error(error);
-      alert(error.response?.data?.message || 'Login failed');
+      toast.error(error.response?.data?.message || 'Login failed');
     } finally {
       setLoading(false);
     }
