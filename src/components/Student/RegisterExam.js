@@ -38,28 +38,25 @@ const RegisterExam = () => {
         console.log('studentClassName:', studentClassName);
         console.log('studentStreamName:', studentStreamName);
         console.log('allExams:', allExams.map(e => e.e_name));
+        console.log('ALL EXAMS:', allExams);
+        if (allExams.length > 0) {
+          console.log('FIRST EXAM OBJECT:', allExams[0]);
+        }
         const studentClassId = student?.user_info?.class_info?.cls_id;
         const studentStreamId = student?.user_info?.class_info?.stream_info?.sid;
-        // Prefer filtering by class_id and stream_id if available
+        const studentSubjectId = student?.user_info?.class_info?.subject_id || null;
+        // Get subjects for this student's class and stream
+        const subjectsRes = await api.get('/subject/subject-display');
+        const studentSubjects = subjectsRes.data.filter(subject => {
+          const subjectClassId = subject.stream_info?.class_info?.cls_id;
+          const subjectStreamId = subject.stream_info?.sid;
+          return String(subjectClassId) === String(studentClassId) && String(subjectStreamId) === String(studentStreamId);
+        });
+        const studentSubjectIds = studentSubjects.map(subject => String(subject.su_id));
+        // Filter exams by subject ID
         const filtered = allExams.filter(exam => {
-          // If exam has class_id and stream_id fields, use them
-          if (exam.class_id && exam.stream_id) {
-            return String(exam.class_id) === String(studentClassId) && String(exam.stream_id) === String(studentStreamId);
-          }
-          // Fallback: try to match by class_name and stream_name if available
-          if (exam.class_name && exam.stream_name) {
-            return (
-              (exam.class_name === student?.user_info?.class_info?.class_name) &&
-              (exam.stream_name === student?.user_info?.class_info?.stream_info?.sname)
-            );
-          }
-          // Fallback: old logic (not recommended, but as last resort)
-          const normalize = str => (str || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
-          return (
-            exam.e_name &&
-            normalize(exam.e_name).includes(normalize(student?.user_info?.class_info?.class_name)) &&
-            normalize(exam.e_name).includes(normalize(student?.user_info?.class_info?.stream_info?.sname))
-          );
+          const examSubjectId = String(exam.su_id);
+          return studentSubjectIds.includes(examSubjectId);
         });
         setExams(filtered);
       } catch (err) {
