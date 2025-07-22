@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../services/authService';
 import './CreateCourseModal.css';
 import toast from 'react-hot-toast';
 
@@ -94,10 +94,10 @@ const CreateExamModal = ({ onClose, templates, exam, refreshExams }) => {
         e_time: formatTimeTo12Hour(form.e_time),
       };
       if (exam && exam.e_id) {
-        await axios.put(`http://localhost:3000/api/exam/edit/${exam.e_id}`, payload);
+        await api.put(`/exam/edit/${exam.e_id}`, payload);
         toast.success('Exam updated successfully!');
       } else {
-        await axios.post('http://localhost:3000/api/exam/add', payload);
+        await api.post('/exam/add', payload);
         toast.success('Exam created successfully!');
       }
       if (refreshExams) await refreshExams();
@@ -131,8 +131,8 @@ const CreateExamModal = ({ onClose, templates, exam, refreshExams }) => {
             <input type="time" value={form.e_time} onChange={e => setForm({ ...form, e_time: e.target.value })} required />
           </div>
           <div className="form-group">
-            <label>Duration</label>
-            <input type="text" value={form.duration} onChange={e => setForm({ ...form, duration: e.target.value })} placeholder="e.g. 2 hours" required />
+            <label>Duration (minutes)</label>
+            <input type="number" min="1" value={form.duration} onChange={e => setForm({ ...form, duration: e.target.value })} placeholder="e.g. 120" required />
           </div>
           <div className="form-group">
             <label>Question Template</label>
