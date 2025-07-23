@@ -37,6 +37,8 @@ const ForgotPassword = () => {
       if (res.status === 200) {
         setStep(2);
         toast.success('Email verified!');
+      } else if (res.status === 404) {
+        toast.error('Email not found');
       } else {
         const data = await res.json();
         toast.error(data.message || 'Email not found');

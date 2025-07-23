@@ -28,11 +28,13 @@ import Materials from './components/Student/Materials';
 import DashboardLayout from './components/Dashboard/DashboardLayout';
 import SendMessage from './components/Dashboard/SendMessage';
 import TakeExam from './components/Student/TakeExam';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
     <Router>
       <div className="App">
+        <Toaster position="top-center" reverseOrder={false} />
         <Routes>
           <Route path="/" element={<LoginForm />} />
           <Route path="/login" element={<LoginForm />} />
