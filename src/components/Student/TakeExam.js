@@ -4,6 +4,14 @@ import api from '../../services/authService';
 import StudentLayout from './StudentLayout';
 import toast from 'react-hot-toast';
 
+function getSelectedOptionKey(selectedValue, question) {
+  if (selectedValue === question.op_a) return "A";
+  if (selectedValue === question.op_b) return "B";
+  if (selectedValue === question.op_c) return "C";
+  if (selectedValue === question.op_d) return "D";
+  return null;
+}
+
 const TakeExam = () => {
   const { examId } = useParams();
   const navigate = useNavigate();
@@ -12,6 +20,7 @@ const TakeExam = () => {
   const [loading, setLoading] = useState(true);
   const [timer, setTimer] = useState(0); // seconds
   const [answers, setAnswers] = useState({});
+  const [result, setResult] = useState(null);
   const timerRef = useRef();
 
   useEffect(() => {
@@ -59,10 +68,29 @@ const TakeExam = () => {
     setAnswers(prev => ({ ...prev, [qid]: opt }));
   };
 
-  const handleSubmit = () => {
-    // Submit answers to API here
-    toast.success('Exam submitted!');
-    navigate('/student/exam');
+  const handleSubmit = async () => {
+    try {
+      const student_id = localStorage.getItem('student_id');
+      if (!student_id) {
+        toast.error('Session expired. Please log in again.');
+        navigate('/login');
+        return;
+      }
+      // Send the selected option TEXT for each question
+      const answersArr = Object.entries(answers).map(([qid, selected]) => ({
+        q_id: Number(qid),
+        selected // this is the option text, not the key
+      }));
+      const res = await api.post('/exam-result/submit', {
+        student_id,
+        exam_id: examId,
+        answers: answersArr
+      });
+      setResult(res.data);
+      toast.success('Exam submitted!');
+    } catch (err) {
+      toast.error('Failed to submit exam.');
+    }
   };
 
   const formatTime = s => {
@@ -106,6 +134,16 @@ const TakeExam = () => {
           </button>
         </div>
         <div style={{ maxWidth: 700, margin: '0 auto', padding: '2.5rem 0 0 0' }}>
+          {result && (
+            <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 16px #e0e7ef', padding: '2.5rem 3rem', textAlign: 'center', marginBottom: 32, marginTop: 16 }}>
+              <div style={{ fontSize: 38, marginBottom: 10 }}>✨🎉 Congratulations! 🎉✨</div>
+              <div style={{ fontWeight: 700, fontSize: '2rem', color: '#2563eb', marginBottom: 8 }}>Your Score: {result.score ? result.score.toFixed(2) : 0}%</div>
+              <div style={{ color: '#16a34a', fontSize: '1.15rem', marginBottom: 4 }}>Correct: {result.correct}</div>
+              <div style={{ color: '#e11d48', fontSize: '1.15rem', marginBottom: 4 }}>Wrong: {result.wrong}</div>
+              <div style={{ color: '#6b7280', fontSize: '1.08rem', marginBottom: 4 }}>Attempted: {result.attempted}</div>
+              <div style={{ color: '#6b7280', fontSize: '1.08rem', marginBottom: 4 }}>Total Questions: {result.total || result.correct + result.wrong}</div>
+            </div>
+          )}
           <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 2px 12px #2563eb18', padding: '2.2rem 2.5rem', marginBottom: 24 }}>
             <div style={{ fontWeight: 700, fontSize: '1.5rem', color: '#2563eb', marginBottom: 6 }}>{exam.e_name}</div>
             <div style={{ color: '#6b7280', fontSize: '1.08rem', marginBottom: 4 }}>Subject: {exam.su_name || 'N/A'}</div>
