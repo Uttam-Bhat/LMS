@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import api from '../../services/authService';
+import AvatarUpload from '../AvatarUpload';
+import toast from 'react-hot-toast';
 
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?name=Admin&background=2563eb&color=fff&size=128';
 
 const AdminProfile = () => {
   const [admin, setAdmin] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     const fetchAdmin = async () => {
@@ -16,8 +20,13 @@ const AdminProfile = () => {
         const userList = Array.isArray(userRes.data) ? userRes.data : [userRes.data];
         const adminObj = userList.find(u => u.email === userEmail && u.user_type === 'admin');
         setAdmin(adminObj);
+        if (adminObj) {
+          const profileRes = await api.get(`/profile/user/${adminObj.id}`);
+          setProfile(profileRes.data);
+        }
       } catch (err) {
         setAdmin(null);
+        setProfile(null);
       } finally {
         setLoading(false);
       }
@@ -45,12 +54,67 @@ const AdminProfile = () => {
     );
   }
 
+  const userId = admin.id;
+  const fullname = admin.fullname || admin.name;
+  const initials = fullname
+    ? fullname.split(' ').map(n => n[0]).join('').toUpperCase()
+    : '';
+  const backendUrl = 'http://localhost:3000';
+  const photoUrl = profile && profile.photo_url ? backendUrl + profile.photo_url : null;
+
+  // Handle photo upload
+  const handlePhotoChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('photo', file);
+    formData.append('user_id', userId);
+    try {
+      if (profile && profile.p_id) {
+        await api.put(`/profile/profile-update/${userId}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      } else {
+        await api.post('/profile/profile-add', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      }
+      toast.success('Profile photo updated!');
+      const res = await api.get(`/profile/user/${userId}`);
+      setProfile(res.data);
+    } catch (err) {
+      toast.error('Failed to upload photo');
+    }
+    setUploading(false);
+  };
+
+  // Handle photo delete
+  const handlePhotoDelete = async () => {
+    setUploading(true);
+    try {
+      await api.put(`/profile/photo-delete/${userId}`);
+      toast.success('Profile photo removed!');
+      const res = await api.get(`/profile/user/${userId}`);
+      setProfile(res.data);
+    } catch (err) {
+      toast.error('Failed to remove photo');
+    }
+    setUploading(false);
+  };
+
   return (
     <DashboardLayout>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh', background: '#f6f8fb' }}>
         <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 16px #e0e7ef', padding: '2.5rem 3rem', minWidth: 350, maxWidth: 400, textAlign: 'center' }}>
-          <img src={admin.avatar || DEFAULT_AVATAR} alt="Profile" style={{ width: 110, height: 110, borderRadius: '50%', marginBottom: 18, objectFit: 'cover', border: '4px solid #2563eb' }} />
-          <h2 style={{ fontWeight: 700, fontSize: '1.5rem', marginBottom: 6 }}>{admin.fullname || admin.name}</h2>
+          <AvatarUpload
+            photoUrl={photoUrl}
+            initials={initials}
+            onPhotoChange={handlePhotoChange}
+            onPhotoDelete={handlePhotoDelete}
+            uploading={uploading}
+          />
+          <h2 style={{ fontWeight: 700, fontSize: '1.5rem', marginBottom: 6 }}>{fullname}</h2>
           <div style={{ color: '#377dff', fontSize: '1.08rem', marginBottom: 8 }}>{admin.email}</div>
         </div>
       </div>
