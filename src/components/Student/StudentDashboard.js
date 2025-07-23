@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Exam from './Exam';
-import StudentLayout from './StudentLayout';
-import styles from './StudentDashboard.module.css';
-import api from '../../services/authService';
-import { FaFolderOpen, FaImage, FaEye } from 'react-icons/fa';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { FaEye } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import api from '../../services/authService';
+import StudentLayout from './StudentLayout';
 
 const StudentDashboard = () => {
   const [showCourse, setShowCourse] = useState(false);
@@ -310,7 +308,7 @@ const StudentDashboard = () => {
                       <div style={{ color: '#374151', fontSize: '1.01rem', display: 'flex', alignItems: 'center', gap: 16 }}>
                         <i className="far fa-calendar-alt" style={{ marginRight: 4 }}></i> {exam.e_date}
                         <i className="far fa-clock" style={{ margin: '0 4px' }}></i> {exam.e_time}
-                        <span style={{ marginLeft: 14 }}><i className="fas fa-hourglass-half" style={{ marginRight: 4 }}></i> {exam.duration}</span>
+                        <span style={{ marginLeft: 14 }}><i className="fas fa-hourglass-half" style={{ marginRight: 4 }}></i> {exam.duration} Minutes</span>
                       </div>
                       <div style={{ color: '#6b7280', fontSize: '0.99rem', marginTop: 6 }}>Template: {exam.t_name}</div>
                     </div>
