@@ -40,8 +40,8 @@ const LoginForm = () => {
         localStorage.removeItem('student_id');
       }
 
-      // Set token expiry (1 hour from now)
-      const expiry = Date.now() + 60 * 60 * 1000;
+      // Set token expiry (6 hours from now)
+      const expiry = Date.now() + 6 * 60 * 60 * 1000;
       localStorage.setItem('token_expiry', expiry);
 
       // Role-based redirection

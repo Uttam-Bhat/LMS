@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 const AvatarUpload = ({
   photoUrl,
@@ -8,9 +8,13 @@ const AvatarUpload = ({
   uploading,
 }) => {
   const fileInputRef = useRef();
+  const [hovered, setHovered] = useState(false);
 
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }}>
+    <div style={{ position: 'relative', display: 'inline-block' }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       <div
         style={{
           width: 120,
@@ -23,7 +27,6 @@ const AvatarUpload = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          overflow: 'hidden',
           border: '4px solid #e0e7ef',
           position: 'relative',
         }}
@@ -46,14 +49,14 @@ const AvatarUpload = ({
         ) : (
           initials
         )}
-        {!photoUrl && (
+        {!photoUrl && hovered && (
           <button
             type="button"
             onClick={() => fileInputRef.current.click()}
             style={{
               position: 'absolute',
-              bottom: 8,
-              right: 8,
+              top: 4,
+              right: 4,
               background: '#fff',
               color: '#2563eb',
               border: '2px solid #2563eb',
@@ -66,6 +69,7 @@ const AvatarUpload = ({
               fontSize: 24,
               cursor: 'pointer',
               boxShadow: '0 2px 6px #e0e7ef',
+              zIndex: 2,
             }}
             disabled={uploading}
             title="Add photo"
@@ -73,14 +77,14 @@ const AvatarUpload = ({
             +
           </button>
         )}
-        {photoUrl && (
+        {photoUrl && hovered && (
           <button
             type="button"
             onClick={onPhotoDelete}
             style={{
               position: 'absolute',
-              bottom: 8,
-              right: 8,
+              top: 4,
+              right: 4,
               background: '#fff',
               color: '#e11d48',
               border: '2px solid #e11d48',
@@ -93,6 +97,7 @@ const AvatarUpload = ({
               fontSize: 20,
               cursor: 'pointer',
               boxShadow: '0 2px 6px #e0e7ef',
+              zIndex: 2,
             }}
             disabled={uploading}
             title="Remove photo"
