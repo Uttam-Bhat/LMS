@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import {
   FaAngleDown, FaHome, FaUsers, FaBook, FaChalkboardTeacher, FaUserGraduate, FaFileAlt,
@@ -6,12 +6,33 @@ import {
 } from 'react-icons/fa';
 import './Dashboard.css';
 import { Toaster } from 'react-hot-toast';
+import api from '../../services/authService';
 
 const DashboardLayout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(location.pathname.startsWith('/admin/users'));
+  const [profilePhoto, setProfilePhoto] = useState(null);
+
+  useEffect(() => {
+    // Try to get admin info from localStorage
+    const userEmail = localStorage.getItem('user_email');
+    if (!userEmail) return;
+    api.get('/admin/users').then(userRes => {
+      const userList = Array.isArray(userRes.data) ? userRes.data : [userRes.data];
+      const adminObj = userList.find(u => u.email === userEmail && u.user_type === 'admin');
+      if (adminObj) {
+        api.get(`/profile/user/${adminObj.id}`).then(profileRes => {
+          if (profileRes.data && profileRes.data.photo_url) {
+            setProfilePhoto('http://localhost:3000' + profileRes.data.photo_url);
+          } else {
+            setProfilePhoto(null);
+          }
+        }).catch(() => setProfilePhoto(null));
+      }
+    }).catch(() => setProfilePhoto(null));
+  }, []);
 
   const submenuPaths = ['/admin/courses', '/admin/classes', '/admin/stream', '/admin/subjects', '/admin/chapters', '/admin/content'];
   const [menuOpen, setMenuOpen] = useState(submenuPaths.includes(location.pathname));
@@ -38,7 +59,15 @@ const DashboardLayout = ({ children }) => {
           <div className="header-right">
             <div className="profile-dropdown">
               <button className="profile-button" onClick={() => setIsProfileOpen(!isProfileOpen)}>
-                <i className="fas fa-user-circle"></i>
+                {profilePhoto ? (
+                  <img
+                    src={profilePhoto}
+                    alt="Profile"
+                    style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', border: '2px solid #2563eb', background: '#fff' }}
+                  />
+                ) : (
+                  <i className="fas fa-user-circle"></i>
+                )}
               </button>
               {isProfileOpen && (
                 <div className="dropdown-menu">
