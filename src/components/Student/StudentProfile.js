@@ -88,6 +88,16 @@ const StudentProfile = () => {
       toast.success('Profile photo updated!');
       const res = await api.get(`/profile/user/${userId}`);
       setProfile(res.data);
+      // Save to localStorage and dispatch event
+      if (res.data && res.data.photo_url) {
+        const backendUrl = 'http://localhost:3000';
+        const newPhotoUrl = backendUrl + res.data.photo_url + `?t=${Date.now()}`;
+        localStorage.setItem('student_profile_photo', newPhotoUrl);
+        window.dispatchEvent(new Event('studentProfilePhotoUpdated'));
+      } else {
+        localStorage.removeItem('student_profile_photo');
+        window.dispatchEvent(new Event('studentProfilePhotoUpdated'));
+      }
     } catch (err) {
       toast.error('Failed to upload photo');
     }
@@ -102,6 +112,9 @@ const StudentProfile = () => {
       toast.success('Profile photo removed!');
       const res = await api.get(`/profile/user/${userId}`);
       setProfile(res.data);
+      // Remove from localStorage and dispatch event
+      localStorage.removeItem('student_profile_photo');
+      window.dispatchEvent(new Event('studentProfilePhotoUpdated'));
     } catch (err) {
       toast.error('Failed to remove photo');
     }

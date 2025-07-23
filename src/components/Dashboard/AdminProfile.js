@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?name=Admin&background=2563eb&color=fff&size=128';
 
-const AdminProfile = () => {
+const AdminProfile = ({ onProfilePhotoChange }) => {
   const [admin, setAdmin] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -60,7 +60,8 @@ const AdminProfile = () => {
     ? fullname.split(' ').map(n => n[0]).join('').toUpperCase()
     : '';
   const backendUrl = 'http://localhost:3000';
-  const photoUrl = profile && profile.photo_url ? backendUrl + profile.photo_url : null;
+  const cacheBuster = profile && profile.photo_url ? `?t=${Date.now()}` : '';
+  const photoUrl = profile && profile.photo_url ? backendUrl + profile.photo_url + cacheBuster : null;
 
   // Handle photo upload
   const handlePhotoChange = async (e) => {
@@ -83,6 +84,16 @@ const AdminProfile = () => {
       toast.success('Profile photo updated!');
       const res = await api.get(`/profile/user/${userId}`);
       setProfile(res.data);
+      // Save to localStorage and dispatch event
+      if (res.data && res.data.photo_url) {
+        const backendUrl = 'http://localhost:3000';
+        const newPhotoUrl = backendUrl + res.data.photo_url + `?t=${Date.now()}`;
+        localStorage.setItem('admin_profile_photo', newPhotoUrl);
+        window.dispatchEvent(new Event('profilePhotoUpdated'));
+      } else {
+        localStorage.removeItem('admin_profile_photo');
+        window.dispatchEvent(new Event('profilePhotoUpdated'));
+      }
     } catch (err) {
       toast.error('Failed to upload photo');
     }
@@ -97,6 +108,9 @@ const AdminProfile = () => {
       toast.success('Profile photo removed!');
       const res = await api.get(`/profile/user/${userId}`);
       setProfile(res.data);
+      // Remove from localStorage and dispatch event
+      localStorage.removeItem('admin_profile_photo');
+      window.dispatchEvent(new Event('profilePhotoUpdated'));
     } catch (err) {
       toast.error('Failed to remove photo');
     }

@@ -13,7 +13,7 @@ const DashboardLayout = ({ children }) => {
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(location.pathname.startsWith('/admin/users'));
-  const [profilePhoto, setProfilePhoto] = useState(null);
+  const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('admin_profile_photo'));
 
   useEffect(() => {
     // Try to get admin info from localStorage
@@ -25,13 +25,26 @@ const DashboardLayout = ({ children }) => {
       if (adminObj) {
         api.get(`/profile/user/${adminObj.id}`).then(profileRes => {
           if (profileRes.data && profileRes.data.photo_url) {
-            setProfilePhoto('http://localhost:3000' + profileRes.data.photo_url);
+            const backendUrl = 'http://localhost:3000';
+            const newPhotoUrl = backendUrl + profileRes.data.photo_url + `?t=${Date.now()}`;
+            setProfilePhoto(newPhotoUrl);
+            localStorage.setItem('admin_profile_photo', newPhotoUrl);
           } else {
             setProfilePhoto(null);
+            localStorage.removeItem('admin_profile_photo');
           }
-        }).catch(() => setProfilePhoto(null));
+        }).catch(() => { setProfilePhoto(null); localStorage.removeItem('admin_profile_photo'); });
       }
-    }).catch(() => setProfilePhoto(null));
+    }).catch(() => { setProfilePhoto(null); localStorage.removeItem('admin_profile_photo'); });
+
+    // Listen for profile photo updates
+    const handleProfilePhotoUpdated = () => {
+      setProfilePhoto(localStorage.getItem('admin_profile_photo'));
+    };
+    window.addEventListener('profilePhotoUpdated', handleProfilePhotoUpdated);
+    return () => {
+      window.removeEventListener('profilePhotoUpdated', handleProfilePhotoUpdated);
+    };
   }, []);
 
   const submenuPaths = ['/admin/courses', '/admin/classes', '/admin/stream', '/admin/subjects', '/admin/chapters', '/admin/content'];
@@ -61,7 +74,7 @@ const DashboardLayout = ({ children }) => {
               <button className="profile-button" onClick={() => setIsProfileOpen(!isProfileOpen)}>
                 {profilePhoto ? (
                   <img
-                    src={profilePhoto}
+                    src={profilePhoto + (profilePhoto.includes('?') ? `&t=${Date.now()}` : `?t=${Date.now()}`)}
                     alt="Profile"
                     style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', border: '2px solid #2563eb', background: '#fff' }}
                   />
@@ -133,8 +146,11 @@ const DashboardLayout = ({ children }) => {
             </nav>
           </aside>
 
+          {/* Pass setProfilePhoto to children if it's a valid React element */}
           <main className="dashboard-main">
-            {children}
+            {React.isValidElement(children)
+              ? React.cloneElement(children, { onProfilePhotoChange: setProfilePhoto })
+              : children}
           </main>
         </div>
       </div>

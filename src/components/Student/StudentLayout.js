@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './StudentDashboard.css';
 import { FaChevronRight, FaChevronDown, FaBookOpen, FaListAlt, FaBook, FaBell, FaChalkboardTeacher, FaChartBar, FaFolderOpen } from 'react-icons/fa';
@@ -8,6 +8,18 @@ const StudentLayout = ({ children }) => {
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [courseMenuOpen, setCourseMenuOpen] = useState(location.pathname.startsWith('/student/available-courses') || location.pathname.startsWith('/student/my-courses'));
+  const [profilePhoto, setProfilePhoto] = useState(() => localStorage.getItem('student_profile_photo'));
+
+  useEffect(() => {
+    // Listen for student profile photo updates
+    const handleProfilePhotoUpdated = () => {
+      setProfilePhoto(localStorage.getItem('student_profile_photo'));
+    };
+    window.addEventListener('studentProfilePhotoUpdated', handleProfilePhotoUpdated);
+    return () => {
+      window.removeEventListener('studentProfilePhotoUpdated', handleProfilePhotoUpdated);
+    };
+  }, []);
 
   const handleLogout = () => {
     // Add logout logic here
@@ -32,7 +44,15 @@ const StudentLayout = ({ children }) => {
               className="profile-button"
               onClick={() => setIsProfileOpen(!isProfileOpen)}
             >
-              <i className="fas fa-user-circle"></i>
+              {profilePhoto ? (
+                <img
+                  src={profilePhoto + (profilePhoto.includes('?') ? `&t=${Date.now()}` : `?t=${Date.now()}`)}
+                  alt="Profile"
+                  style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', border: '2px solid #2563eb', background: '#fff' }}
+                />
+              ) : (
+                <i className="fas fa-user-circle"></i>
+              )}
             </button>
             {isProfileOpen && (
               <div className="dropdown-menu">
