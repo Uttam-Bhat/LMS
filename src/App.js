@@ -29,6 +29,7 @@ import DashboardLayout from './components/Dashboard/DashboardLayout';
 import SendMessage from './components/Dashboard/SendMessage';
 import TakeExam from './components/Student/TakeExam';
 import { Toaster } from 'react-hot-toast';
+import Result from './components/Student/Result';
 
 function App() {
   return (
@@ -58,7 +59,7 @@ function App() {
           <Route path="/student/exam" element={<ProtectedRoute><RegisterExam /></ProtectedRoute>} />
           <Route path="/student/exam/take/:examId" element={<TakeExam />} />
           <Route path="/student/notifications" element={<ProtectedRoute><Notification /></ProtectedRoute>} />
-          <Route path="/student/result" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
+          <Route path="/student/result" element={<ProtectedRoute><Result /></ProtectedRoute>} />
           <Route path="/student/Logout" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
           <Route path="/student/available-courses" element={<ProtectedRoute><AvailableCourses /></ProtectedRoute>} />
           <Route path="/student/my-courses" element={<ProtectedRoute><MyCourses /></ProtectedRoute>} />
