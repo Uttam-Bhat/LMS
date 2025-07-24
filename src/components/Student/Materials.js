@@ -55,7 +55,7 @@ const Materials = () => {
     (item.des || '').toLowerCase().includes(search.toLowerCase())
   );
 
-  const updateCourseCompletion = (courseName, materialId, delta = 10) => {
+  const updateCourseCompletion = (courseName, materialId) => {
     if (!courseName || !materialId) return;
     const key = 'courseCompletion';
     const viewedKey = 'viewedMaterials';
@@ -66,7 +66,9 @@ const Materials = () => {
     if (viewed[courseName].includes(materialId)) return false; // Already viewed, do nothing
     viewed[courseName].push(materialId);
     localStorage.setItem(viewedKey, JSON.stringify(viewed));
-    // Update completion
+    // Update completion with dynamic increment
+    const total = materials.filter(m => m.coursename === courseName).length;
+    const delta = total > 0 ? 100 / total : 10;
     const saved = localStorage.getItem(key);
     const map = saved ? JSON.parse(saved) : {};
     map[courseName] = Math.min(100, (map[courseName] || 0) + delta);
