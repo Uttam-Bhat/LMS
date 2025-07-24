@@ -6,7 +6,7 @@ import CreateExamModal from './CreateExamModal';
 import CreateUserModal from './CreateUserModal';
 import DashboardLayout from './DashboardLayout';
 import ViewReportsModal from './ViewReportsModal';
-import { BarChartPlaceholder } from './ResultsPlaceholder';
+import { MultiPieChart } from './ResultsPlaceholder';
 
 import './Dashboard.css';
 
@@ -70,23 +70,20 @@ const AdminDashboard = () => {
         const studentsRes = await api.get('/student/student-display');
         const studentsArr = Array.isArray(studentsRes.data) ? studentsRes.data : [studentsRes.data];
         let totalResults = 0;
-        let examScoreMap = {};
+        let examResultCount = {};
         for (const stu of studentsArr) {
           const res2 = await api.get(`/exam-result/results/${stu.st_id}`);
           const results = res2.data || [];
           totalResults += results.length;
           results.forEach(r => {
-            if (!examScoreMap[r.e_name]) examScoreMap[r.e_name] = [];
-            examScoreMap[r.e_name].push(r.score);
+            if (!examResultCount[r.e_name]) examResultCount[r.e_name] = 0;
+            examResultCount[r.e_name]++;
           });
         }
         setResultsProcessed(totalResults);
-        // Bar chart: average score per exam
-        const labels = Object.keys(examScoreMap);
-        const data = labels.map(lab => {
-          const arr = examScoreMap[lab];
-          return arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length) : 0;
-        });
+        // Pie chart: distribution of results per exam
+        const labels = Object.keys(examResultCount);
+        const data = labels.map(lab => examResultCount[lab]);
         setResultsChartLabels(labels);
         setResultsChartData(data);
       } catch (err) {

@@ -15,6 +15,93 @@ export const BarChartPlaceholder = ({ data, labels }) => (
   </div>
 );
 
+const PIE_COLORS = [
+  '#2563eb', // blue
+  '#ef6c00', // orange
+  '#2e7d32', // green
+  '#8e24aa', // purple
+  '#d32f2f', // red
+  '#1976d2', // deep blue
+  '#c2185b', // pink
+  '#388e3c', // dark green
+  '#fbc02d', // yellow
+  '#5d4037', // brown
+];
+
+export const MultiPieChart = ({ data = [], labels = [] }) => {
+  // data: array of values (average scores)
+  // labels: array of exam names
+  const total = data.reduce((a, b) => a + b, 0) || 1;
+  const radius = 100;
+  const center = radius + 10;
+  const stroke = 0;
+  let cumulative = 0;
+  // Helper to get coordinates for a slice
+  const getCoordinates = (percent) => {
+    const angle = 2 * Math.PI * percent;
+    return {
+      x: center + radius * Math.cos(angle - Math.PI / 2),
+      y: center + radius * Math.sin(angle - Math.PI / 2),
+    };
+  };
+  // Helper to get label position
+  const getLabelCoordinates = (start, end) => {
+    const angle = 2 * Math.PI * (start + (end - start) / 2);
+    return {
+      x: center + (radius * 0.6) * Math.cos(angle - Math.PI / 2),
+      y: center + (radius * 0.6) * Math.sin(angle - Math.PI / 2),
+    };
+  };
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: 24 }}>
+      <svg width={center * 2} height={center * 2}>
+        {data.map((value, idx) => {
+          const percent = value / total;
+          const start = cumulative;
+          const end = cumulative + percent;
+          const largeArc = percent > 0.5 ? 1 : 0;
+          const startCoord = getCoordinates(start);
+          const endCoord = getCoordinates(end);
+          const pathData = [
+            `M ${center} ${center}`,
+            `L ${startCoord.x} ${startCoord.y}`,
+            `A ${radius} ${radius} 0 ${largeArc} 1 ${endCoord.x} ${endCoord.y}`,
+            'Z',
+          ].join(' ');
+          const labelCoord = getLabelCoordinates(start, end);
+          cumulative += percent;
+          return (
+            <g key={labels[idx] || idx}>
+              <path d={pathData} fill={PIE_COLORS[idx % PIE_COLORS.length]} stroke="#fff" strokeWidth={stroke} />
+              {percent > 0.04 && (
+                <text
+                  x={labelCoord.x}
+                  y={labelCoord.y}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fontSize="1.1em"
+                  fontWeight="bold"
+                  fill="#222"
+                >
+                  {Math.round(percent * 100)}%
+                </text>
+              )}
+            </g>
+          );
+        })}
+      </svg>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginTop: 18, justifyContent: 'center' }}>
+        {labels.map((label, idx) => (
+          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ width: 18, height: 18, background: PIE_COLORS[idx % PIE_COLORS.length], display: 'inline-block', borderRadius: 4 }}></span>
+            <span style={{ color: '#222', fontWeight: 500 }}>{label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const ResultsPlaceholder = () => {
   const [students, setStudents] = useState([]);
   const [studentResults, setStudentResults] = useState({}); // { student_id: [results] }
@@ -47,7 +134,7 @@ const ResultsPlaceholder = () => {
         let allScores = [];
         let passCount = 0;
         let totalCount = 0;
-        let examScoreMap = {}; // { exam_id: [scores] }
+        let examResultCount = {}; // { exam_id: count }
         for (const stu of studentsArr) {
           const res2 = await api.get(`/exam-result/results/${stu.st_id}`);
           resultsObj[stu.st_id] = res2.data || [];
@@ -55,8 +142,8 @@ const ResultsPlaceholder = () => {
             allScores.push(r.score);
             totalCount++;
             if (r.score >= 40) passCount++;
-            if (!examScoreMap[r.e_name]) examScoreMap[r.e_name] = [];
-            examScoreMap[r.e_name].push(r.score);
+            if (!examResultCount[r.e_name]) examResultCount[r.e_name] = 0;
+            examResultCount[r.e_name]++;
           });
         }
         setStudentResults(resultsObj);
@@ -68,12 +155,9 @@ const ResultsPlaceholder = () => {
           if (s.label === 'Pass Rate') return { ...s, value: passRate.toFixed(1) + '%' };
           return s;
         }));
-        // Bar chart: average score per exam
-        const labels = Object.keys(examScoreMap);
-        const data = labels.map(lab => {
-          const arr = examScoreMap[lab];
-          return arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length) : 0;
-        });
+        // Pie chart: distribution of results per exam
+        const labels = Object.keys(examResultCount);
+        const data = labels.map(lab => examResultCount[lab]);
         setChartLabels(labels);
         setChartData(data);
       } catch (err) {
@@ -106,7 +190,11 @@ const ResultsPlaceholder = () => {
                 </div>
               ))}
             </div>
-            <BarChartPlaceholder data={chartData} labels={chartLabels} />
+            {chartData.length > 0 && chartLabels.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 32 }}>
+                <MultiPieChart data={chartData} labels={chartLabels} />
+              </div>
+            )}
           </div>
           <div className="exam-section-card" style={{ marginTop: '2rem' }}>
             <div className="section-header">
@@ -130,9 +218,9 @@ const ResultsPlaceholder = () => {
                     </button>
                   </div>
                   {expanded === idx && (
-                    <div style={{ marginTop: 16 }}>
+                    <div style={{ marginTop: 16, overflowX: 'auto', width: '100%' }}>
                       {studentResults[student.st_id] && studentResults[student.st_id].length > 0 ? (
-                        <table className="users-table" style={{ background: '#fff', borderRadius: 8 }}>
+                        <table className="users-table" style={{ background: '#fff', borderRadius: 8, minWidth: 600, width: '100%', borderCollapse: 'separate', borderSpacing: 0 }}>
                           <thead>
                             <tr>
                               <th>Exam</th>
