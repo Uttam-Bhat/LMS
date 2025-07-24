@@ -94,7 +94,7 @@ const Materials = () => {
               <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Study Materials</h1>
               <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Access all your learning materials here</div>
             </div>
-            <div style={{ position: 'relative', minWidth: 220, maxWidth: 320, flex: 1 }}>
+            <div style={{ position: 'relative', minWidth: 220, maxWidth: 320, flex: 2 }}>
               <FaSearch style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }} />
               <input
                 type="text"
