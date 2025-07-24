@@ -106,13 +106,20 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
           </div>
 
           <div className="user-filters">
-            <div className="search-box">
-              <span className="search-icon"><FaSearch /></span>
+            <div className="search-box" style={{ position: 'relative', width: 300 }}>
+              <span className="search-icon" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }}><FaSearch /></span>
               <input
                 type="text"
                 placeholder="Search users..."
                 value={searchQuery}
                 onChange={handleSearch}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem 0.75rem 2.5rem',
+                  border: '1px solid #e1e1e1',
+                  borderRadius: 8,
+                  fontSize: '0.95rem',
+                }}
               />
             </div>
             <div className="filter-buttons">
