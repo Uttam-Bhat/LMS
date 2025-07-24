@@ -15,6 +15,7 @@ const StreamManagement = () => {
   const [streamList, setStreamList] = useState([]);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const isMobile = window.innerWidth <= 900;
 
   const fetchStreams = async () => {
     try {
@@ -199,99 +200,185 @@ const getUniqueClasses = () => {
           </div>
         </div>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, maxWidth: 1100, margin: '0 auto 24px auto' }}>
-        {/* Filter/search bar and add button */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
-          <div style={{ position: 'relative', flex: 1 }}>
-            <FaSearch style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }} />
-            <input
-              type="text"
-              placeholder="Search streams..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
+      {/* Controls: search, add, count */}
+      {!isMobile && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, maxWidth: 1100, margin: '0 auto 24px auto' }}>
+          {/* Filter/search bar and add button */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
+            <div style={{ position: 'relative', flex: 1 }}>
+              <FaSearch style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }} />
+              <input
+                type="text"
+                placeholder="Search streams..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{
+                  width: '90%',
+                  padding: '0.75rem 1rem 0.75rem 2.5rem',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: 8,
+                  fontSize: '1rem',
+                  background: '#f9fafb',
+                  color: '#1a1a1a',
+                  outline: 'none',
+                }}
+              />
+            </div>
+            <button
+              className="add-stream-btn"
               style={{
-                width: '90%',
-                padding: '0.75rem 1rem 0.75rem 2.5rem',
-                border: '1px solid #e5e7eb',
-                borderRadius: 8,
-                fontSize: '1rem',
-                background: '#f9fafb',
-                color: '#1a1a1a',
-                outline: 'none',
+                background: '#2563eb',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: '1.1rem',
+                border: 'none',
+                borderRadius: 10,
+                padding: '0.75rem 2rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                boxShadow: '0 2px 8px #2563eb22',
+                cursor: 'pointer',
               }}
-            />
+              onClick={() => { setShowModal(true); setEditItem(null); }}
+            >
+              <FaPlus /> Add Stream
+            </button>
           </div>
-          {/* Removed the <select> with <option>Name A–Z</option> here */}
-          <button
-            className="add-stream-btn"
-            style={{
-              background: '#2563eb',
-              color: '#fff',
-              fontWeight: 600,
-              fontSize: '1.1rem',
-              border: 'none',
-              borderRadius: 10,
-              padding: '0.75rem 2rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              boxShadow: '0 2px 8px #2563eb22',
-              cursor: 'pointer',
-            }}
-            onClick={() => { setShowModal(true); setEditItem(null); }}
-          >
-            <FaPlus /> Add Stream
-          </button>
+          {/* Count box */}
+          <div style={{
+            minWidth: 110,
+            minHeight: 70,
+            background: '#f1f5f9',
+            borderRadius: 16,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px #0001',
+            fontWeight: 700,
+            fontSize: '1.5rem',
+            color: '#2563eb',
+          }}>
+            {streamList.length}
+            <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Streams</div>
+          </div>
         </div>
-        {/* Count box */}
-        <div style={{
-          minWidth: 110,
-          minHeight: 70,
-          background: '#f1f5f9',
-          borderRadius: 16,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 2px 8px #0001',
-          fontWeight: 700,
-          fontSize: '1.5rem',
-          color: '#2563eb',
-        }}>
-          {streamList.length}
-          <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Streams</div>
-        </div>
-      </div>
+      )}
       <div className="stream-management">
-        <div className="stream-table-container">
-          <table className="stream-table">
-            <thead>
-              <tr><th>Name</th><th>Description</th><th>Class</th><th>Created</th><th>Action</th></tr>
-            </thead>
-            <tbody>
-            {filtered.map(s => (
-  <tr key={s.id || s.sid}>
-    <td>{s.sname || s.name || s.stream_name || 'N/A'}</td>
-    <td>{s.description || s.des}</td>
-    <td>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div style={{ background: '#e8f0fe', color: '#2563eb', fontWeight: 600, padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem' }}>
-          {s.class_details?.class_name || s.className || s.class_name || 'N/A'}
-        </div>
-      </div>
-    </td>
-    <td>{s.created || s.cdate}</td>
-    <td>
-      <div className="stream-action-buttons">
-        <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
-        <button className="stream-delete-btn" onClick={() => handleDelete(s.id || s.sid)}>Delete</button>
-      </div>
-    </td>
-  </tr>
-))}
-            </tbody>
-          </table>
-        </div>
+        {isMobile ? (
+          <>
+            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1.1rem', marginBottom: '1.1rem' }}>
+              <div className="search-box" style={{ position: 'relative', width: '100%', maxWidth: 340, margin: '0 auto' }}>
+                <FaSearch style={{ position: 'absolute', left: 16, right: 'unset', top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18, pointerEvents: 'none' }} />
+                <input
+                  type="text"
+                  placeholder="Search streams..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem 0.75rem 2.5rem',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: 8,
+                    fontSize: '1rem',
+                    background: '#f9fafb',
+                    color: '#1a1a1a',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+              <button
+                className="add-user-btn"
+                style={{ width: '100%' }}
+                onClick={() => { setShowModal(true); setEditItem(null); }}
+              >
+                <FaPlus /> Add Stream
+              </button>
+              <div style={{
+                minWidth: 110,
+                minHeight: 70,
+                background: '#f1f5f9',
+                borderRadius: 16,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 2px 8px #0001',
+                fontWeight: 700,
+                fontSize: '1.5rem',
+                color: '#2563eb',
+                margin: '0 auto',
+                marginTop: 8
+              }}>
+                {streamList.length}
+                <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Streams</div>
+              </div>
+            </div>
+            <div className="users-cards-container">
+              {filtered.map(s => (
+                <div className="user-card" key={s.id || s.sid}>
+                  <div className="user-card-header">
+                    <div className="user-card-info">
+                      <div className="user-card-name">{s.sname || s.name || s.stream_name || 'N/A'}</div>
+                      <div className="user-card-email">Class: {s.class_details?.class_name || s.className || s.class_name || 'N/A'}</div>
+                    </div>
+                  </div>
+                  <div className="user-card-row">
+                    <span className="user-card-label">Description:</span>
+                    <span>{s.description || s.des}</span>
+                  </div>
+                  <div className="user-card-row">
+                    <span className="user-card-label">Created:</span>
+                    <span>{s.created || s.cdate}</span>
+                  </div>
+                  <div className="user-card-row">
+                    <span className="user-card-label">Actions:</span>
+                    <div className="action-buttons">
+                      <button className="edit-btn" title="Edit stream" onClick={() => openModal(s)}>
+                        Edit
+                      </button>
+                      <button className="delete-btn" title="Delete stream" onClick={() => handleDelete(s.id || s.sid)}>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="stream-table-container">
+            <table className="stream-table">
+              <thead>
+                <tr><th>Name</th><th>Description</th><th>Class</th><th>Created</th><th>Action</th></tr>
+              </thead>
+              <tbody>
+              {filtered.map(s => (
+                <tr key={s.id || s.sid}>
+                  <td>{s.sname || s.name || s.stream_name || 'N/A'}</td>
+                  <td>{s.description || s.des}</td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ background: '#e8f0fe', color: '#2563eb', fontWeight: 600, padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem' }}>
+                        {s.class_details?.class_name || s.className || s.class_name || 'N/A'}
+                      </div>
+                    </div>
+                  </td>
+                  <td>{s.created || s.cdate}</td>
+                  <td>
+                    <div className="stream-action-buttons">
+                      <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
+                      <button className="stream-delete-btn" onClick={() => handleDelete(s.id || s.sid)}>Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         {showModal && (
           <div className="stream-modal-overlay">
