@@ -14,6 +14,9 @@ const StudentDashboard = () => {
   const [recentContent, setRecentContent] = useState([]);
   const [studentInfo, setStudentInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [averageScore, setAverageScore] = useState(0);
+  const [completedExams, setCompletedExams] = useState(0);
+  const [passedExams, setPassedExams] = useState(0);
 
   useEffect(() => {
     const email = localStorage.getItem('user_email');
@@ -123,6 +126,14 @@ const StudentDashboard = () => {
           if (recentCourse && recentSubject) break;
         }
         setRecentContent([recentCourse, recentSubject].filter(Boolean));
+        // --- STUDENT EXAM RESULTS ---
+        const examResultsRes = await api.get(`/exam-result/results/${student.st_id}`);
+        const examResults = Array.isArray(examResultsRes.data) ? examResultsRes.data : [examResultsRes.data];
+        setCompletedExams(examResults.length);
+        const passed = examResults.filter(r => r.score >= 40);
+        setPassedExams(passed.length);
+        const avg = examResults.length ? (examResults.reduce((a, b) => a + b.score, 0) / examResults.length) : 0;
+        setAverageScore(avg);
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
       } finally {
@@ -159,17 +170,17 @@ const StudentDashboard = () => {
           </div>
           <div style={{background: '#eafff3', borderRadius: '16px', padding: '1.2rem 2.2rem', minWidth: 180, flex: 1}}>
             <div style={{color: '#1dbf73', fontWeight: 600, marginBottom: 4}}>Average Score</div>
-            <div style={{fontSize: '2rem', fontWeight: 700}}>0%</div>
+            <div style={{fontSize: '2rem', fontWeight: 700}}>{averageScore.toFixed(0)}%</div>
             <div style={{display: 'flex', alignItems: 'center', marginTop: 6}}><span style={{marginLeft: 4}}><i className="fas fa-signal"></i></span></div>
           </div>
           <div style={{background: '#f7f3ff', borderRadius: '16px', padding: '1.2rem 2.2rem', minWidth: 180, flex: 1}}>
             <div style={{color: '#a259ff', fontWeight: 600, marginBottom: 4}}>Completed Exams</div>
-            <div style={{fontSize: '2rem', fontWeight: 700}}>0</div>
+            <div style={{fontSize: '2rem', fontWeight: 700}}>{completedExams}</div>
             <div style={{display: 'flex', alignItems: 'center', marginTop: 6}}><span style={{marginLeft: 4}}><i className="fas fa-clipboard-list"></i></span></div>
           </div>
           <div style={{background: '#fff8e1', borderRadius: '16px', padding: '1.2rem 2.2rem', minWidth: 180, flex: 1}}>
             <div style={{color: '#ffb300', fontWeight: 600, marginBottom: 4}}>Passed Exams</div>
-            <div style={{fontSize: '2rem', fontWeight: 700}}>0</div>
+            <div style={{fontSize: '2rem', fontWeight: 700}}>{passedExams}</div>
             <div style={{display: 'flex', alignItems: 'center', marginTop: 6}}><span style={{marginLeft: 4}}><i className="fas fa-check-circle"></i></span></div>
           </div>
         </div>
