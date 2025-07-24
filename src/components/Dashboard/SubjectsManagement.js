@@ -19,6 +19,7 @@ const SubjectsManagement = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const isMobile = window.innerWidth <= 900;
 
   useEffect(() => {
     const loadData = async () => {
@@ -204,18 +205,89 @@ const SubjectsManagement = () => {
           </div>
         </div>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, maxWidth: 1100, margin: '0 auto 24px auto' }}>
-        {/* Filter/search bar and add button */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
-          <div style={{ position: 'relative', flex: 1 }}>
-            <FaSearch style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }} />
+      {!isMobile && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, maxWidth: 1100, margin: '0 auto 24px auto' }}>
+          {/* Filter/search bar and add button */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
+            <div style={{ position: 'relative', flex: 1 }}>
+              <FaSearch style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }} />
+              <input
+                type="text"
+                placeholder="Search subjects..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{
+                  width: '90%',
+                  padding: '0.75rem 1rem 0.75rem 2.5rem',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: 8,
+                  fontSize: '1rem',
+                  background: '#f9fafb',
+                  color: '#1a1a1a',
+                  outline: 'none',
+                }}
+              />
+            </div>
+            <button
+              className="add-stream-btn"
+              style={{
+                background: '#2563eb',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: '1.1rem',
+                border: 'none',
+                borderRadius: 10,
+                padding: '0.75rem 2rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                boxShadow: '0 2px 8px #2563eb22',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                if (streams.length === 0) {
+                  toast('Please wait for streams to load before adding a subject.');
+                  return;
+                }
+                setShowModal(true);
+                setEditItem(null);
+                setForm({ code: '', name: '', description: '', created: '', streamId: '' });
+              }}
+            >
+              <FaPlus /> Add Subject
+            </button>
+          </div>
+          {/* Count box */}
+          <div style={{
+            minWidth: 110,
+            minHeight: 70,
+            background: '#f1f5f9',
+            borderRadius: 16,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px #0001',
+            fontWeight: 700,
+            fontSize: '1.5rem',
+            color: '#2563eb',
+          }}>
+            {subjects.length}
+            <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Subjects</div>
+          </div>
+        </div>
+      )}
+      {isMobile && (
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1.1rem', marginBottom: '1.1rem', alignItems: 'center' }}>
+          <div className="search-box" style={{ position: 'relative', width: '100%', maxWidth: 340, margin: '0 auto' }}>
+            <FaSearch style={{ position: 'absolute', left: 16, right: 'unset', top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18, pointerEvents: 'none' }} />
             <input
               type="text"
               placeholder="Search subjects..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               style={{
-                width: '90%',
+                width: '100%',
                 padding: '0.75rem 1rem 0.75rem 2.5rem',
                 border: '1px solid #e5e7eb',
                 borderRadius: 8,
@@ -223,44 +295,13 @@ const SubjectsManagement = () => {
                 background: '#f9fafb',
                 color: '#1a1a1a',
                 outline: 'none',
+                boxSizing: 'border-box',
               }}
             />
           </div>
-          <select
-            value={selectedClass}
-            onChange={e => { setSelectedClass(e.target.value); setForm(prev => ({ ...prev, streamId: '' })); }}
-            style={{
-              minWidth: 160,
-              padding: '0.75rem 1rem',
-              border: '1px solid #e5e7eb',
-              borderRadius: 8,
-              fontSize: '1rem',
-              background: '#f9fafb',
-              color: '#1a1a1a',
-              outline: 'none',
-            }}
-          >
-            <option value="">All Classes</option>
-            {classes.map(cls => (
-              <option key={String(cls.cls_id)} value={String(cls.cls_id)}>{cls.class_name}</option>
-            ))}
-          </select>
           <button
             className="add-stream-btn"
-            style={{
-              background: '#2563eb',
-              color: '#fff',
-              fontWeight: 600,
-              fontSize: '1.1rem',
-              border: 'none',
-              borderRadius: 10,
-              padding: '0.75rem 2rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              boxShadow: '0 2px 8px #2563eb22',
-              cursor: 'pointer',
-            }}
+            style={{ width: '100%', maxWidth: 340 }}
             onClick={() => {
               if (streams.length === 0) {
                 toast('Please wait for streams to load before adding a subject.');
@@ -273,83 +314,120 @@ const SubjectsManagement = () => {
           >
             <FaPlus /> Add Subject
           </button>
-        </div>
-        {/* Count box */}
-        <div style={{
-          minWidth: 110,
-          minHeight: 70,
-          background: '#f1f5f9',
-          borderRadius: 16,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 2px 8px #0001',
-          fontWeight: 700,
-          fontSize: '1.5rem',
-          color: '#2563eb',
-        }}>
-          {subjects.length}
-          <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Subjects</div>
-        </div>
-      </div>
-      <div className="stream-table-container">
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '2rem' }}>
-            <p>Loading subjects...</p>
+          <div style={{
+            minWidth: 110,
+            minHeight: 70,
+            background: '#f1f5f9',
+            borderRadius: 16,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px #0001',
+            fontWeight: 700,
+            fontSize: '1.5rem',
+            color: '#2563eb',
+            margin: '0 auto',
+            marginTop: 8,
+            maxWidth: 340,
+            width: '100%'
+          }}>
+            {subjects.length}
+            <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Subjects</div>
           </div>
-        ) : (
-          <table className="stream-table">
-            <thead>
-              <tr>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Class</th>
-                <th>Stream</th>
-                <th>Created</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredSubjects.map(s => (
-                <tr key={s._id || s.id}>
-                  <td>{s.sub_code || ''}</td>
-                  <td>{s.su_name}</td>
-                  <td>{s.des}</td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{
-                        background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
-                        padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem'
-                      }}>
-                        {s.class_name || s.stream_info?.class_info?.class_name || 'N/A'}
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{
-                        background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
-                        padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem'
-                      }}>
-                        {s.stream_info?.sname || 'N/A'}
-                      </div>
-                    </div>
-                  </td>
-                  <td>{s.cdate}</td>
-                  <td>
-                    <div className="stream-action-buttons">
-                      <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
-                      <button className="stream-delete-btn" onClick={() => handleDelete(s.su_id || s.id)}>Delete</button>
-                    </div>
-                  </td>
+        </div>
+      )}
+      {isMobile ? (
+        <div className="users-cards-container">
+          {filteredSubjects.map(s => (
+            <div className="user-card" key={s.su_id || s.id}>
+              <div className="user-card-header">
+                <div className="user-card-info">
+                  <div className="user-card-name">{s.su_name}</div>
+                  <div className="user-card-email">Code: {s.sub_code}</div>
+                </div>
+              </div>
+              <div className="user-card-row">
+                <span className="user-card-label">Description:</span>
+                <span>{s.des}</span>
+              </div>
+              <div className="user-card-row">
+                <span className="user-card-label">Stream:</span>
+                <span>{s.stream_info?.sname || s.stream_name || 'N/A'}</span>
+              </div>
+              <div className="user-card-row">
+                <span className="user-card-label">Created:</span>
+                <span>{s.cdate}</span>
+              </div>
+              <div className="user-card-row">
+                <span className="user-card-label">Actions:</span>
+                <div className="action-buttons">
+                  <button className="edit-btn" title="Edit subject" onClick={() => openModal(s)}>
+                    Edit
+                  </button>
+                  <button className="delete-btn" title="Delete subject" onClick={() => handleDelete(s.su_id || s.id)}>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="stream-table-container">
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '2rem' }}>
+              <p>Loading subjects...</p>
+            </div>
+          ) : (
+            <table className="stream-table">
+              <thead>
+                <tr>
+                  <th>Subject Code</th>
+                  <th>Subject Name</th>
+                  <th>Class</th>
+                  <th>Stream</th>
+                  <th>Description</th>
+                  <th>Created</th>
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+              </thead>
+              <tbody>
+                {filteredSubjects.map(s => (
+                  <tr key={s.su_id || s.id}>
+                    <td>{s.sub_code}</td>
+                    <td>{s.su_name}</td>
+                    <td>
+                      <div style={{
+                        background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
+                        padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem', display: 'inline-block'
+                      }}>
+                        {s.class_name || s.class_info?.class_name || s.stream_info?.class_info?.class_name || 'N/A'}
+                      </div>
+                    </td>
+                    <td>
+                      <div style={{
+                        background: '#e8f0fe', color: '#2563eb', fontWeight: 600,
+                        padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem', display: 'inline-block'
+                      }}>
+                        {s.stream_info?.sname || s.stream_name || 'N/A'}
+                      </div>
+                    </td>
+                    <td>{s.des}</td>
+                    <td>{s.cdate}</td>
+                    <td>
+                      <div className="stream-action-buttons">
+                        <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
+                        <button className="stream-delete-btn" onClick={() => handleDelete(s.su_id || s.id)}>Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
 
       {showModal && (
         <div className="stream-modal-overlay">
