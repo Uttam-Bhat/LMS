@@ -142,25 +142,38 @@ const CourseManagement = () => {
     ? Math.round(courses.reduce((sum, c) => sum + (c.completion || 0), 0) / courses.length)
     : 0;
 
+  const isMobile = window.innerWidth <= 900;
+
   return (
     <DashboardLayout>
       <div className="course-management">
-        <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-            <FaChartLine size={38} color="#2563eb" style={{ flexShrink: 0 }} />
-            <div>
-              <h1 style={{ fontSize: '2.1rem', fontWeight: 700, color: '#2563eb', margin: 0 }}>Course Management</h1>
-              <div style={{ color: '#6b7280', fontSize: '1.08rem', marginTop: 2 }}>Create, manage and track your courses</div>
-            </div>
+        <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginBottom: 32, gap: 18, position: 'relative' }}>
+          <FaChartLine size={38} color="#2563eb" style={{ flexShrink: 0 }} />
+          <div>
+            <h1 style={{ fontSize: '2.1rem', fontWeight: 700, color: '#2563eb', margin: 0 }}>Course Management</h1>
+            <div style={{ color: '#6b7280', fontSize: '1.08rem', marginTop: 2 }}>Create, manage and track your courses</div>
           </div>
+          {!isMobile && (
+            <button 
+              className="create-course-btn"
+              style={{ position: 'absolute', right: 0, top: 0 }}
+              onClick={() => setShowCreateCourseModal(true)}
+            >
+              <FaPlus />
+              Create New Course
+            </button>
+          )}
+        </div>
+        {isMobile && (
           <button 
             className="create-course-btn"
+            style={{ width: '90%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.1rem auto', fontSize: '1.08rem', padding: '1.1rem 0', borderRadius: 14, boxSizing: 'border-box', boxShadow: '0 2px 12px rgba(30,34,90,0.10)', gap: '0.7rem' }}
             onClick={() => setShowCreateCourseModal(true)}
           >
             <FaPlus />
             Create New Course
           </button>
-        </div>
+        )}
 
         <div className="course-stats">
           <div className="stat-card">
@@ -202,7 +215,7 @@ const CourseManagement = () => {
         </div>
 
         <div className="courses-container">
-          <div className="courses-header">
+          <div className="courses-header" style={isMobile ? { flexDirection: 'column', alignItems: 'stretch', gap: '1rem' } : {}}>
             <div className="search-box" style={{ position: 'relative', width: 300 }}>
               <i className="fas fa-search" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }}></i>
               <input
@@ -226,58 +239,113 @@ const CourseManagement = () => {
             </div>
           </div>
 
-          <div className="courses-grid">
-            {filteredCourses.map(course => (
-              <div key={course.courseId} className="course-card">
-                <div className="course-header">
-                  <h3>{course.coursename}</h3>
-                  <span className={`status-badge ${course.status}`}>
-                    {course.status.charAt(0).toUpperCase() + course.status.slice(1)}
-                  </span>
-                </div>
-                <div className="course-info">
-                  <div className="info-item">
-                    <i className="fas fa-chalkboard-teacher"></i>
-                    <span>{
-                      (() => {
+          {/* Mobile: course cards, Desktop: grid */}
+          {isMobile ? (
+            <div className="users-cards-container">
+              {filteredCourses.map(course => (
+                <div key={course.courseId} className="user-card">
+                  <div className="user-card-header">
+                    <div className="user-card-info">
+                      <div className="user-card-name">{course.coursename}</div>
+                      <div className="user-card-email">{(() => {
                         const teacher = teachers.find(
                           t => String(t.id || t._id) === String(course.ass_teacher)
                         );
                         return teacher?.fullname || teacher?.name || course.ass_teacher;
-                      })()
-                    }</span>
+                      })()}</div>
+                    </div>
+                    <span className={`role-badge ${course.status}`}>{course.status.charAt(0).toUpperCase() + course.status.slice(1)}</span>
                   </div>
-                  <div className="info-item">
-                    <i className="fas fa-users"></i>
-                    <span>{course.students} Students</span>
+                  <div className="user-card-row">
+                    <span className="user-card-label">Students:</span>
+                    <span>{course.students}</span>
                   </div>
-                  <div className="info-item">
-                    <i className="fas fa-calendar-alt"></i>
-                    <span>Start: {course.start_date}</span>
+                  <div className="user-card-row">
+                    <span className="user-card-label">Start:</span>
+                    <span>{course.start_date}</span>
                   </div>
-                  <div className="info-item">
-                    <i className="fas fa-calendar-check"></i>
-                    <span>End: {course.end_date}</span>
+                  <div className="user-card-row">
+                    <span className="user-card-label">End:</span>
+                    <span>{course.end_date}</span>
                   </div>
-                  <div className="info-item">
-                    <i className="fas fa-info-circle"></i>
-                    <span>Description: {course.des}</span>
+                  <div className="user-card-row">
+                    <span className="user-card-label">Description:</span>
+                    <span>{course.des}</span>
+                  </div>
+                  {/* Only show this action row for mobile cards */}
+                  {isMobile && (
+                    <div className="user-card-row">
+                      <span className="user-card-label">Actions:</span>
+                      <div className="action-buttons" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                        <button className="edit-btn" title="Edit course" onClick={() => openModal('edit', course)}>
+                          <FaEdit />
+                        </button>
+                        <button className="assign-btn" title="Add User" onClick={() => openModal('addUser', course)}>
+                          <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22 }}>
+                            <FaUserPlus />
+                          </span>
+                        </button>
+                        <button className="delete-btn" title="Delete course" onClick={() => openModal('delete', course)}>
+                          <FaTrashAlt />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="courses-grid">
+              {filteredCourses.map(course => (
+                <div key={course.courseId} className="course-card">
+                  <div className="course-header">
+                    <h3>{course.coursename}</h3>
+                    <span className={`status-badge ${course.status}`}>
+                      {course.status.charAt(0).toUpperCase() + course.status.slice(1)}
+                    </span>
+                  </div>
+                  <div className="course-info">
+                    <div className="info-item">
+                      <i className="fas fa-chalkboard-teacher"></i>
+                      <span>{(() => {
+                        const teacher = teachers.find(
+                          t => String(t.id || t._id) === String(course.ass_teacher)
+                        );
+                        return teacher?.fullname || teacher?.name || course.ass_teacher;
+                      })()}</span>
+                    </div>
+                    <div className="info-item">
+                      <i className="fas fa-users"></i>
+                      <span>{course.students} Students</span>
+                    </div>
+                    <div className="info-item">
+                      <i className="fas fa-calendar-alt"></i>
+                      <span>Start: {course.start_date}</span>
+                    </div>
+                    <div className="info-item">
+                      <i className="fas fa-calendar-check"></i>
+                      <span>End: {course.end_date}</span>
+                    </div>
+                    <div className="info-item">
+                      <i className="fas fa-info-circle"></i>
+                      <span>Description: {course.des}</span>
+                    </div>
+                  </div>
+                  <div className="course-actions">
+                    <button className="action-btn edit" title="Edit course" onClick={() => openModal('edit', course)}>
+                      <FaEdit />
+                    </button>
+                    <button className="action-btn assign" title="Add User" onClick={() => openModal('addUser', course)}>
+                      <FaUserPlus />
+                    </button>
+                    <button className="action-btn delete" title="Delete course" onClick={() => openModal('delete', course)}>
+                      <FaTrashAlt />
+                    </button>
                   </div>
                 </div>
-                <div className="course-actions">
-                  <button className="action-btn edit" title="Edit course" onClick={() => openModal('edit', course)}>
-                    <FaEdit />
-                  </button>
-                  <button className="action-btn assign" title="Add User" onClick={() => openModal('addUser', course)}>
-                    <FaUserPlus />
-                  </button>
-                  <button className="action-btn delete" title="Delete course" onClick={() => openModal('delete', course)}>
-                    <FaTrashAlt />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {showCreateCourseModal && (
