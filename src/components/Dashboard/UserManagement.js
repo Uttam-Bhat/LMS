@@ -84,18 +84,22 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
     }
   };
 
+  // Only show cards on mobile, table on desktop
+  const isMobile = window.innerWidth <= 900;
+
   return (
     <>
       {activeSubPage === 'all-users' && (
         <div className="user-management">
-          <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-              <FaUserPlus size={38} color="#2563eb" style={{ flexShrink: 0 }} />
-              <div>
-                <h1 style={{ fontSize: '2.1rem', fontWeight: 700, color: '#2563eb', margin: 0 }}>User Management</h1>
-                <div style={{ color: '#6b7280', fontSize: '1.08rem', marginTop: 2 }}>Add, assign, and manage users</div>
-              </div>
+          <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginBottom: 32, gap: 18 }}>
+            <FaUserPlus size={38} color="#2563eb" style={{ flexShrink: 0 }} />
+            <div>
+              <h1 style={{ fontSize: '2.1rem', fontWeight: 700, color: '#2563eb', margin: 0 }}>User Management</h1>
+              <div style={{ color: '#6b7280', fontSize: '1.08rem', marginTop: 2 }}>Add, assign, and manage users</div>
             </div>
+          </div>
+          {/* Add New User button: below header on mobile, in header on desktop */}
+          {isMobile ? (
             <button 
               className="add-user-btn"
               onClick={() => setShowCreateUserModal(true)}
@@ -103,7 +107,16 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
               <FaUserPlus />
               Add New User
             </button>
-          </div>
+          ) : (
+            <button 
+              className="add-user-btn"
+              style={{ position: 'absolute', right: 0, top: 0 }}
+              onClick={() => setShowCreateUserModal(true)}
+            >
+              <FaUserPlus />
+              Add New User
+            </button>
+          )}
 
           <div className="user-filters">
             <div className="search-box" style={{ position: 'relative', width: 300 }}>
@@ -144,60 +157,100 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
             </div>
           </div>
 
-          <div className="users-table-container">
-            <table className="users-table">
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Actions</th>
-                  {filteredUsers.some(u => u.user_type === 'student') && <th>Assign</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.map(user => (
-                  <tr key={user.id}>
-                    <td>
-                      <div className="user-info">
-                        <FaUserCircle />
-                        <span>{user.fullname}</span>
-                      </div>
-                    </td>
-                    <td>{user.email}</td>
-                    <td>
-                      <span className={`role-badge ${user.user_type || 'unknown'}`}>
-                        {(user.user_type || 'unknown').charAt(0).toUpperCase() + (user.user_type || 'unknown').slice(1)}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="action-buttons">
-                        <button className="edit-btn" title="Edit user" onClick={() => { setEditUserData(user); setShowCreateUserModal(true); }}>
-                          <FaPencilAlt />
+          {/* Responsive User Cards for Mobile - only render on mobile */}
+          {isMobile && (
+            <div className="users-cards-container">
+              {filteredUsers.map(user => (
+                <div className="user-card" key={user.id}>
+                  <div className="user-card-header">
+                    <FaUserCircle className="user-card-avatar" />
+                    <div className="user-card-info">
+                      <div className="user-card-name">{user.fullname}</div>
+                      <div className="user-card-email">{user.email}</div>
+                    </div>
+                    <span className={`role-badge ${user.user_type || 'unknown'}`}>{(user.user_type || 'unknown').charAt(0).toUpperCase() + (user.user_type || 'unknown').slice(1)}</span>
+                  </div>
+                  <div className="user-card-row">
+                    <span className="user-card-label">Actions:</span>
+                    <div className="action-buttons">
+                      <button className="edit-btn" title="Edit user" onClick={() => { setEditUserData(user); setShowCreateUserModal(true); }}>
+                        <FaPencilAlt />
+                      </button>
+                      <button className="delete-btn" title="Delete user" onClick={() => handleDelete(user.id)}>
+                        <FaTrashAlt />
+                      </button>
+                    </div>
+                  </div>
+                  {user.user_type === 'student' && (
+                    <div className="user-card-row">
+                      <span className="user-card-label">Assign:</span>
+                      {assignedStudents[user.id] ? (
+                        <button className="assigned-btn" disabled>Assigned</button>
+                      ) : (
+                        <button className="assign-btn" onClick={() => { setAssigningUser(user); setShowAssignModal(true); }} disabled={assignedStudents[user.id]}>
+                          Assign
                         </button>
-                        <button className="delete-btn" title="Delete user" onClick={() => handleDelete(user.id)}>
-                          <FaTrashAlt />
-                        </button>
-                      </div>
-                    </td>
-                    <td>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Desktop Table - only render on desktop */}
+          {!isMobile && (
+            <div className="users-table-container">
+              <table className="users-table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                    {filteredUsers.some(u => u.user_type === 'student') && <th>Assign</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredUsers.map(user => (
+                    <tr key={user.id}>
+                      <td>
+                        <div className="user-info">
+                          <FaUserCircle />
+                          <span>{user.fullname}</span>
+                        </div>
+                      </td>
+                      <td>{user.email}</td>
+                      <td>
+                        <span className={`role-badge ${user.user_type || 'unknown'}`}>
+                          {(user.user_type || 'unknown').charAt(0).toUpperCase() + (user.user_type || 'unknown').slice(1)}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="action-buttons">
+                          <button className="edit-btn" title="Edit user" onClick={() => { setEditUserData(user); setShowCreateUserModal(true); }}>
+                            <FaPencilAlt />
+                          </button>
+                          <button className="delete-btn" title="Delete user" onClick={() => handleDelete(user.id)}>
+                            <FaTrashAlt />
+                          </button>
+                        </div>
+                      </td>
                       {user.user_type === 'student' ? (
                         assignedStudents[user.id] ? (
-                          <button className="assigned-btn" disabled>Assigned</button>
+                          <td><button className="assigned-btn" disabled>Assigned</button></td>
                         ) : (
-                          <button className="assign-btn" onClick={() => { setAssigningUser(user); setShowAssignModal(true); }} disabled={assignedStudents[user.id]}>
-                            Assign
-                          </button>
+                          <td><button className="assign-btn" onClick={() => { setAssigningUser(user); setShowAssignModal(true); }} disabled={assignedStudents[user.id]}>Assign</button></td>
                         )
                       ) : (
-                        <span style={{ color: '#b0b0b0', fontSize: '1.2em' }}>-</span>
+                        <td><span style={{ color: '#b0b0b0', fontSize: '1.2em' }}>-</span></td>
                       )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           {(showCreateUserModal || editUserData) && (
             <CreateUserModal

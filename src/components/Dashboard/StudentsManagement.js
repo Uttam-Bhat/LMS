@@ -15,6 +15,7 @@ const StudentsManagement = () => {
   const [editLoading, setEditLoading] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingDeleteStudent, setPendingDeleteStudent] = useState(null);
+  const isMobile = window.innerWidth <= 900;
 
   useEffect(() => {
     fetchStudents();
@@ -80,25 +81,87 @@ const StudentsManagement = () => {
 
   return (
     <div className="user-management">
-      <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-          <FaUserGraduate size={38} color="#377dff" style={{ flexShrink: 0 }} />
-          <div>
-            <h1 style={{ fontSize: '2.1rem', fontWeight: 700, color: '#377dff', margin: 0 }}>Assigned Students</h1>
-            <div style={{ color: '#5b6b7a', fontSize: '1.08rem', marginTop: 2 }}>View, edit, and manage assigned students</div>
+      {/* Responsive header for mobile */}
+      {isMobile ? (
+        <div className="page-header" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: 14, marginBottom: 24 }}>
+          <span style={{ display: 'flex', alignItems: 'center', height: 44 }}>
+            <FaUserGraduate size={32} color="#377dff" style={{ flexShrink: 0, marginRight: 2, marginTop: 2 }} />
+          </span>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <h1 style={{ fontSize: '1.6rem', fontWeight: 700, color: '#377dff', margin: 0, lineHeight: 1.2 }}>Assigned Students</h1>
+            <div style={{ color: '#5b6b7a', fontSize: '1.02rem', marginTop: 2 }}>View, edit, and manage assigned students</div>
+          </div>
+          <div style={{ background: '#f8fafd', borderRadius: 14, padding: '0.6rem 1.2rem', boxShadow: '0 2px 8px rgba(30,34,90,0.06)', display: 'flex', flexDirection: 'column', alignItems: 'center', marginLeft: 'auto' }}>
+            <span style={{ color: '#377dff', fontWeight: 700, fontSize: 19 }}>{students.length}</span>
+            <span style={{ color: '#5b6b7a', fontSize: 13 }}>Total Students</span>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-          {/* <button className="add-user-btn" style={{ fontWeight: 600, fontSize: 17, padding: '0.7rem 1.7rem', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <FaUserPlus style={{ fontSize: 18 }} /> Add Student
-          </button> */}
+      ) : (
+        <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+            <FaUserGraduate size={38} color="#377dff" style={{ flexShrink: 0 }} />
+            <div>
+              <h1 style={{ fontSize: '2.1rem', fontWeight: 700, color: '#377dff', margin: 0 }}>Assigned Students</h1>
+              <div style={{ color: '#5b6b7a', fontSize: '1.08rem', marginTop: 2 }}>View, edit, and manage assigned students</div>
+            </div>
+          </div>
           <div style={{ background: '#f8fafd', borderRadius: 16, padding: '0.7rem 1.5rem', boxShadow: '0 2px 8px rgba(30,34,90,0.06)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <span style={{ color: '#377dff', fontWeight: 700, fontSize: 22 }}>{students.length}</span>
             <span style={{ color: '#5b6b7a', fontSize: 14 }}>Total Students</span>
           </div>
         </div>
-      </div>
-      <div className="users-table-container">
+      )}
+      {/* Student Cards for Mobile */}
+      {isMobile ? (
+        <div className="users-cards-container">
+          {loading ? (
+            <div style={{ padding: '1.5rem', textAlign: 'center' }}>Loading...</div>
+          ) : error ? (
+            <div style={{ padding: '1.5rem', textAlign: 'center', color: 'red' }}>{error}</div>
+          ) : students.length === 0 ? (
+            <div style={{ padding: '1.5rem', textAlign: 'center' }}>No assigned students found.</div>
+          ) : students.map(student => (
+            <div className="user-card" key={student.st_id}>
+              <div className="user-card-header">
+                <FaUserCircle className="user-card-avatar" />
+                <div className="user-card-info">
+                  <div className="user-card-name">{student.user_info.fullname}</div>
+                  <div className="user-card-email">{student.user_info.email}</div>
+                </div>
+              </div>
+              <div className="user-card-row">
+                <span className="user-card-label">Class:</span>
+                <span>{student.user_info.class_info.class_name}</span>
+              </div>
+              <div className="user-card-row">
+                <span className="user-card-label">Stream:</span>
+                <span>{student.user_info.class_info.stream_info.sname}</span>
+              </div>
+              <div className="user-card-row">
+                <span className="user-card-label">Actions:</span>
+                <div className="action-buttons">
+                  <button
+                    className="edit-btn"
+                    title="Edit student"
+                    aria-label="Edit student"
+                    onClick={() => handleEdit(student)}
+                  >
+                    <FaPencilAlt />
+                  </button>
+                  <button
+                    className="delete-btn"
+                    title="Delete student"
+                    aria-label="Delete student"
+                    onClick={() => handleDelete(student)}
+                  >
+                    <FaTrashAlt />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
         <table className="users-table">
           <thead>
             <tr>
@@ -151,7 +214,7 @@ const StudentsManagement = () => {
             ))}
           </tbody>
         </table>
-      </div>
+      )}
       {showEditModal && editStudent && (
         <EditStudentModal
           student={editStudent}
