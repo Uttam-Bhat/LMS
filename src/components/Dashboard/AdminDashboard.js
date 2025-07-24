@@ -6,6 +6,7 @@ import CreateExamModal from './CreateExamModal';
 import CreateUserModal from './CreateUserModal';
 import DashboardLayout from './DashboardLayout';
 import ViewReportsModal from './ViewReportsModal';
+import { BarChartPlaceholder } from './ResultsPlaceholder';
 
 import './Dashboard.css';
 
@@ -18,6 +19,9 @@ const AdminDashboard = () => {
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalExams, setTotalExams] = useState(0);
   const [templates, setTemplates] = useState([]);
+  const [resultsProcessed, setResultsProcessed] = useState(0);
+  const [resultsChartData, setResultsChartData] = useState([]);
+  const [resultsChartLabels, setResultsChartLabels] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,6 +63,39 @@ const AdminDashboard = () => {
       }
     };
     fetchTemplates();
+    // Fetch processed results count and chart data
+    const fetchResultsProcessed = async () => {
+      try {
+        // Fetch all students
+        const studentsRes = await api.get('/student/student-display');
+        const studentsArr = Array.isArray(studentsRes.data) ? studentsRes.data : [studentsRes.data];
+        let totalResults = 0;
+        let examScoreMap = {};
+        for (const stu of studentsArr) {
+          const res2 = await api.get(`/exam-result/results/${stu.st_id}`);
+          const results = res2.data || [];
+          totalResults += results.length;
+          results.forEach(r => {
+            if (!examScoreMap[r.e_name]) examScoreMap[r.e_name] = [];
+            examScoreMap[r.e_name].push(r.score);
+          });
+        }
+        setResultsProcessed(totalResults);
+        // Bar chart: average score per exam
+        const labels = Object.keys(examScoreMap);
+        const data = labels.map(lab => {
+          const arr = examScoreMap[lab];
+          return arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length) : 0;
+        });
+        setResultsChartLabels(labels);
+        setResultsChartData(data);
+      } catch (err) {
+        setResultsProcessed(0);
+        setResultsChartLabels([]);
+        setResultsChartData([]);
+      }
+    };
+    fetchResultsProcessed();
   }, []);
 
   const handleExamCreated = () => {
@@ -100,7 +137,7 @@ const AdminDashboard = () => {
             <i className="fas fa-chart-line"></i>
             <div className="stat-content">
               <h3>Results Processed</h3>
-              <p>156</p>
+              <p>{resultsProcessed}</p>
             </div>
           </div>
         </div>
@@ -176,7 +213,11 @@ const AdminDashboard = () => {
           />
         )}
         {showViewReportsModal && (
-          <ViewReportsModal onClose={() => setShowViewReportsModal(false)} />
+          <ViewReportsModal 
+            onClose={() => setShowViewReportsModal(false)}
+            chartData={resultsChartData}
+            chartLabels={resultsChartLabels}
+          />
         )}
       </div>
     </DashboardLayout>

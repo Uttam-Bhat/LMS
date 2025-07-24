@@ -3,7 +3,7 @@ import DashboardLayout from './DashboardLayout';
 import './ExamManagement.css';
 import api from '../../services/authService';
 
-const BarChartPlaceholder = ({ data, labels }) => (
+export const BarChartPlaceholder = ({ data, labels }) => (
   <div style={{ width: '100%', height: 220, background: '#f3f6fa', borderRadius: 12, display: 'flex', alignItems: 'flex-end', gap: 18, padding: 24, margin: '1.5rem 0' }}>
     {data.map((val, idx) => (
       <div key={idx} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
