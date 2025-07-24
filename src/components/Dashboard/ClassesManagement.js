@@ -156,29 +156,40 @@ const ClassesManagement = () => {
     s.class_name && s.class_name.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Fix: define isMobile at the top level
+  const isMobile = window.innerWidth <= 900;
+
   return (
     <DashboardLayout>
-      <div className="class-management-header" style={{ padding: '2rem 0 1rem 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <FaChalkboardTeacher size={32} color="#2563eb" />
-          <div>
-            <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Manage Classes</h1>
-            <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic classes</div>
+      <div className="classes-management">
+        {/* Mobile: Centered heading and subtitle */}
+        {isMobile ? (
+          <div style={{ padding: '2rem 0 1rem 0', textAlign: 'center' }}>
+            <FaChalkboardTeacher size={36} color="#2563eb" style={{ marginBottom: 8 }} />
+            <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb', letterSpacing: 0.2 }}>Manage Classes</h1>
+            <div style={{ color: '#6b7280', fontSize: '1.08rem', fontWeight: 500, marginTop: 2 }}>Add, assign, and manage academic classes</div>
           </div>
-        </div>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, maxWidth: 1100, margin: '0 auto 24px auto' }}>
-        {/* Filter/search bar and add button */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
-          <div style={{ position: 'relative', flex: 1 }}>
-            <FaSearch style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }} />
+        ) : (
+          <div className="class-management-header" style={{ padding: '2rem 0 1rem 0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <FaChalkboardTeacher size={32} color="#2563eb" />
+              <div>
+                <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Manage Classes</h1>
+                <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic classes</div>
+              </div>
+            </div>
+          </div>
+        )}
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1.1rem', marginBottom: '1.1rem' }}>
+          <div className="search-box" style={{ position: 'relative', width: '100%', maxWidth: 340, margin: '0 auto' }}>
+            <FaSearch style={{ position: 'absolute', left: 16, right: 'unset', top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18, pointerEvents: 'none' }} />
             <input
               type="text"
               placeholder="Search classes..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               style={{
-                width: '90%',
+                width: '100%',
                 padding: '0.75rem 1rem 0.75rem 2.5rem',
                 border: '1px solid #e5e7eb',
                 borderRadius: 8,
@@ -186,149 +197,153 @@ const ClassesManagement = () => {
                 background: '#f9fafb',
                 color: '#1a1a1a',
                 outline: 'none',
+                boxSizing: 'border-box',
               }}
             />
           </div>
-          {/* Removed the <select> with <option>Name A–Z</option> here */}
           <button
-            className="add-stream-btn"
-            style={{
-              background: '#2563eb',
-              color: '#fff',
-              fontWeight: 600,
-              fontSize: '1.1rem',
-              border: 'none',
-              borderRadius: 10,
-              padding: '0.75rem 2rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              boxShadow: '0 2px 8px #2563eb22',
-              cursor: 'pointer',
-            }}
+            className="add-user-btn"
+            style={{ width: '100%' }}
             onClick={() => openModal(null)}
           >
             <FaPlus /> Add Class
           </button>
         </div>
-        {/* Count box */}
-        <div style={{
-          minWidth: 110,
-          minHeight: 70,
-          background: '#f1f5f9',
-          borderRadius: 16,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 2px 8px #0001',
-          fontWeight: 700,
-          fontSize: '1.5rem',
-          color: '#2563eb',
-        }}>
-          {classes.length}
-          <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Classes</div>
-        </div>
-      </div>
 
-      {statusMessage && <p className="status-message">{statusMessage}</p>}
+        {statusMessage && <p className="status-message">{statusMessage}</p>}
 
-      <div className="stream-table-container">
-        <table className="stream-table">
-          <thead>
-            <tr>
-              <th>Class Name</th>
-              <th>Description</th>
-              <th>Section</th>
-              <th>Created</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
+        {/* Class Cards for Mobile - like user management */}
+        {isMobile ? (
+          <div className="users-cards-container" style={{ marginLeft: '2vw' }}>
             {filtered.map(s => (
-              <tr key={s.cls_id}>
-                <td>{s.class_name}</td>
-                <td>{s.des}</td>
-                <td>{s.section}</td>
-                <td>{s.cdate}</td>
-                <td>
-                  <div className="stream-action-buttons">
-                    <button className="stream-edit-btn" onClick={() => openModal(s)}>
+              <div className="user-card" key={s.cls_id}>
+                <div className="user-card-header">
+                  <div className="user-card-info">
+                    <div className="user-card-name">{s.class_name}</div>
+                    <div className="user-card-email">Section: {s.section}</div>
+                  </div>
+                </div>
+                <div className="user-card-row">
+                  <span className="user-card-label">Description:</span>
+                  <span>{s.des}</span>
+                </div>
+                <div className="user-card-row">
+                  <span className="user-card-label">Created:</span>
+                  <span>{s.cdate}</span>
+                </div>
+                <div className="user-card-row">
+                  <span className="user-card-label">Actions:</span>
+                  <div className="action-buttons">
+                    <button className="edit-btn" title="Edit class" onClick={() => openModal(s)}>
                       Edit
                     </button>
-                    <button
-                      className="stream-delete-btn"
-                      onClick={() => handleDelete(s.cls_id)}
-                    >
+                    <button className="delete-btn" title="Delete class" onClick={() => handleDelete(s.cls_id)}>
                       Delete
                     </button>
                   </div>
-                </td>
-              </tr>
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </div>
+        ) : (
+          <div className="stream-table-container">
+            <table className="stream-table">
+              <thead>
+                <tr>
+                  <th>Class Name</th>
+                  <th>Description</th>
+                  <th>Section</th>
+                  <th>Created</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map(s => (
+                  <tr key={s.cls_id}>
+                    <td>{s.class_name}</td>
+                    <td>{s.des}</td>
+                    <td>{s.section}</td>
+                    <td>{s.cdate}</td>
+                    <td>
+                      <div className="stream-action-buttons">
+                        <button className="stream-edit-btn" onClick={() => openModal(s)}>
+                          Edit
+                        </button>
+                        <button
+                          className="stream-delete-btn"
+                          onClick={() => handleDelete(s.cls_id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-      {showModal && (
-        <div className="stream-modal-overlay">
-          <div className="stream-modal">
-            <div className="stream-modal-header">
-              <h2>{editItem ? 'Edit Class' : 'Add Class'}</h2>
-              <button className="stream-close-btn" onClick={() => setShowModal(false)}>
-                ×
-              </button>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <input
-                name="class_name"
-                placeholder="Class Name"
-                value={form.class_name}
-                onChange={handleInputChange}
-                style={{ fontWeight: 500 }}
-                required
-              />
-              <input
-                name="des"
-                placeholder="Description"
-                value={form.des}
-                onChange={handleInputChange}
-                required
-              />
-              <input
-                name="section"
-                placeholder="Section (e.g. A, B, C)"
-                value={form.section}
-                onChange={handleInputChange}
-                required
-              />
-              <label style={{ fontWeight: 500 }}>Created Date</label>
-              <input
-                type="date"
-                name="cdate"
-                value={form.cdate}
-                onChange={handleInputChange}
-                required
-              />
-              <button
-                className="add-stream-btn"
-                style={{ marginTop: '0.5rem' }}
-                onClick={handleSave}
-              >
-                {editItem ? 'Save Changes' : 'Add Class'}
-              </button>
+        {showModal && (
+          <div className="stream-modal-overlay">
+            <div className="stream-modal">
+              <div className="stream-modal-header">
+                <h2>{editItem ? 'Edit Class' : 'Add Class'}</h2>
+                <button className="stream-close-btn" onClick={() => setShowModal(false)}>
+                  ×
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <input
+                  name="class_name"
+                  placeholder="Class Name"
+                  value={form.class_name}
+                  onChange={handleInputChange}
+                  style={{ fontWeight: 500 }}
+                  required
+                />
+                <input
+                  name="des"
+                  placeholder="Description"
+                  value={form.des}
+                  onChange={handleInputChange}
+                  required
+                />
+                <input
+                  name="section"
+                  placeholder="Section (e.g. A, B, C)"
+                  value={form.section}
+                  onChange={handleInputChange}
+                  required
+                />
+                <label style={{ fontWeight: 500 }}>Created Date</label>
+                <input
+                  type="date"
+                  name="cdate"
+                  value={form.cdate}
+                  onChange={handleInputChange}
+                  required
+                />
+                <button
+                  className="add-stream-btn"
+                  style={{ marginTop: '0.5rem' }}
+                  onClick={handleSave}
+                >
+                  {editItem ? 'Save Changes' : 'Add Class'}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <ConfirmDialog
-        open={confirmOpen}
-        title="Delete Class?"
-        message="Are you sure you want to delete this class? This action cannot be undone."
-        onConfirm={confirmDelete}
-        onCancel={() => { setConfirmOpen(false); setPendingDeleteId(null); }}
-      />
+        <ConfirmDialog
+          open={confirmOpen}
+          title="Delete Class?"
+          message="Are you sure you want to delete this class? This action cannot be undone."
+          onConfirm={confirmDelete}
+          onCancel={() => { setConfirmOpen(false); setPendingDeleteId(null); }}
+        />
+      </div>
     </DashboardLayout>
   );
 };
