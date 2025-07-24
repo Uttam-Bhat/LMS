@@ -245,23 +245,6 @@ const SubjectsManagement = () => {
               <option key={String(cls.cls_id)} value={String(cls.cls_id)}>{cls.class_name}</option>
             ))}
           </select>
-          <select
-            value={''}
-            onChange={() => {}}
-            style={{
-              minWidth: 140,
-              padding: '0.75rem 1rem',
-              border: '1px solid #e5e7eb',
-              borderRadius: 8,
-              fontSize: '1rem',
-              background: '#f9fafb',
-              color: '#1a1a1a',
-              outline: 'none',
-            }}
-            disabled
-          >
-            <option>Name A–Z</option>
-          </select>
           <button
             className="add-stream-btn"
             style={{

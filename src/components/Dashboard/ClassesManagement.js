@@ -189,23 +189,7 @@ const ClassesManagement = () => {
               }}
             />
           </div>
-          <select
-            value={''}
-            onChange={() => {}}
-            style={{
-              minWidth: 140,
-              padding: '0.75rem 1rem',
-              border: '1px solid #e5e7eb',
-              borderRadius: 8,
-              fontSize: '1rem',
-              background: '#f9fafb',
-              color: '#1a1a1a',
-              outline: 'none',
-            }}
-            disabled
-          >
-            <option>Name A–Z</option>
-          </select>
+          {/* Removed the <select> with <option>Name A–Z</option> here */}
           <button
             className="add-stream-btn"
             style={{
