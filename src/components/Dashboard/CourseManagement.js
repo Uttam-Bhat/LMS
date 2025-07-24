@@ -141,6 +141,11 @@ const CourseManagement = () => {
     }
   }, [teachers, courses]);
 
+  // Calculate dynamic average completion
+  const averageCompletion = courses.length
+    ? Math.round(courses.reduce((sum, c) => sum + (c.completion || 0), 0) / courses.length)
+    : 0;
+
   return (
     <DashboardLayout>
       <div className="course-management">
@@ -195,7 +200,7 @@ const CourseManagement = () => {
             </div>
             <div className="stat-content">
               <h3>Average Completion</h3>
-              <p>78%</p>
+              <p>{averageCompletion}%</p>
             </div>
           </div>
         </div>

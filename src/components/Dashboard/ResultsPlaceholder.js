@@ -115,6 +115,7 @@ const ResultsPlaceholder = () => {
   ]);
   const [chartLabels, setChartLabels] = useState([]);
   const [chartData, setChartData] = useState([]);
+  const [studentSearch, setStudentSearch] = useState("");
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -169,6 +170,15 @@ const ResultsPlaceholder = () => {
     fetchAll();
   }, []);
 
+  // Filter students by search
+  const filteredStudents = students.filter(student => {
+    const q = studentSearch.toLowerCase();
+    return (
+      student.user_info.fullname.toLowerCase().includes(q) ||
+      student.user_info.email.toLowerCase().includes(q)
+    );
+  });
+
   return (
     <DashboardLayout>
       <div className="exam-management" style={{ padding: '2rem 0 1rem 0' }}>
@@ -201,15 +211,31 @@ const ResultsPlaceholder = () => {
             )}
           </div>
           <div className="exam-section-card" style={{ marginTop: '2rem' }}>
-            <div className="section-header">
+            <div className="section-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 18 }}>
               <h2>Student Results</h2>
+              <div style={{ position: 'relative', width: 180, flexShrink: 0 }}>
+                <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 16 }}><i className="fas fa-search"></i></span>
+                <input
+                  type="text"
+                  placeholder="Search students..."
+                  value={studentSearch}
+                  onChange={e => setStudentSearch(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.6rem 0.9rem 0.6rem 2.1rem',
+                    border: '1px solid #e1e1e1',
+                    borderRadius: 8,
+                    fontSize: '0.95rem',
+                  }}
+                />
+              </div>
             </div>
             <div style={{ margin: '1.5rem 0', borderRadius: 12, background: '#f8fafc', boxShadow: '0 2px 8px #e0e7ef', padding: '1.5rem 2rem' }}>
               {loading ? (
                 <div>Loading...</div>
               ) : students.length === 0 ? (
                 <div>No students found.</div>
-              ) : students.map((student, idx) => (
+              ) : filteredStudents.map((student, idx) => (
                 <div key={idx} style={{ marginBottom: 18, borderBottom: '1px solid #e5e7eb', paddingBottom: 18 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
                     <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(student.user_info.fullname)}&background=2563eb&color=fff&size=64`} alt={student.user_info.fullname} style={{ width: 48, height: 48, borderRadius: '50%', border: '2px solid #2563eb' }} />
