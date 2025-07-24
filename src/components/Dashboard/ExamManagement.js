@@ -163,13 +163,13 @@ const handleDelete = async (fileId) => {
 
   return (
     <DashboardLayout>
-      <div className="exam-management">
-        <div className="page-header">
-          <h1>Exam Management</h1>
-          <button className="create-exam-btn" onClick={handleCreateExam}>
-            <FaPlus />
-            Create New Exam
-          </button>
+      <div className="exam-management" style={{ padding: '2rem 0 1rem 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+          <span style={{ fontSize: 36, color: '#2563eb' }}><FaFileAlt /></span>
+          <div>
+            <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Exam Management</h1>
+            <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Create, edit, and manage exams and question banks</div>
+          </div>
         </div>
         {showCreateExamModal && (
           <CreateExamModal 
@@ -291,7 +291,7 @@ const handleDelete = async (fileId) => {
             <div className="section-header">
               <h2>Exam Schedules</h2>
               <button title="Add Schedule" onClick={handleCreateExam}>
-                <FaClock />
+                <FaPlus />
               </button>
             </div>
             <div className="schedule-list">

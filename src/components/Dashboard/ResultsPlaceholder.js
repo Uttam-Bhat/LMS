@@ -171,9 +171,13 @@ const ResultsPlaceholder = () => {
 
   return (
     <DashboardLayout>
-      <div className="exam-management">
-        <div className="page-header">
-          <h1>Results & Reports (Admin)</h1>
+      <div className="exam-management" style={{ padding: '2rem 0 1rem 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+          <span style={{ fontSize: 36, color: '#2563eb' }}><i className="fas fa-chart-bar"></i></span>
+          <div>
+            <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Results & Reports</h1>
+            <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>View analytics and student exam results</div>
+          </div>
         </div>
         <div className="exam-sections">
           <div className="exam-section-card">
