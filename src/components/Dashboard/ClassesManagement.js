@@ -170,49 +170,130 @@ const ClassesManagement = () => {
             <div style={{ color: '#6b7280', fontSize: '1.08rem', fontWeight: 500, marginTop: 2 }}>Add, assign, and manage academic classes</div>
           </div>
         ) : (
-          <div className="class-management-header" style={{ padding: '2rem 0 1rem 0' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <FaChalkboardTeacher size={32} color="#2563eb" />
-              <div>
-                <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Manage Classes</h1>
-                <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic classes</div>
+          <>
+            <div className="class-management-header" style={{ padding: '2rem 0 1rem 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <FaChalkboardTeacher size={32} color="#2563eb" />
+                <div>
+                  <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Manage Classes</h1>
+                  <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic classes</div>
+                </div>
               </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, maxWidth: 1100, margin: '0 auto 24px auto' }}>
+              {/* Filter/search bar and add button */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
+                <div style={{ position: 'relative', flex: 1 }}>
+                  <FaSearch style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }} />
+                  <input
+                    type="text"
+                    placeholder="Search classes..."
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    style={{
+                      width: '90%',
+                      padding: '0.75rem 1rem 0.75rem 2.5rem',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: 8,
+                      fontSize: '1rem',
+                      background: '#f9fafb',
+                      color: '#1a1a1a',
+                      outline: 'none',
+                    }}
+                  />
+                </div>
+                <button
+                  className="add-user-btn"
+                  style={{
+                    background: '#2563eb',
+                    color: '#fff',
+                    fontWeight: 600,
+                    fontSize: '1.1rem',
+                    border: 'none',
+                    borderRadius: 10,
+                    padding: '0.75rem 2rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    boxShadow: '0 2px 8px #2563eb22',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => openModal(null)}
+                >
+                  <FaPlus /> Add Class
+                </button>
+              </div>
+              {/* Count box */}
+              <div style={{
+                minWidth: 110,
+                minHeight: 70,
+                background: '#f1f5f9',
+                borderRadius: 16,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 2px 8px #0001',
+                fontWeight: 700,
+                fontSize: '1.5rem',
+                color: '#2563eb',
+              }}>
+                {classes.length}
+                <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Classes</div>
+              </div>
+            </div>
+          </>
+        )}
+        {isMobile && (
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1.1rem', marginBottom: '1.1rem' }}>
+            <div className="search-box" style={{ position: 'relative', width: '100%', maxWidth: 340, margin: '0 auto' }}>
+              <FaSearch style={{ position: 'absolute', left: 16, right: 'unset', top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18, pointerEvents: 'none' }} />
+              <input
+                type="text"
+                placeholder="Search classes..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem 0.75rem 2.5rem',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: 8,
+                  fontSize: '1rem',
+                  background: '#f9fafb',
+                  color: '#1a1a1a',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+            <button
+              className="add-user-btn"
+              style={{ width: '100%' }}
+              onClick={() => openModal(null)}
+            >
+              <FaPlus /> Add Class
+            </button>
+            <div style={{
+              minWidth: 110,
+              minHeight: 70,
+              background: '#f1f5f9',
+              borderRadius: 16,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 8px #0001',
+              fontWeight: 700,
+              fontSize: '1.5rem',
+              color: '#2563eb',
+              margin: '0 auto',
+              marginTop: 8
+            }}>
+              {classes.length}
+              <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Classes</div>
             </div>
           </div>
         )}
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1.1rem', marginBottom: '1.1rem' }}>
-          <div className="search-box" style={{ position: 'relative', width: '100%', maxWidth: 340, margin: '0 auto' }}>
-            <FaSearch style={{ position: 'absolute', left: 16, right: 'unset', top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18, pointerEvents: 'none' }} />
-            <input
-              type="text"
-              placeholder="Search classes..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.75rem 1rem 0.75rem 2.5rem',
-                border: '1px solid #e5e7eb',
-                borderRadius: 8,
-                fontSize: '1rem',
-                background: '#f9fafb',
-                color: '#1a1a1a',
-                outline: 'none',
-                boxSizing: 'border-box',
-              }}
-            />
-          </div>
-          <button
-            className="add-user-btn"
-            style={{ width: '100%' }}
-            onClick={() => openModal(null)}
-          >
-            <FaPlus /> Add Class
-          </button>
-        </div>
-
-        {statusMessage && <p className="status-message">{statusMessage}</p>}
-
-        {/* Class Cards for Mobile - like user management */}
         {isMobile ? (
           <div className="users-cards-container" style={{ marginLeft: '2vw' }}>
             {filtered.map(s => (
