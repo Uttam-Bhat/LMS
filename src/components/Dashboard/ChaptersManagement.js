@@ -61,7 +61,6 @@ const ChaptersManagement = () => {
   const fetchSubjects = async () => {
     try {
       const response = await api.get('http://localhost:3000/api/subject/subject-display');
-      console.log('Fetched subjects:', response.data);
       setSubjects(response.data);
     } catch (error) {
       console.error('Failed to fetch subjects:', error);
@@ -72,7 +71,6 @@ const ChaptersManagement = () => {
   const fetchChapters = async () => {
     try {
       const response = await api.get('http://localhost:3000/api/chapter/display');
-      console.log('Fetched chapters:', response.data);
       setChapters(response.data);
     } catch (error) {
       console.error('Failed to fetch chapters:', error);
@@ -119,7 +117,7 @@ const ChaptersManagement = () => {
     };
 
     const subjectObj = subjects.find(s => s.su_name === form.su_name && s.stream_info?.sid?.toString() === selectedStream);
-    const streamObj = availableStreams.find(s => String(s.sid) === String(selectedStream));
+    const streamObj = streams.find(s => String(s.sid) === String(selectedStream));
     const classObj = classes.find(c => String(c.cls_id) === String(selectedClass));
 
     if (!form.ch_name || !form.des || !form.cdate || !subjectObj || !streamObj || !classObj) {
@@ -218,15 +216,6 @@ const ChaptersManagement = () => {
   const availableSubjects = subjects
     .filter(s => s.stream_info?.sid?.toString() === selectedStream)
     .filter((sub, idx, arr) => sub && arr.findIndex(s2 => s2.su_id === sub.su_id) === idx);
-
-  // Debug: log availableStreams and selectedClass before rendering
-  console.log('Available streams for class', selectedClass, availableStreams);
-
-  // Debug logs for data inspection
-  console.log('Chapters:', filteredChapters);
-  console.log('Subjects:', subjects);
-  console.log('Streams:', streams);
-  console.log('Classes:', classes);
 
   return (
     <DashboardLayout>

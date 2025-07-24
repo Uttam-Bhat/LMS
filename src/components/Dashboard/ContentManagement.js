@@ -59,7 +59,6 @@ const ContentManagement = () => {
   const fetchContents = async () => {
     try {
       const res = await api.get('http://localhost:3000/api/content/display');
-      console.log('Raw API response:', res.data);
       let contentArr = [];
       if (Array.isArray(res.data)) {
         contentArr = res.data;
@@ -159,9 +158,6 @@ const ContentManagement = () => {
     setSelectedAssociationId('');
     setFile(null);
   };
-
-  // Debug log to show what is being rendered
-  console.log('Contents to display:', contents);
 
   return (
     <DashboardLayout>
@@ -310,30 +306,21 @@ const ContentManagement = () => {
                         href={`http://localhost:3000/${content.file_path.replace(/\\/g, '/')}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{
-                          display: 'inline-block',
-                          background: '#16a34a',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: 6,
-                          padding: '4px 12px',
-                          fontWeight: 500,
-                          textDecoration: 'none',
-                          fontSize: '0.98rem',
-                          cursor: 'pointer',
-                          transition: 'background 0.2s',
-                          margin: 0
-                        }}
+                        style={{ color: '#2563eb', textDecoration: 'underline' }}
                       >
-                        View
+                        View File
                       </a>
                     </td>
-                    <td style={{padding: 10, border: '1px solid #e2e8f0'}}>{content.coursename || content.su_name || '-'}</td>
+                    <td style={{padding: 10, border: '1px solid #e2e8f0'}}>
+                      {content.coursename || content.su_name}
+                    </td>
                     <td style={{padding: 10, border: '1px solid #e2e8f0', textAlign: 'center'}}>
-                      <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10}}>
-                        <button className="action-btn edit" style={{background: '#f3f4f6', border: '1px solid #2563eb', color: '#2563eb', borderRadius: 6, padding: '4px 10px', cursor: 'pointer'}} title="Edit" onClick={() => handleEditContent(content)}><FaEdit /></button>
-                        <button className="action-btn delete" style={{background: '#f3f4f6', border: '1px solid #e11d48', color: '#e11d48', borderRadius: 6, padding: '4px 10px', cursor: 'pointer'}} title="Delete" onClick={() => handleDelete(content.ct_id)}><FaTrashAlt /></button>
-                      </div>
+                      <button onClick={() => handleEditContent(content)} style={{background: '#2563eb', color: '#fff', border: '1px solid #2563eb', borderRadius: 6, padding: '0.4rem 0.8rem', fontSize: 12, marginRight: 5, cursor: 'pointer'}}>
+                        <FaEdit />
+                      </button>
+                      <button onClick={() => handleDelete(content.ct_id)} style={{background: '#dc3545', color: '#fff', border: '1px solid #dc3545', borderRadius: 6, padding: '0.4rem 0.8rem', fontSize: 12, cursor: 'pointer'}}>
+                        <FaTrashAlt />
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -341,15 +328,14 @@ const ContentManagement = () => {
             </tbody>
           </table>
         </div>
-
-        <ConfirmDialog
-          open={confirmOpen}
-          title="Delete Content?"
-          message="Are you sure you want to delete this content? This action cannot be undone."
-          onConfirm={confirmDelete}
-          onCancel={() => { setConfirmOpen(false); setPendingDeleteId(null); }}
-        />
       </div>
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={confirmDelete}
+        title="Confirm Delete"
+        message={`Are you sure you want to delete this content? This action cannot be undone.`}
+      />
     </DashboardLayout>
   );
 };

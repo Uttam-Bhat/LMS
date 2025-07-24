@@ -25,7 +25,6 @@ const CourseManagement = () => {
     try {
       const response = await api.get('/course/teachers');
       setTeachers(response.data);
-      console.log("Fetched data:", response.data);
     } catch (error) {
       console.error('Failed to fetch teachers:', error);
     }
@@ -110,7 +109,6 @@ const CourseManagement = () => {
   };
 
   const handleAddStudents = (students) => {
-    console.log('Students added to course:', students);
     // No toast here; handled in the modal
   };
 
@@ -136,8 +134,6 @@ const CourseManagement = () => {
 
   useEffect(() => {
     if (teachers.length && courses.length) {
-      console.log('Teachers:', teachers);
-      console.log('Courses:', courses);
     }
   }, [teachers, courses]);
 

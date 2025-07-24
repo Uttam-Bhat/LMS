@@ -4,8 +4,6 @@ import './StudentDashboard.css';
 import StudentLayout from './StudentLayout';
 import { FaBookOpen } from 'react-icons/fa';
 
-console.log('AvailableCourses component rendered');
-
 const AvailableCourses = () => {
   const [courses, setCourses] = useState([]);
   const [enrolled, setEnrolled] = useState([]);
@@ -53,7 +51,6 @@ const AvailableCourses = () => {
         .filter(e => String(e.st_id) === String(studentId))
         .map(e => String(e.course_info.cid));
       setEnrolled(enrolledIds);
-      console.log('FETCHED ENROLLED IDS:', enrolledIds);
     } catch (error) {
       setEnrolled([]);
     }
@@ -76,7 +73,6 @@ const AvailableCourses = () => {
 
   const handleEnroll = async (courseId) => {
     const studentId = localStorage.getItem('student_id');
-    console.log('ENROLL DEBUG:', { studentId, courseId }); // Debug log
     if (!studentId) {
       console.error('Student ID not found in localStorage.');
       setEnrollError('Student ID not found. Please log in again.');
@@ -148,7 +144,6 @@ const AvailableCourses = () => {
             <div style={{ color: '#6b7a90', fontSize: '1.1rem' }}>No courses found.</div>
           ) : (
             filteredCourses.map(course => {
-              console.log('COURSE:', course);
               const teacher = teachers.find(t => String(t.id) === String(course.ass_teacher));
               const teacherName = teacher?.fullname || 'Not Assigned';
               // Use courseId for comparison, as returned by backend

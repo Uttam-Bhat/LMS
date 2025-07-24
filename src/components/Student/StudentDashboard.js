@@ -54,58 +54,41 @@ const StudentDashboard = () => {
         const enrolledCourseIds = studentEnrollments.map(e => String(e.course_info.cid));
         // Collect enrolled course names
         const enrolledCourseNames = studentEnrollments.map(e => e.course_info.coursename);
-        console.log('ENROLLED COURSE IDs:', enrolledCourseIds);
-        console.log('ENROLLED COURSE NAMES:', enrolledCourseNames);
+        
         // --- UPCOMING EXAMS ---
         const examsRes = await api.get('/exam/display');
         const allExams = Array.isArray(examsRes.data) ? examsRes.data : [examsRes.data];
-        console.log('FIRST EXAM FULL OBJECT:', JSON.stringify(allExams[0], null, 2));
-        console.log('ALL EXAMS COUNT:', allExams.length);
         
         // Get student's class and stream IDs
         const studentClassId = student?.user_info?.class_info?.cls_id;
         const studentStreamId = student?.user_info?.class_info?.stream_info?.sid;
-        console.log('STUDENT CLASS ID:', studentClassId);
-        console.log('STUDENT STREAM ID:', studentStreamId);
         
         // Get subjects for this student's class and stream
         const subjectsRes = await api.get('/subject/subject-display');
-        console.log('ALL SUBJECTS:', subjectsRes.data);
-        console.log('FIRST SUBJECT:', JSON.stringify(subjectsRes.data[0], null, 2));
         const studentSubjects = subjectsRes.data.filter(subject => {
           // Use the correct nested field structure
           const subjectClassId = subject.stream_info?.class_info?.cls_id;
           const subjectStreamId = subject.stream_info?.sid;
           const isMatch = String(subjectClassId) === String(studentClassId) && 
                          String(subjectStreamId) === String(studentStreamId);
-          console.log('SUBJECT:', subject.su_name, 'CLASS ID:', subjectClassId, 'STREAM ID:', subjectStreamId, 'MATCH:', isMatch);
           return isMatch;
         });
-        console.log('STUDENT SUBJECTS:', studentSubjects);
         const studentSubjectIds = studentSubjects.map(subject => String(subject.su_id));
-        console.log('STUDENT SUBJECT IDs:', studentSubjectIds);
         
         // Filter exams by subject ID
         const filteredExams = allExams.filter(exam => {
           const examSubjectId = String(exam.su_id);
           const isMatch = studentSubjectIds.includes(examSubjectId);
-          console.log('EXAM:', exam.e_name, 'SUBJECT ID:', examSubjectId, 'MATCH:', isMatch);
           return isMatch;
         });
-        console.log('FILTERED EXAMS COUNT:', filteredExams.length);
         setUpcomingExams(filteredExams);
         // --- RECENT CONTENT (MATERIALS) ---
         const contentRes = await api.get('/content/display');
         const allMaterials = contentRes.data.content || contentRes.data || [];
-        console.log('FIRST MATERIAL:', allMaterials[0]);
+        
         // Collect student subject names
         const studentSubjectNames = studentSubjects.map(subject => subject.su_name);
-        console.log('STUDENT SUBJECT NAMES:', studentSubjectNames);
-        allMaterials.forEach(item => {
-          if (item.su_name) {
-            console.log('SUBJECT MATERIAL:', item.title, '| su_name:', item.su_name);
-          }
-        });
+        
         const normalize = str => (str || '').toLowerCase().trim();
         const relevantMaterials = allMaterials.filter(item => {
           const courseMatch = item.coursename && enrolledCourseNames.some(name => normalize(name) === normalize(item.coursename));
