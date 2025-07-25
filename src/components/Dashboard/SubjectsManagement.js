@@ -181,10 +181,10 @@ const SubjectsManagement = () => {
   const filteredSubjects = subjects.filter(s =>
     s.su_name.toLowerCase().includes(search.toLowerCase()) &&
     (
-      !selectedStream ||
-      String(
-        s.stream_info?.sid || s.sid || s.stream_id
-      ) === String(selectedStream)
+      !selectedClass || String(s.stream_info?.class_info?.cls_id) === String(selectedClass)
+    ) &&
+    (
+      !selectedStream || String(s.stream_info?.sid) === String(selectedStream)
     )
   );
 
@@ -253,7 +253,31 @@ const SubjectsManagement = () => {
                 }}
               />
             </div>
-            {/* Stream dropdown filter after search button */}
+            {/* Class dropdown filter */}
+            <select
+              value={selectedClass}
+              onChange={e => {
+                setSelectedClass(e.target.value);
+                setSelectedStream('');
+              }}
+              style={{
+                padding: '0.7rem 1.2rem',
+                border: '1px solid #e5e7eb',
+                borderRadius: 8,
+                fontSize: '1rem',
+                background: '#f9fafb',
+                color: '#1a1a1a',
+                outline: 'none',
+                minWidth: 160,
+                marginLeft: 8
+              }}
+            >
+              <option value=''>All Classes</option>
+              {classes.map(cls => (
+                <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
+              ))}
+            </select>
+            {/* Stream dropdown filter, filtered by selected class */}
             <select
               value={selectedStream}
               onChange={e => setSelectedStream(e.target.value)}
@@ -268,13 +292,16 @@ const SubjectsManagement = () => {
                 minWidth: 160,
                 marginLeft: 8
               }}
+              disabled={!selectedClass}
             >
               <option value=''>All Streams</option>
-              {getUniqueStreams().map(stream => (
-                <option key={stream.sid} value={stream.sid}>
-                  {`${(stream.sname || '').trim()} (${stream.class_details?.class_name || ''})`}
-                </option>
-              ))}
+              {getUniqueStreams()
+                .filter(stream => !selectedClass || String(stream.class_details?.cls_id) === String(selectedClass))
+                .map(stream => (
+                  <option key={stream.sid} value={stream.sid}>
+                    {(stream.sname || '').trim()}
+                  </option>
+                ))}
             </select>
             <button
               className="add-stream-btn"
