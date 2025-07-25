@@ -81,7 +81,14 @@ const StudentDashboard = () => {
           const isMatch = studentSubjectIds.includes(examSubjectId);
           return isMatch;
         });
-        setUpcomingExams(filteredExams);
+        // --- STUDENT EXAM RESULTS ---
+        const examResultsRes = await api.get(`/exam-result/results/${student.st_id}`);
+        const examResults = Array.isArray(examResultsRes.data) ? examResultsRes.data : [examResultsRes.data];
+        setCompletedExams(examResults.length);
+        const completedExamIds = examResults.map(r => r.exam_id);
+        // Only show exams not yet attempted
+        const notAttemptedExams = filteredExams.filter(exam => !completedExamIds.includes(exam.e_id));
+        setUpcomingExams(notAttemptedExams);
         // --- RECENT CONTENT (MATERIALS) ---
         const contentRes = await api.get('/content/display');
         const allMaterials = contentRes.data.content || contentRes.data || [];
@@ -109,10 +116,6 @@ const StudentDashboard = () => {
           if (recentCourse && recentSubject) break;
         }
         setRecentContent([recentCourse, recentSubject].filter(Boolean));
-        // --- STUDENT EXAM RESULTS ---
-        const examResultsRes = await api.get(`/exam-result/results/${student.st_id}`);
-        const examResults = Array.isArray(examResultsRes.data) ? examResultsRes.data : [examResultsRes.data];
-        setCompletedExams(examResults.length);
         const passed = examResults.filter(r => r.score >= 40);
         setPassedExams(passed.length);
         const avg = examResults.length ? (examResults.reduce((a, b) => a + b.score, 0) / examResults.length) : 0;
