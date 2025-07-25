@@ -89,10 +89,11 @@ const Materials = () => {
       <div className="dashboard-main-content">
         <div style={{ padding: '0 0 1rem 0' }}>
           <div style={{ display: 'flex', flexDirection:'column', gap: 12 }}>
-            <div> 
-              <FaFolderOpen size={32} color="#2563eb" /><h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Study Materials</h1>
-              <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Access all your learning materials here</div>
+            <div style={{display:'flex',flexDirection:'row',paddingleft:'0.5rem',gap:10}}> 
+              <FaFolderOpen size={32} color="#2563eb" />
+              <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Study Materials</h1>
             </div>
+            <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Access all your learning materials here</div>
             <div style={{ position: 'relative', minWidth: 220, maxWidth: 320, flex: 2 }}>
               <FaSearch style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }} />
               <input
