@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import api from '../../services/authService';
 import DashboardLayout from './DashboardLayout';
 import './ExamManagement.css';
-import api from '../../services/authService';
 
 export const BarChartPlaceholder = ({ data, labels }) => (
   <div style={{ width: '100%', height: 220, background: '#f3f6fa', borderRadius: 12, display: 'flex', alignItems: 'flex-end', gap: 18, padding: 24, margin: '1.5rem 0' }}>
@@ -221,7 +221,7 @@ const ResultsPlaceholder = () => {
                   value={studentSearch}
                   onChange={e => setStudentSearch(e.target.value)}
                   style={{
-                    width: '100%',
+                    width: '82%',
                     padding: '0.6rem 0.9rem 0.6rem 2.1rem',
                     border: '1px solid #e1e1e1',
                     borderRadius: 8,

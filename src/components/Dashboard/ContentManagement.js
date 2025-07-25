@@ -1,7 +1,7 @@
-import api from '../../services/authService';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
+import api from '../../services/authService';
 import ConfirmDialog from './ConfirmDialog';
 import DashboardLayout from './DashboardLayout';
 import './StreamManagement.css';
@@ -170,10 +170,9 @@ const ContentManagement = () => {
             </div>
             <div style={{color: '#377dff', fontSize: '1.1rem', fontWeight: 400, marginTop: 2, marginLeft: 48}}>Manage all educational content across the platform</div>
           </div>
-          <button onClick={() => setShowModal(true)} style={{background: '#2563eb', color: '#fff', border: '2.5px solid #fff', boxShadow: '0 0 0 2.5px #2563eb', borderRadius: 10, padding: '0.9rem 2.2rem', fontWeight: 600, fontSize: '1.1rem', cursor: 'pointer'}}>Upload New Content</button>
         </div>
 
-        <div style={{background: '#fff', borderRadius: 24, boxShadow: '0 2px 16px #e0e7ef', padding: '2rem 2.5rem', marginBottom: 40, display: 'flex', flexDirection: 'column', gap: 18, alignItems: 'flex-start', maxWidth: 1400}}>
+        <div style={{background: '#fff', borderRadius: 24, boxShadow: '0 2px 16px #e0e7ef', padding: '2rem 2.5rem', marginBottom: 40, display: 'flex', flexDirection: 'row', gap: 18,justifyContent:'space-between', maxWidth: 1400}}>
           <input
             type="text"
             placeholder="Search Content..."
@@ -181,6 +180,7 @@ const ContentManagement = () => {
             onChange={e => setSearch(e.target.value)}
             style={{flex: 1, minWidth: 220, maxWidth: 260, padding: '0.9rem 1.2rem', border: '1.5px solid #e2e8f0', borderRadius: 12, fontSize: '1.08rem', background: '#fff', color: '#222', outline: 'none', boxShadow: 'none', transition: 'border 0.2s'}}
           />
+          <button onClick={() => setShowModal(true)} style={{background: '#2563eb', color: '#fff', border: '2.5px solid #fff', boxShadow: '0 0 0 2.5px #2563eb', borderRadius: 10, padding: '0.9rem 2.2rem', fontWeight: 600, fontSize: '1.1rem', cursor: 'pointer',marginleft:'auto'}}>Upload New Content</button>
         </div>
 
         {showModal && (

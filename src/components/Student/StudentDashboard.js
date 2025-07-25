@@ -138,7 +138,7 @@ const StudentDashboard = () => {
 
   return (
     <StudentLayout>
-      <div style={{padding: '2.5rem 2rem', background: '#f6f8fb', minHeight: '100vh'}}>
+      <div style={{ background: '#f6f8fb', minHeight: '100vh'}}>
         <h1 style={{fontSize: '2rem', fontWeight: 700, color: '#377dff', marginBottom: 0}}>
           Welcome back, {studentInfo?.user_info?.fullname || 'Student'}!
         </h1>

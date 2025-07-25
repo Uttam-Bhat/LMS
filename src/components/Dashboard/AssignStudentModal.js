@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './CreateUserModal.css';
 import toast from 'react-hot-toast';
+import api from '../../services/authService';
 
 const AssignStudentModal = ({ user, onClose, onAssigned }) => {
   const [classes, setClasses] = useState([]);
@@ -16,7 +17,7 @@ const AssignStudentModal = ({ user, onClose, onAssigned }) => {
     const fetchClasses = async () => {
       setLoading(true);
       try {
-        const classRes = await axios.get('http://localhost:3000/api/class/display');
+        const classRes = await api.get('/class/display');
         setClasses(classRes.data || []);
       } catch (err) {
         setError('Failed to fetch classes');
@@ -35,7 +36,7 @@ const AssignStudentModal = ({ user, onClose, onAssigned }) => {
     const fetchStreams = async () => {
       setLoading(true);
       try {
-        const streamRes = await axios.get(`http://localhost:3000/api/stream/display?class_id=${selectedClass}`);
+        const streamRes = await api.get(`/stream/display?class_id=${selectedClass}`);
         const uniqueStreams = (streamRes.data || []).filter((stream, idx, arr) =>
           arr.findIndex(s => s.sid === stream.sid) === idx
         );
@@ -57,7 +58,7 @@ const AssignStudentModal = ({ user, onClose, onAssigned }) => {
     setAssigning(true);
     setError('');
     try {
-      const response = await axios.post('http://localhost:3000/api/student/student-add', {
+      const response = await api.post('/student/student-add', {
         user_id: user.id,
         class_id: selectedClass,
         stream_id: selectedStream,

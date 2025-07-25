@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import api from '../../services/authService';
-import StudentLayout from './StudentLayout';
-import './StudentDashboard.css';
-import { FaFolderOpen, FaSearch, FaBook, FaInfoCircle, FaImage, FaEye } from 'react-icons/fa';
-import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { FaEye, FaFolderOpen, FaImage, FaSearch } from 'react-icons/fa';
+import { useLocation, useNavigate } from 'react-router-dom';
+import api from '../../services/authService';
+import './StudentDashboard.css';
+import StudentLayout from './StudentLayout';
 
 const Materials = () => {
   const [materials, setMaterials] = useState([]);
@@ -87,11 +87,10 @@ const Materials = () => {
   return (
     <StudentLayout>
       <div className="dashboard-main-content">
-        <div style={{ padding: '2rem 0 1rem 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <FaFolderOpen size={32} color="#2563eb" />
-            <div>
-              <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Study Materials</h1>
+        <div style={{ padding: '0 0 1rem 0' }}>
+          <div style={{ display: 'flex', flexDirection:'column', gap: 12 }}>
+            <div> 
+              <FaFolderOpen size={32} color="#2563eb" /><h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Study Materials</h1>
               <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Access all your learning materials here</div>
             </div>
             <div style={{ position: 'relative', minWidth: 220, maxWidth: 320, flex: 2 }}>

@@ -91,32 +91,24 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
     <>
       {activeSubPage === 'all-users' && (
         <div className="user-management">
-          <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginBottom: 32, gap: 18 }}>
-            <FaUserPlus size={38} color="#2563eb" style={{ flexShrink: 0 }} />
-            <div>
-              <h1 style={{ fontSize: '2.1rem', fontWeight: 700, color: '#2563eb', margin: 0 }}>User Management</h1>
-              <div style={{ color: '#6b7280', fontSize: '1.08rem', marginTop: 2 }}>Add, assign, and manage users</div>
+          <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, gap: 18 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+              <FaUserPlus size={38} color="#2563eb" style={{ flexShrink: 0 }} />
+              <div>
+                <h1 style={{ fontSize: '2.1rem', fontWeight: 700, color: '#2563eb', margin: 0 }}>User Management</h1>
+                <div style={{ color: '#6b7280', fontSize: '1.08rem', marginTop: 2 }}>Add, assign, and manage users</div>
+              </div>
             </div>
+            {/* Add User button only on desktop */}
+            {!isMobile && (
+              <button 
+                className="add-user-btn"
+                onClick={() => setShowCreateUserModal(true)}
+              >
+                <FaUserPlus /> Add New User
+              </button>
+            )}
           </div>
-          {/* Add New User button: below header on mobile, in header on desktop */}
-          {isMobile ? (
-            <button 
-              className="add-user-btn"
-              onClick={() => setShowCreateUserModal(true)}
-            >
-              <FaUserPlus />
-              Add New User
-            </button>
-          ) : (
-            <button 
-              className="add-user-btn"
-              style={{ position: 'absolute', right: 0, top: 0 }}
-              onClick={() => setShowCreateUserModal(true)}
-            >
-              <FaUserPlus />
-              Add New User
-            </button>
-          )}
 
           <div className="user-filters">
             <div className="search-box" style={{ position: 'relative', width: 300 }}>
