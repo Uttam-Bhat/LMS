@@ -132,25 +132,26 @@ const ExamManagement = () => {
     }
   };
   const handleFileUpload = async (file) => {
-  if (!file) return;
-  try {
-    const formData = new FormData();
-    formData.append("file", file);
+    if (!file) return;
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
 
-    const response = await api.post("/file/upload", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+      const response = await api.post("/file/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-    toast.success('Upload successful!');
-    console.log("Response:", response.data);
-    // Optional: refresh questionSets from backend
-  } catch (error) {
-    console.error("Upload failed:", error);
-    toast.error('Upload failed');
-  }
-};
+      toast.success('Upload successful!');
+      console.log("Response:", response.data);
+      // Immediately refresh file list after upload
+      fetchFiles();
+    } catch (error) {
+      console.error("Upload failed:", error);
+      toast.error('Upload failed');
+    }
+  };
 const handleDelete = async (fileId) => {
   try {
     await api.delete(`/file/delete/${fileId}`);

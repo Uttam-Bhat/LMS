@@ -20,6 +20,7 @@ const CourseManagement = () => {
    const [totalCourses, setTotalCourses] = useState(0);
    const [teachers, setTeachers] = useState([]);
    const [enrolledStudentCount, setEnrolledStudentCount] = useState(0);
+   const [selectedCourseType, setSelectedCourseType] = useState('');
 
   const fetchTeachers = async () => {
     try {
@@ -126,10 +127,13 @@ const CourseManagement = () => {
       return (teacher?.fullname || teacher?.name || '').toLowerCase();
     })();
     const searchTerm = searchQuery.toLowerCase();
-    
-    return courseName.includes(searchTerm) || 
-           teacherId.includes(searchTerm) || 
-           teacherName.includes(searchTerm);
+    const matchesType = !selectedCourseType || (course.course_type && course.course_type.toLowerCase() === selectedCourseType.toLowerCase());
+    return (
+      (courseName.includes(searchTerm) || 
+      teacherId.includes(searchTerm) || 
+      teacherName.includes(searchTerm)) &&
+      matchesType
+    );
   });
 
   useEffect(() => {
@@ -216,26 +220,44 @@ const CourseManagement = () => {
 
         <div className="courses-container">
           <div className="courses-header" style={isMobile ? { flexDirection: 'column', alignItems: 'stretch', gap: '1rem' } : {}}>
-            <div className="search-box" style={{ position: 'relative', width: 300 }}>
-              <i className="fas fa-search" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }}></i>
-              <input
-                type="text"
-                placeholder="Search courses..."
-                value={searchQuery}
-                onChange={handleSearch}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div className="search-box" style={{ position: 'relative', width: 300,display:'flex',flexDirection:'row',justifyContent:'space-between' }}>
+                <i className="fas fa-search" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }}></i>
+                <input
+                  type="text"
+                  placeholder="Search courses..."
+                  value={searchQuery}
+                  onChange={handleSearch}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem 0.75rem 2.5rem',
+                    border: '1px solid #e1e1e1',
+                    borderRadius: 8,
+                    fontSize: '0.95rem',
+                  }}
+                />
+              </div>
+              {/* Course type dropdown filter */}
+              <select
+                value={selectedCourseType}
+                onChange={e => setSelectedCourseType(e.target.value)}
                 style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem 0.75rem 2.5rem',
-                  border: '1px solid #e1e1e1',
+                  padding: '0.7rem 1.2rem',
+                  border: '1px solid #e5e7eb',
                   borderRadius: 8,
-                  fontSize: '0.95rem',
+                  fontSize: '1rem',
+                  background: '#f9fafb',
+                  color: '#1a1a1a',
+                  outline: 'none',
+                  minWidth: 160,
+                  marginLeft: 8
                 }}
-              />
-            </div>
-            <div className="view-options">
-              <button className="view-btn active">All Courses</button>
-              <button className="view-btn">Active</button>
-              <button className="view-btn">Completed</button>
+              >
+                <option value=''>All Course Types</option>
+                {[...new Set(courses.map(c => c.course_type).filter(Boolean))].map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
             </div>
           </div>
 

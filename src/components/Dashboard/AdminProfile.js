@@ -18,7 +18,10 @@ const AdminProfile = ({ onProfilePhotoChange }) => {
         const userEmail = localStorage.getItem('user_email');
         const userRes = await api.get('/admin/users');
         const userList = Array.isArray(userRes.data) ? userRes.data : [userRes.data];
+        console.log('DEBUG: userEmail from localStorage:', userEmail);
+        console.log('DEBUG: userList from /admin/users:', userList);
         const adminObj = userList.find(u => u.email === userEmail && u.user_type === 'admin');
+        console.log('DEBUG: found adminObj:', adminObj);
         setAdmin(adminObj);
         if (adminObj) {
           const profileRes = await api.get(`/profile/user/${adminObj.id}`);
@@ -27,6 +30,7 @@ const AdminProfile = ({ onProfilePhotoChange }) => {
       } catch (err) {
         setAdmin(null);
         setProfile(null);
+        console.error('DEBUG: Error in fetchAdmin:', err);
       } finally {
         setLoading(false);
       }
