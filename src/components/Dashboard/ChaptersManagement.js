@@ -36,6 +36,7 @@ const ChaptersManagement = () => {
   const [selectedStream, setSelectedStream] = useState('');
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [selectedSubject, setSelectedSubject] = useState('');
 
   useEffect(() => {
     const loadData = async () => {
@@ -194,8 +195,10 @@ const ChaptersManagement = () => {
     }
   };
 
-  const filteredChapters = chapters.filter(s =>
-    s.ch_name.toLowerCase().includes(search.toLowerCase())
+  // Filter chapters by selected subject
+  const filteredChapters = chapters.filter(chap =>
+    (!selectedSubject || String(chap.su_id) === String(selectedSubject)) &&
+    (chap.ch_name || '').toLowerCase().includes(search.toLowerCase())
   );
 
   // Build uniqueClasses from subjects' stream_info.class_info
@@ -250,6 +253,27 @@ const ChaptersManagement = () => {
               }}
             />
           </div>
+          {/* Subject dropdown filter after search button */}
+          <select
+            value={selectedSubject}
+            onChange={e => setSelectedSubject(e.target.value)}
+            style={{
+              padding: '0.7rem 1.2rem',
+              border: '1px solid #e5e7eb',
+              borderRadius: 8,
+              fontSize: '1rem',
+              background: '#f9fafb',
+              color: '#1a1a1a',
+              outline: 'none',
+              minWidth: 160,
+              marginLeft: 8
+            }}
+          >
+            <option value=''>All Subjects</option>
+            {subjects.map(sub => (
+              <option key={sub.su_id} value={sub.su_id}>{sub.su_name}</option>
+            ))}
+          </select>
           <button
             className="add-stream-btn"
             style={{

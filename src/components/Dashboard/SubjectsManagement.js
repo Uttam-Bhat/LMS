@@ -8,6 +8,7 @@ import './StreamManagement.css';
 
 const SubjectsManagement = () => {
   const [search, setSearch] = useState('');
+  const [selectedStream, setSelectedStream] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [form, setForm] = useState({ code: '', name: '', description: '', created: '', streamId: '' });
@@ -42,6 +43,11 @@ const SubjectsManagement = () => {
     try {
       const response = await api.get('http://localhost:3000/api/stream/display');
       console.log('Fetched streams:', response.data);
+      if (Array.isArray(response.data)) {
+        response.data.forEach((s, i) => {
+          console.log(`Stream[${i}]:`, s);
+        });
+      }
       setStreams(response.data);
     } catch (error) {
       console.error('Failed to fetch streams:', error);
@@ -173,7 +179,13 @@ const SubjectsManagement = () => {
   };
 
   const filteredSubjects = subjects.filter(s =>
-    s.su_name.toLowerCase().includes(search.toLowerCase())
+    s.su_name.toLowerCase().includes(search.toLowerCase()) &&
+    (
+      !selectedStream ||
+      String(
+        s.stream_info?.sid || s.sid || s.stream_id
+      ) === String(selectedStream)
+    )
   );
 
   // Filter streams by selected class
@@ -182,6 +194,19 @@ const SubjectsManagement = () => {
         s.class_info && s.class_info.cls_id && s.class_info.cls_id.toString() === selectedClass
       )
     : streams;
+
+  // Helper to get unique streams by sname
+  const getUniqueStreams = () => {
+    const seen = new Set();
+    return streams.filter(stream => {
+      const sname = (stream.sname || '').trim().toLowerCase();
+      const classId = String(stream.class_details?.cls_id || stream.class_id || stream.class_info?.cls_id || '');
+      const key = `${sname}__${classId}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  };
 
   // When editing, set selectedClass based on the stream/class
   useEffect(() => {
@@ -228,6 +253,29 @@ const SubjectsManagement = () => {
                 }}
               />
             </div>
+            {/* Stream dropdown filter after search button */}
+            <select
+              value={selectedStream}
+              onChange={e => setSelectedStream(e.target.value)}
+              style={{
+                padding: '0.7rem 1.2rem',
+                border: '1px solid #e5e7eb',
+                borderRadius: 8,
+                fontSize: '1rem',
+                background: '#f9fafb',
+                color: '#1a1a1a',
+                outline: 'none',
+                minWidth: 160,
+                marginLeft: 8
+              }}
+            >
+              <option value=''>All Streams</option>
+              {getUniqueStreams().map(stream => (
+                <option key={stream.sid} value={stream.sid}>
+                  {`${(stream.sname || '').trim()} (${stream.class_details?.class_name || ''})`}
+                </option>
+              ))}
+            </select>
             <button
               className="add-stream-btn"
               style={{

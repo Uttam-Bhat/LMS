@@ -8,6 +8,7 @@ import './StreamManagement.css';
 
 const StreamManagement = () => {
   const [search, setSearch] = useState('');
+  const [selectedClass, setSelectedClass] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [form, setForm] = useState({ name: '', description: '', created: '', classId: '' });
@@ -176,8 +177,14 @@ const StreamManagement = () => {
     return `${dd}-${mm}-${yyyy}`;
   };
   const filtered = streamList.filter(s => 
-  (s.name || s.sname || '').toLowerCase().includes(search.toLowerCase())
-);
+    (s.name || s.sname || '').toLowerCase().includes(search.toLowerCase()) &&
+    (
+      !selectedClass ||
+      String(
+        s.class_details?.cls_id || s.class_id || s.class_details?.class_id || s.class_details?.id || s.class_details?._id || s.class_details?.id
+      ) === String(selectedClass)
+    )
+  );
 const getUniqueClasses = () => {
   const seen = new Set();
   return classes.filter(cls => {
@@ -224,6 +231,27 @@ const getUniqueClasses = () => {
                 }}
               />
             </div>
+            {/* Class dropdown filter after search button */}
+            <select
+              value={selectedClass}
+              onChange={e => setSelectedClass(e.target.value)}
+              style={{
+                padding: '0.7rem 1.2rem',
+                border: '1px solid #e5e7eb',
+                borderRadius: 8,
+                fontSize: '1rem',
+                background: '#f9fafb',
+                color: '#1a1a1a',
+                outline: 'none',
+                minWidth: 160,
+                marginLeft: 8
+              }}
+            >
+              <option value=''>All Classes</option>
+              {classes.map(cls => (
+                <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
+              ))}
+            </select>
             <button
               className="add-stream-btn"
               style={{
