@@ -219,9 +219,26 @@ const CourseManagement = () => {
         </div>
 
         <div className="courses-container">
-          <div className="courses-header" style={isMobile ? { flexDirection: 'column', alignItems: 'stretch', gap: '1rem' } : {}}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div className="search-box" style={{ position: 'relative', width: 300,display:'flex',flexDirection:'row',justifyContent:'space-between' }}>
+          <div className="courses-header" style={isMobile ? { 
+            flexDirection: 'column', 
+            alignItems: 'stretch', 
+            gap: '1rem',
+            padding: '0 16px'
+          } : {}}>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 12,
+              flexDirection: isMobile ? 'column' : 'row',
+              width: isMobile ? '100%' : 'auto'
+            }}>
+              <div className="search-box" style={{ 
+                position: 'relative', 
+                width: isMobile ? '100%' : 300,
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between'
+              }}>
                 <i className="fas fa-search" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }}></i>
                 <input
                   type="text"
@@ -234,6 +251,7 @@ const CourseManagement = () => {
                     border: '1px solid #e1e1e1',
                     borderRadius: 8,
                     fontSize: '0.95rem',
+                    boxSizing: 'border-box'
                   }}
                 />
               </div>
@@ -249,8 +267,10 @@ const CourseManagement = () => {
                   background: '#f9fafb',
                   color: '#1a1a1a',
                   outline: 'none',
-                  minWidth: 160,
-                  marginLeft: 8
+                  minWidth: isMobile ? '100%' : 160,
+                  marginLeft: isMobile ? 0 : 8,
+                  marginTop: isMobile ? 8 : 0,
+                  boxSizing: 'border-box'
                 }}
               >
                 <option value=''>All Course Types</option>
