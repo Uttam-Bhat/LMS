@@ -204,7 +204,7 @@ const ChaptersManagement = () => {
   const filteredChapters = chapters.filter(chap =>
     (!selectedClass || String(chap.subject_info?.stream_info?.class_info?.cls_id) === String(selectedClass)) &&
     (!selectedStream || String(chap.subject_info?.stream_info?.sid) === String(selectedStream)) &&
-    (!selectedSubject || String(chap.su_id) === String(selectedSubject)) &&
+    (!selectedSubject || String(chap.subject_info?.su_id) === String(selectedSubject)) &&
     (chap.ch_name || '').toLowerCase().includes(search.toLowerCase())
   );
 
@@ -223,9 +223,9 @@ const ChaptersManagement = () => {
     stream => String(stream.class_details?.cls_id) === String(selectedClass)
   );
   // Build availableSubjects for dropdown from subjects for selected stream
-  const availableSubjects = subjects
-    .filter(s => s.stream_info?.sid?.toString() === selectedStream)
-    .filter((sub, idx, arr) => sub && arr.findIndex(s2 => s2.su_id === sub.su_id) === idx);
+  const availableSubjects = subjects.filter(
+    sub => String(sub.stream_info?.sid) === String(selectedStream)
+  );
 
   return (
     <DashboardLayout>
