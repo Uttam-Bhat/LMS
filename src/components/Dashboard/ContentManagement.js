@@ -21,6 +21,7 @@ const ContentManagement = () => {
   const [editContent, setEditContent] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -57,6 +58,7 @@ const ContentManagement = () => {
   }, [association]);
 
   const fetchContents = async () => {
+    setLoading(true);
     try {
       const res = await api.get('http://localhost:3000/api/content/display');
       let contentArr = [];
@@ -72,6 +74,8 @@ const ContentManagement = () => {
       setContents(contentArr);
     } catch (err) {
       console.error('Error fetching contents:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -159,29 +163,96 @@ const ContentManagement = () => {
     setFile(null);
   };
 
+  // Fix: define isMobile at the top level
+  const isMobile = window.innerWidth <= 900;
+
   return (
     <DashboardLayout>
       <div style={{padding: '2.5rem 2rem', background: '#f8fafc', minHeight: '100vh'}}>
-        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18}}>
-          <div>
-            <div style={{display: 'flex', alignItems: 'center', gap: 12}}>
-              <span style={{fontSize: 36, color: '#2563eb'}}><i className="fas fa-users"></i></span>
-              <span style={{fontSize: '2.2rem', fontWeight: 700, color: '#2563eb', letterSpacing: 0.5}}>Content Management</span>
-            </div>
-            <div style={{color: '#377dff', fontSize: '1.1rem', fontWeight: 400, marginTop: 2, marginLeft: 48}}>Manage all educational content across the platform</div>
+        {/* Mobile: Centered heading and subtitle */}
+        {isMobile ? (
+          <div style={{ padding: '1rem 0 1rem 0', textAlign: 'center' }}>
+            <span style={{ fontSize: 36, color: '#2563eb' }}><i className="fas fa-users"></i></span>
+            <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb', letterSpacing: 0.2 }}>Content Management</h1>
+            <div style={{ color: '#6b7280', fontSize: '1.08rem', fontWeight: 500, marginTop: 2 }}>Manage all educational content across the platform</div>
           </div>
-        </div>
+        ) : (
+          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18}}>
+            <div>
+              <div style={{display: 'flex', alignItems: 'center', gap: 12}}>
+                <span style={{fontSize: 36, color: '#2563eb'}}><i className="fas fa-users"></i></span>
+                <span style={{fontSize: '2.2rem', fontWeight: 700, color: '#2563eb', letterSpacing: 0.5}}>Content Management</span>
+              </div>
+              <div style={{color: '#377dff', fontSize: '1.1rem', fontWeight: 400, marginTop: 2, marginLeft: 48}}>Manage all educational content across the platform</div>
+            </div>
+          </div>
+        )}
 
-        <div style={{background: '#fff', borderRadius: 24, boxShadow: '0 2px 16px #e0e7ef', padding: '2rem 2.5rem', marginBottom: 40, display: 'flex', flexDirection: 'row', gap: 18,justifyContent:'space-between', maxWidth: 1400}}>
-          <input
-            type="text"
-            placeholder="Search Content..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{flex: 1, minWidth: 220, maxWidth: 260, padding: '0.9rem 1.2rem', border: '1.5px solid #e2e8f0', borderRadius: 12, fontSize: '1.08rem', background: '#fff', color: '#222', outline: 'none', boxShadow: 'none', transition: 'border 0.2s'}}
-          />
-          <button onClick={() => setShowModal(true)} style={{background: '#2563eb', color: '#fff', border: '2.5px solid #fff', boxShadow: '0 0 0 2.5px #2563eb', borderRadius: 10, padding: '0.9rem 2.2rem', fontWeight: 600, fontSize: '1.1rem', cursor: 'pointer',marginleft:'auto'}}>Upload New Content</button>
-        </div>
+        {/* Desktop: Filter/search bar and add button */}
+        {!isMobile && (
+          <div style={{background: '#fff', borderRadius: 24, boxShadow: '0 2px 16px #e0e7ef', padding: '2rem 2.5rem', marginBottom: 40, display: 'flex', flexDirection: 'row', gap: 18,justifyContent:'space-between', maxWidth: 1400}}>
+            <input
+              type="text"
+              placeholder="Search Content..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{flex: 1, minWidth: 220, maxWidth: 260, padding: '0.9rem 1.2rem', border: '1.5px solid #e2e8f0', borderRadius: 12, fontSize: '1.08rem', background: '#fff', color: '#222', outline: 'none', boxShadow: 'none', transition: 'border 0.2s'}}
+            />
+            <button onClick={() => setShowModal(true)} style={{background: '#2563eb', color: '#fff', border: '2.5px solid #fff', boxShadow: '0 0 0 2.5px #2563eb', borderRadius: 10, padding: '0.9rem 2.2rem', fontWeight: 600, fontSize: '1.1rem', cursor: 'pointer',marginleft:'auto'}}>Upload New Content</button>
+          </div>
+        )}
+
+        {/* Mobile: Search and add button */}
+        {isMobile && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1rem',
+            padding: '0 1rem',
+            marginBottom: '2rem'
+          }}>
+            <input
+              type="text"
+              placeholder="Search Content..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{
+                width: '100%',
+                maxWidth: '350px',
+                padding: '0.75rem 1rem',
+                border: '1px solid #e5e7eb',
+                borderRadius: 8,
+                fontSize: '1rem',
+                background: '#fff',
+                color: '#1a1a1a',
+                outline: 'none'
+              }}
+            />
+            <button 
+              onClick={() => setShowModal(true)} 
+              style={{
+                background: '#2563eb',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: '1.1rem',
+                border: 'none',
+                borderRadius: 10,
+                padding: '0.75rem 2rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                boxShadow: '0 2px 8px #2563eb22',
+                cursor: 'pointer',
+                maxWidth: '350px',
+                width: '100%',
+                justifyContent: 'center'
+              }}
+            >
+              <i className="fas fa-plus"></i> Upload New Content
+            </button>
+          </div>
+        )}
 
         {showModal && (
           <div className="stream-modal-overlay" style={{alignItems: 'center', justifyContent: 'center'}}>
@@ -279,55 +350,167 @@ const ContentManagement = () => {
           </div>
         )}
 
-        <div style={{background: '#fff', borderRadius: 24, boxShadow: '0 2px 16px #e0e7ef', padding: '2rem 2.5rem', marginTop: 20, maxWidth: 1400}}>
-          <h3 style={{marginBottom: 16, color: '#2563eb'}}>All Content</h3>
-          <table className="management-table" style={{width: '100%', borderCollapse: 'collapse', fontSize: '1rem'}}>
-            <thead>
-              <tr style={{background: '#f3f4f6'}}>
-                <th style={{padding: 10, border: '1px solid #e2e8f0', textAlign: 'left'}}>Title</th>
-                <th style={{padding: 10, border: '1px solid #e2e8f0', textAlign: 'left'}}>Description</th>
-                <th style={{padding: 10, border: '1px solid #e2e8f0', textAlign: 'left'}}>Type</th>
-                <th style={{padding: 10, border: '1px solid #e2e8f0', textAlign: 'left'}}>File</th>
-                <th style={{padding: 10, border: '1px solid #e2e8f0', textAlign: 'left'}}>Course/Subject</th>
-                <th style={{padding: 10, border: '1px solid #e2e8f0', textAlign: 'center'}}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {contents.length === 0 ? (
-                <tr><td colSpan="6" style={{textAlign: 'center', padding: 16}}>No content found.</td></tr>
-              ) : (
-                contents.filter(c => c.title?.toLowerCase().includes(search.toLowerCase())).map(content => (
-                  <tr key={content.ct_id} style={{borderBottom: '1px solid #e2e8f0'}}>
-                    <td style={{padding: 10, border: '1px solid #e2e8f0'}}>{content.title}</td>
-                    <td style={{padding: 10, border: '1px solid #e2e8f0'}}>{content.des}</td>
-                    <td style={{padding: 10, border: '1px solid #e2e8f0'}}>{content.c_type}</td>
-                    <td style={{padding: 10, border: '1px solid #e2e8f0'}}>
-                      <a
-                        href={`http://localhost:3000/${content.file_path.replace(/\\/g, '/')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ color: '#2563eb', textDecoration: 'underline' }}
-                      >
-                        View File
-                      </a>
-                    </td>
-                    <td style={{padding: 10, border: '1px solid #e2e8f0'}}>
-                      {content.coursename || content.su_name}
-                    </td>
-                    <td style={{padding: 10, border: '1px solid #e2e8f0', textAlign: 'center'}}>
-                      <button onClick={() => handleEditContent(content)} style={{background: '#2563eb', color: '#fff', border: '1px solid #2563eb', borderRadius: 6, padding: '0.4rem 0.8rem', fontSize: 12, marginRight: 5, cursor: 'pointer'}}>
-                        <FaEdit />
-                      </button>
-                      <button onClick={() => handleDelete(content.ct_id)} style={{background: '#dc3545', color: '#fff', border: '1px solid #dc3545', borderRadius: 6, padding: '0.4rem 0.8rem', fontSize: 12, cursor: 'pointer'}}>
-                        <FaTrashAlt />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        {/* Desktop: Table view */}
+        {!isMobile && (
+          <div style={{background: '#fff', borderRadius: 24, boxShadow: '0 2px 16px #e0e7ef', padding: '2rem 2.5rem', marginTop: 20, maxWidth: 1400}}>
+            <h3 style={{marginBottom: 16, color: '#2563eb'}}>All Content</h3>
+            <table className="management-table" style={{width: '100%', borderCollapse: 'collapse', fontSize: '1rem'}}>
+              <thead>
+                <tr style={{background: '#f3f4f6'}}>
+                  <th style={{padding: 10, border: '1px solid #e2e8f0', textAlign: 'left'}}>Title</th>
+                  <th style={{padding: 10, border: '1px solid #e2e8f0', textAlign: 'left'}}>Description</th>
+                  <th style={{padding: 10, border: '1px solid #e2e8f0', textAlign: 'left'}}>Type</th>
+                  <th style={{padding: 10, border: '1px solid #e2e8f0', textAlign: 'left'}}>File</th>
+                  <th style={{padding: 10, border: '1px solid #e2e8f0', textAlign: 'left'}}>Course/Subject</th>
+                  <th style={{padding: 10, border: '1px solid #e2e8f0', textAlign: 'center'}}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {contents.length === 0 ? (
+                  <tr><td colSpan="6" style={{textAlign: 'center', padding: 16}}>No content found.</td></tr>
+                ) : (
+                  contents.filter(c => c.title?.toLowerCase().includes(search.toLowerCase())).map(content => (
+                    <tr key={content.ct_id} style={{borderBottom: '1px solid #e2e8f0'}}>
+                      <td style={{padding: 10, border: '1px solid #e2e8f0'}}>{content.title}</td>
+                      <td style={{padding: 10, border: '1px solid #e2e8f0'}}>{content.des}</td>
+                      <td style={{padding: 10, border: '1px solid #e2e8f0'}}>{content.c_type}</td>
+                      <td style={{padding: 10, border: '1px solid #e2e8f0'}}>
+                        <a
+                          href={`http://localhost:3000/${content.file_path.replace(/\\/g, '/')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: '#2563eb', textDecoration: 'underline' }}
+                        >
+                          View File
+                        </a>
+                      </td>
+                      <td style={{padding: 10, border: '1px solid #e2e8f0'}}>
+                        {content.coursename || content.su_name}
+                      </td>
+                      <td style={{padding: 10, border: '1px solid #e2e8f0', textAlign: 'center'}}>
+                        <button onClick={() => handleEditContent(content)} style={{background: '#2563eb', color: '#fff', border: '1px solid #2563eb', borderRadius: 6, padding: '0.4rem 0.8rem', fontSize: 12, marginRight: 5, cursor: 'pointer'}}>
+                          <FaEdit />
+                        </button>
+                        <button onClick={() => handleDelete(content.ct_id)} style={{background: '#dc3545', color: '#fff', border: '1px solid #dc3545', borderRadius: 6, padding: '0.4rem 0.8rem', fontSize: 12, cursor: 'pointer'}}>
+                          <FaTrashAlt />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Mobile: Card view */}
+        {isMobile && (
+          <div style={{
+            padding: '0 1rem',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1rem'
+          }}>
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>Loading content...</div>
+            ) : contents.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>No content found.</div>
+            ) : (
+              contents.filter(c => c.title?.toLowerCase().includes(search.toLowerCase())).map(content => (
+                <div key={content.ct_id} style={{
+                  background: '#fff',
+                  borderRadius: 12,
+                  padding: '1rem',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  width: '100%',
+                  maxWidth: '350px',
+                  border: '1px solid #e5e7eb'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600, color: '#1f2937' }}>{content.title}</h3>
+                    <span style={{
+                      background: '#2563eb',
+                      color: '#fff',
+                      padding: '0.25rem 0.5rem',
+                      borderRadius: 6,
+                      fontSize: '0.75rem',
+                      fontWeight: 500
+                    }}>
+                      {content.c_type}
+                    </span>
+                  </div>
+                  
+                  {content.des && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontWeight: 500 }}>Description:</span>
+                      <span>{content.des}</span>
+                    </div>
+                  )}
+                  
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
+                    <span style={{ fontWeight: 500 }}>Course/Subject:</span>
+                    <span>{content.coursename || content.su_name}</span>
+                  </div>
+                  
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
+                    <span style={{ fontWeight: 500 }}>File:</span>
+                    <a
+                      href={`http://localhost:3000/${content.file_path.replace(/\\/g, '/')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: '#2563eb', textDecoration: 'underline', fontSize: '0.9rem' }}
+                    >
+                      View File
+                    </a>
+                  </div>
+                  
+                  <div style={{
+                    display: 'flex',
+                    gap: '0.5rem',
+                    marginTop: '1rem',
+                    justifyContent: 'center'
+                  }}>
+                    <button 
+                      onClick={() => handleEditContent(content)} 
+                      style={{
+                        background: '#2563eb',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: 6,
+                        padding: '0.5rem 1rem',
+                        fontSize: '0.9rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.25rem'
+                      }}
+                    >
+                      <FaEdit size={12} /> Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(content.ct_id)} 
+                      style={{
+                        background: '#dc3545',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: 6,
+                        padding: '0.5rem 1rem',
+                        fontSize: '0.9rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.25rem'
+                      }}
+                    >
+                      <FaTrashAlt size={12} /> Delete
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
       </div>
       <ConfirmDialog
         open={confirmOpen}
