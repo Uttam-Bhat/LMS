@@ -236,7 +236,7 @@ const ChaptersManagement = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 24, maxWidth: 1100, margin: '0 auto 24px auto' }}>
         {/* Filter/search bar and add button */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
-          <div style={{ position: 'relative', flex: 1,marginLeft:'-4rem'}}>
+          <div style={{ position: 'relative', flex: 1,marginLeft:'-4rem',justifyContent:'space-between'}}>
             <FaSearch style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }} />
             <input
               type="text"
