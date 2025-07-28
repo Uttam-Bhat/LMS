@@ -221,15 +221,17 @@ const SubjectsManagement = () => {
 
   return (
     <DashboardLayout>
-      <div className="subject-management-header" style={{ padding: '2rem 0 1rem 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <FaBookOpen size={32} color="#2563eb" />
-          <div>
-            <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Manage Subject</h1>
-            <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic subjects</div>
+      {!isMobile && (
+        <div className="subject-management-header" style={{ padding: '2rem 0 1rem 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <FaBookOpen size={32} color="#2563eb" />
+            <div>
+              <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Manage Subjects</h1>
+              <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic subjects</div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
       {!isMobile && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, maxWidth: 1100, margin: '0 auto 24px auto' }}>
           {/* Filter/search bar and add button */}
@@ -353,64 +355,159 @@ const SubjectsManagement = () => {
         </div>
       )}
       {isMobile && (
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1.1rem', marginBottom: '1.1rem', alignItems: 'center' }}>
-          <div className="search-box" style={{ position: 'relative', width: '100%', maxWidth: 340, margin: '0 auto' }}>
-            <FaSearch style={{ position: 'absolute', left: 16, right: 'unset', top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18, pointerEvents: 'none' }} />
-            <input
-              type="text"
-              placeholder="Search subjects..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
+        <>
+          {/* Mobile: Centered heading and subtitle */}
+          <div style={{ padding: '1rem 0 1.5rem 0', textAlign: 'center' }}>
+            <FaBookOpen size={36} color="#2563eb" style={{ marginBottom: 8 }} />
+            <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb', letterSpacing: 0.2 }}>Manage Subjects</h1>
+            <div style={{ color: '#6b7280', fontSize: '1.08rem', fontWeight: 500, marginTop: 2 }}>Add, assign, and manage academic subjects</div>
+          </div>
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '1rem', 
+            marginBottom: '1rem',
+            padding: '0 20px',
+            alignItems: 'center',
+            width: '100%',
+            boxSizing: 'border-box'
+          }}>
+            <div className="search-box" style={{ 
+              position: 'relative', 
+              width: '100%', 
+              maxWidth: '350px'
+            }}>
+              <FaSearch style={{ 
+                position: 'absolute', 
+                left: 16, 
+                top: '50%', 
+                transform: 'translateY(-50%)', 
+                color: '#a0aec0', 
+                fontSize: 18, 
+                pointerEvents: 'none' 
+              }} />
+              <input
+                type="text"
+                placeholder="Search subjects..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem 0.75rem 2.5rem',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: 8,
+                  fontSize: '1rem',
+                  background: '#f9fafb',
+                  color: '#1a1a1a',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+            {/* Class dropdown filter for mobile */}
+            <select
+              value={selectedClass}
+              onChange={e => {
+                setSelectedClass(e.target.value);
+                setSelectedStream('');
+              }}
               style={{
                 width: '100%',
-                padding: '0.75rem 1rem 0.75rem 2.5rem',
+                maxWidth: '350px',
+                padding: '0.75rem 1.2rem',
                 border: '1px solid #e5e7eb',
                 borderRadius: 8,
                 fontSize: '1rem',
                 background: '#f9fafb',
                 color: '#1a1a1a',
                 outline: 'none',
-                boxSizing: 'border-box',
+                boxSizing: 'border-box'
               }}
-            />
+            >
+              <option value=''>All Classes</option>
+              {classes.map(cls => (
+                <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
+              ))}
+            </select>
+            {/* Stream dropdown filter for mobile */}
+            <select
+              value={selectedStream}
+              onChange={e => setSelectedStream(e.target.value)}
+              style={{
+                width: '100%',
+                maxWidth: '350px',
+                padding: '0.75rem 1.2rem',
+                border: '1px solid #e5e7eb',
+                borderRadius: 8,
+                fontSize: '1rem',
+                background: '#f9fafb',
+                color: '#1a1a1a',
+                outline: 'none',
+                boxSizing: 'border-box'
+              }}
+              disabled={!selectedClass}
+            >
+              <option value=''>All Streams</option>
+              {getUniqueStreams()
+                .filter(stream => !selectedClass || String(stream.class_details?.cls_id) === String(selectedClass))
+                .map(stream => (
+                  <option key={stream.sid} value={stream.sid}>
+                    {(stream.sname || '').trim()}
+                  </option>
+                ))}
+            </select>
+            <button
+              className="add-stream-btn"
+              style={{ 
+                width: '100%',
+                maxWidth: '350px',
+                background: '#2563eb',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: '1rem',
+                border: 'none',
+                borderRadius: 10,
+                padding: '0.75rem 1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                boxShadow: '0 2px 8px #2563eb22',
+                cursor: 'pointer'
+              }}
+              onClick={() => {
+                if (streams.length === 0) {
+                  toast('Please wait for streams to load before adding a subject.');
+                  return;
+                }
+                setShowModal(true);
+                setEditItem(null);
+                setForm({ code: '', name: '', description: '', created: '', streamId: '' });
+              }}
+            >
+              <FaPlus /> Add Subject
+            </button>
+            <div style={{
+              width: '100%',
+              maxWidth: '350px',
+              minHeight: 70,
+              background: '#f1f5f9',
+              borderRadius: 16,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 8px #0001',
+              fontWeight: 700,
+              fontSize: '1.5rem',
+              color: '#2563eb',
+              padding: '1rem'
+            }}>
+              {subjects.length}
+              <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Subjects</div>
+            </div>
           </div>
-          <button
-            className="add-stream-btn"
-            style={{ width: '100%', maxWidth: 340 }}
-            onClick={() => {
-              if (streams.length === 0) {
-                toast('Please wait for streams to load before adding a subject.');
-                return;
-              }
-              setShowModal(true);
-              setEditItem(null);
-              setForm({ code: '', name: '', description: '', created: '', streamId: '' });
-            }}
-          >
-            <FaPlus /> Add Subject
-          </button>
-          <div style={{
-            minWidth: 110,
-            minHeight: 70,
-            background: '#f1f5f9',
-            borderRadius: 16,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 2px 8px #0001',
-            fontWeight: 700,
-            fontSize: '1.5rem',
-            color: '#2563eb',
-            margin: '0 auto',
-            marginTop: 8,
-            maxWidth: 340,
-            width: '100%'
-          }}>
-            {subjects.length}
-            <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Subjects</div>
-          </div>
-        </div>
+        </>
       )}
       {isMobile ? (
         <div className="users-cards-container">
