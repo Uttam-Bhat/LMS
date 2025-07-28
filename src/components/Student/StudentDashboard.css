@@ -1,5 +1,41 @@
 /* Existing styles remain unchanged */
 
+/* Mobile Hamburger Navigation Styles */
+.mobile-hamburger {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .mobile-hamburger {
+    display: inline-flex;
+  }
+  
+  .dashboard-sidebar {
+    display: none;
+  }
+  
+  .dashboard-main {
+    margin-left: 0 !important;
+    padding: 70px 0.2rem 1.2rem 0.2rem !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100vw;
+    max-width: 100vw;
+    overflow-x: hidden;
+    min-height: calc(100vh - 60px);
+  }
+  
+  .dashboard-content {
+    display: block !important;
+  }
+}
+
+/* Menu arrow rotation for mobile */
+.menu-arrow.rotated {
+  transform: rotate(180deg);
+}
+
 /* Dashboard Welcome Page */
 .dashboard-welcome {
   max-width: 1200px;
