@@ -33,6 +33,7 @@ const Notification = () => {
   const [student, setStudent] = useState(null);
   const [unseenCount, setUnseenCount] = useState(0);
   const [hiddenMsgIds, setHiddenMsgIds] = useState([]);
+  const isMobile = window.innerWidth <= 900;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,26 +96,61 @@ const Notification = () => {
         <div className="no-notifications">No notifications yet.</div>
       ) : (
         list.map((n, idx) => (
-          <div key={n.m_id || idx} className={`notification-card admin`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
-              <div style={{ fontSize: 28, color: type === 'direct' ? '#2563eb' : '#059669', marginRight: 8 }}>
+          <div key={n.m_id || idx} className={`notification-card admin`} style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between', 
+            gap: isMobile ? 12 : 16,
+            padding: isMobile ? '1rem 0.8rem' : undefined,
+            borderRadius: isMobile ? 12 : undefined,
+            boxShadow: isMobile ? '0 2px 8px rgba(0,0,0,0.1)' : undefined,
+            border: isMobile ? '1px solid #e5e7eb' : undefined,
+            marginBottom: isMobile ? 12 : undefined
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 16, flex: 1 }}>
+              <div style={{ 
+                fontSize: isMobile ? 20 : 28, 
+                color: type === 'direct' ? '#2563eb' : '#059669', 
+                marginRight: isMobile ? 6 : 8 
+              }}>
                 {type === 'direct' ? <FaUserShield /> : <FaUsers />}
               </div>
               <div className="notification-content" style={{ flex: 1 }}>
                 <div className="notification-header">
-                  <span className="notification-sender">
+                  <span className="notification-sender" style={{ 
+                    fontSize: isMobile ? '0.9rem' : undefined,
+                    fontWeight: isMobile ? 600 : undefined
+                  }}>
                     Admin
                   </span>
-                  <span className="notification-time">{n.created_at ? new Date(n.created_at).toLocaleString() : ''}</span>
+                  <span className="notification-time" style={{ 
+                    fontSize: isMobile ? '0.75rem' : undefined,
+                    color: isMobile ? '#6b7280' : undefined
+                  }}>{n.created_at ? new Date(n.created_at).toLocaleString() : ''}</span>
                 </div>
-                <div className="notification-message" style={{ fontWeight: 500, fontSize: '1.08rem', color: '#222', marginTop: 4 }}>
+                <div className="notification-message" style={{ 
+                  fontWeight: 500, 
+                  fontSize: isMobile ? '0.9rem' : '1.08rem', 
+                  color: '#222', 
+                  marginTop: isMobile ? 6 : 4,
+                  lineHeight: isMobile ? '1.4' : undefined
+                }}>
                   {n.msg || <span style={{ color: '#d32f2f' }}>[No message]</span>}
                 </div>
               </div>
             </div>
             <span
               onClick={() => handleDeleteMsg(n.m_id)}
-              style={{ color: '#d32f2f', cursor: 'pointer', fontWeight: 600, fontSize: '0.97rem', marginLeft: 18, alignSelf: 'center', textDecoration: 'underline', whiteSpace: 'nowrap' }}
+              style={{ 
+                color: '#d32f2f', 
+                cursor: 'pointer', 
+                fontWeight: 600, 
+                fontSize: isMobile ? '0.8rem' : '0.97rem', 
+                marginLeft: isMobile ? 8 : 18, 
+                alignSelf: 'center', 
+                textDecoration: 'underline', 
+                whiteSpace: 'nowrap' 
+              }}
             >
               Delete for me
             </span>
@@ -126,30 +162,72 @@ const Notification = () => {
 
   return (
     <StudentLayout notificationCount={unseenCount}>
-      <div className="dashboard-main-content">
-        <div className="notification-page">
-          <div className="page-header">
+      <div className="dashboard-main-content" style={{
+        padding: isMobile ? '0' : undefined
+      }}>
+        <div className="notification-page" style={{
+          padding: isMobile ? '1rem 0.8rem' : undefined
+        }}>
+          <div className="page-header" style={{
+            textAlign: isMobile ? 'center' : undefined,
+            marginBottom: isMobile ? '1.5rem' : undefined
+          }}>
             <div className="header-content">
-              <h1>Notifications</h1>
-              <p>Stay updated with important messages from your admin</p>
+              <h1 style={{
+                fontSize: isMobile ? '1.5rem' : undefined,
+                marginBottom: isMobile ? '0.5rem' : undefined
+              }}>Notifications</h1>
+              <p style={{
+                fontSize: isMobile ? '0.9rem' : undefined,
+                color: isMobile ? '#6b7280' : undefined
+              }}>Stay updated with important messages from your admin</p>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 16, marginBottom: 24 }}>
+          <div style={{ 
+            display: 'flex', 
+            gap: isMobile ? 8 : 16, 
+            marginBottom: isMobile ? 20 : 24,
+            justifyContent: isMobile ? 'center' : undefined
+          }}>
             <button
               onClick={() => setTab('direct')}
-              style={{ background: tab === 'direct' ? '#2563eb' : '#e5e7eb', color: tab === 'direct' ? '#fff' : '#222', border: 'none', borderRadius: 8, padding: '8px 24px', fontWeight: 600, cursor: 'pointer' }}
+              style={{ 
+                background: tab === 'direct' ? '#2563eb' : '#e5e7eb', 
+                color: tab === 'direct' ? '#fff' : '#222', 
+                border: 'none', 
+                borderRadius: isMobile ? 6 : 8, 
+                padding: isMobile ? '0.6rem 1rem' : '8px 24px', 
+                fontWeight: 600, 
+                cursor: 'pointer',
+                fontSize: isMobile ? '0.85rem' : undefined
+              }}
             >
               Direct Notifications
             </button>
             <button
               onClick={() => setTab('class')}
-              style={{ background: tab === 'class' ? '#2563eb' : '#e5e7eb', color: tab === 'class' ? '#fff' : '#222', border: 'none', borderRadius: 8, padding: '8px 24px', fontWeight: 600, cursor: 'pointer' }}
+              style={{ 
+                background: tab === 'class' ? '#2563eb' : '#e5e7eb', 
+                color: tab === 'class' ? '#fff' : '#222', 
+                border: 'none', 
+                borderRadius: isMobile ? 6 : 8, 
+                padding: isMobile ? '0.6rem 1rem' : '8px 24px', 
+                fontWeight: 600, 
+                cursor: 'pointer',
+                fontSize: isMobile ? '0.85rem' : undefined
+              }}
             >
               Class Notifications
             </button>
           </div>
           {loading ? (
-            <div style={{ color: '#2563eb', fontWeight: 600, fontSize: '1.1rem', marginTop: 32 }}>Loading notifications...</div>
+            <div style={{ 
+              color: '#2563eb', 
+              fontWeight: 600, 
+              fontSize: isMobile ? '1rem' : '1.1rem', 
+              marginTop: 32,
+              textAlign: isMobile ? 'center' : undefined
+            }}>Loading notifications...</div>
           ) : (
             tab === 'direct' ? renderMessages(directMsgs, 'direct') : renderMessages(classMsgs, 'class')
           )}
