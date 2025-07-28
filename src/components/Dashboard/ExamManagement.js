@@ -206,36 +206,51 @@ const handleDelete = async (fileId) => {
         
         {isMobile && (
           <div style={{
-            width: '100vw',
-            minHeight: '100vh',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'flex-start',
-            padding: '0',
-            background: '#fff',
+            width: '100%',
+            boxSizing: 'border-box',
+            padding: '0 20px',
+            gap: 16
           }}>
+            {/* Mobile Header */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 12,
+              width: '100%',
+              padding: '1rem 0'
+            }}>
+              <FaFileAlt size={28} color="#2563eb" />
+              <div style={{ textAlign: 'center' }}>
+                <h1 style={{ margin: 0, fontWeight: 700, fontSize: '1.5rem', color: '#2563eb' }}>Exam Management</h1>
+                <div style={{ color: '#6b7280', fontSize: '0.9rem', fontWeight: 500 }}>Create, edit, and manage exams</div>
+              </div>
+            </div>
+
             {/* Exam Templates Section */}
             <div style={{
-              maxWidth: '380px',
-              margin: '0 auto 2rem auto',
               width: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
+              maxWidth: '350px',
+              background: '#fff',
+              borderRadius: 12,
+              padding: '1.5rem',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: '1px solid #e5e7eb'
             }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                width: '100%',
-                margin: '0 0 1rem 0',
+                marginBottom: '1rem'
               }}>
                 <h2 style={{
                   margin: 0,
-                  fontSize: '1.4rem',
+                  fontSize: '1.2rem',
                   fontWeight: 600,
-                  color: '#1a1a1a',
+                  color: '#1a1a1a'
                 }}>Exam Templates</h2>
                 <button
                   onClick={handleCreateTemplate}
@@ -243,108 +258,110 @@ const handleDelete = async (fileId) => {
                     background: '#2563eb',
                     color: '#fff',
                     border: 'none',
-                    borderRadius: 8,
-                    padding: '0.6rem',
+                    borderRadius: 6,
+                    padding: '0.5rem',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    justifyContent: 'center'
                   }}
                 >
-                  <FaPlus size={16} />
+                  <FaPlus size={14} />
                 </button>
               </div>
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 12,
-                maxWidth: '380px',
-                margin: '0 auto',
-              }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {templates.map((template, idx) => (
-                  <div key={`template-${template.t_id}-${idx}`} style={mobileCardStyle}>
-                    <h3 style={{
-                      margin: 0,
-                      fontSize: '1.2rem',
-                      fontWeight: 600,
-                      color: '#1a1a1a',
-                      marginBottom: '0.5rem',
-                      textAlign: 'center',
-                      width: '100%'
-                    }}>
-                      {template.title}
-                    </h3>
-                    <div style={{
-                      fontSize: '1rem',
-                      color: '#6b7280',
-                      marginBottom: '0.8rem',
-                      textAlign: 'center',
-                      width: '100%'
-                    }}>
-                      • {template.questions.length} questions
-                    </div>
+                  <div key={`template-${template.t_id}-${idx}`} style={{
+                    background: '#f8fafc',
+                    borderRadius: 8,
+                    padding: '1rem',
+                    border: '1px solid #e2e8f0'
+                  }}>
                     <div style={{
                       display: 'flex',
-                      gap: 8,
-                      justifyContent: 'center',
-                      width: '100%'
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      marginBottom: '0.5rem'
                     }}>
-                      <button
-                        onClick={() => handleEditTemplate(template)}
-                        style={{
-                          background: '#2563eb',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: 6,
-                          padding: '0.6rem 1rem',
-                          fontSize: '0.9rem',
-                          fontWeight: 500,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteTemplate(template.t_id)}
-                        style={{
-                          background: '#dc2626',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: 6,
-                          padding: '0.6rem 1rem',
-                          fontSize: '0.9rem',
-                          fontWeight: 500,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        Delete
-                      </button>
+                      <div style={{ flex: 1 }}>
+                        <h3 style={{
+                          margin: 0,
+                          fontSize: '1rem',
+                          fontWeight: 600,
+                          color: '#1a1a1a',
+                          marginBottom: '0.25rem'
+                        }}>
+                          {template.title}
+                        </h3>
+                        <div style={{
+                          fontSize: '0.875rem',
+                          color: '#6b7280'
+                        }}>
+                          • {template.questions.length} questions
+                        </div>
+                      </div>
+                      <div style={{
+                        display: 'flex',
+                        gap: 6
+                      }}>
+                        <button
+                          onClick={() => handleEditTemplate(template)}
+                          style={{
+                            background: '#2563eb',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: 4,
+                            padding: '0.4rem 0.6rem',
+                            fontSize: '0.75rem',
+                            fontWeight: 500,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteTemplate(template.t_id)}
+                          style={{
+                            background: '#dc2626',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: 4,
+                            padding: '0.4rem 0.6rem',
+                            fontSize: '0.75rem',
+                            fontWeight: 500,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
+
             {/* Question Bank Section */}
             <div style={{
-              maxWidth: '380px',
-              margin: '0 auto 2rem auto',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
+              width: '100%',
+              maxWidth: '350px',
+              background: '#fff',
+              borderRadius: 12,
+              padding: '1.5rem',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: '1px solid #e5e7eb'
             }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                width: '100%',
-                margin: '0 0 1rem 0',
+                marginBottom: '1rem'
               }}>
                 <h2 style={{
                   margin: 0,
-                  fontSize: '1.4rem',
+                  fontSize: '1.2rem',
                   fontWeight: 600,
-                  color: '#1a1a1a',
+                  color: '#1a1a1a'
                 }}>Question Bank</h2>
                 <button
                   onClick={() => fileInputRef.current && fileInputRef.current.click()}
@@ -352,15 +369,15 @@ const handleDelete = async (fileId) => {
                     background: '#2563eb',
                     color: '#fff',
                     border: 'none',
-                    borderRadius: 8,
-                    padding: '0.6rem',
+                    borderRadius: 6,
+                    padding: '0.5rem',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    justifyContent: 'center'
                   }}
                 >
-                  <FaUpload size={16} />
+                  <FaUpload size={14} />
                 </button>
                 <input
                   type="file"
@@ -375,18 +392,13 @@ const handleDelete = async (fileId) => {
               </div>
               <div
                 style={{
-                  maxWidth: '380px',
-                  border: '3px dashed #d1d5db',
-                  borderRadius: 12,
-                  padding: '2rem 1rem',
+                  border: '2px dashed #d1d5db',
+                  borderRadius: 8,
+                  padding: '1.5rem 1rem',
                   textAlign: 'center',
                   background: '#f9fafb',
                   cursor: 'pointer',
-                  margin: '0 auto 1rem auto',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  marginBottom: '1rem'
                 }}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
@@ -398,98 +410,101 @@ const handleDelete = async (fileId) => {
                 }}
                 onClick={() => fileInputRef.current && fileInputRef.current.click()}
               >
-                <FaFileAlt size={36} color="#9ca3af" style={{ marginBottom: '0.8rem' }} />
+                <FaFileAlt size={24} color="#9ca3af" style={{ marginBottom: '0.5rem' }} />
                 <p style={{
                   margin: 0,
-                  fontSize: '1rem',
+                  fontSize: '0.875rem',
                   color: '#6b7280',
-                  fontWeight: 500,
-                  textAlign: 'center',
-                  width: '100%'
+                  fontWeight: 500
                 }}>
                   Tap to upload question files
                 </p>
               </div>
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 12,
-                maxWidth: '380px',
-                margin: '0 auto',
-              }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {uploadedFiles.map((file, idx) => (
-                  <div key={`file-${file.file_id || idx}`} style={mobileCardStyle}>
-                    <h3 style={{
-                      margin: 0,
-                      fontSize: '1.1rem',
-                      fontWeight: 600,
-                      color: '#1a1a1a',
-                      marginBottom: '0.8rem'
-                    }}>
-                      {file.file_name}
-                    </h3>
+                  <div key={`file-${file.file_id || idx}`} style={{
+                    background: '#f8fafc',
+                    borderRadius: 8,
+                    padding: '1rem',
+                    border: '1px solid #e2e8f0'
+                  }}>
                     <div style={{
                       display: 'flex',
-                      gap: 8,
-                      justifyContent: 'center',
-                      width: '100%'
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
                     }}>
-                      <button
-                        onClick={() => window.open(`http://localhost:3000/${file.file_path.replace("\\", "/")}`, "_blank")}
-                        style={{
-                          background: '#2563eb',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: 6,
-                          padding: '0.6rem 1rem',
-                          fontSize: '0.9rem',
-                          fontWeight: 500,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        View
-                      </button>
-                      <button
-                        onClick={() => handleDelete(file.file_id)}
-                        style={{
-                          background: '#dc2626',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: 6,
-                          padding: '0.6rem 1rem',
-                          fontSize: '0.9rem',
-                          fontWeight: 500,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        Delete
-                      </button>
+                      <div style={{ flex: 1 }}>
+                        <h3 style={{
+                          margin: 0,
+                          fontSize: '0.875rem',
+                          fontWeight: 600,
+                          color: '#1a1a1a'
+                        }}>
+                          {file.file_name}
+                        </h3>
+                      </div>
+                      <div style={{
+                        display: 'flex',
+                        gap: 6
+                      }}>
+                        <button
+                          onClick={() => window.open(`http://localhost:3000/${file.file_path.replace("\\", "/")}`, "_blank")}
+                          style={{
+                            background: '#2563eb',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: 4,
+                            padding: '0.4rem 0.6rem',
+                            fontSize: '0.75rem',
+                            fontWeight: 500,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => handleDelete(file.file_id)}
+                          style={{
+                            background: '#dc2626',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: 4,
+                            padding: '0.4rem 0.6rem',
+                            fontSize: '0.75rem',
+                            fontWeight: 500,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
+
             {/* Exam Schedules Section */}
             <div style={{
-              maxWidth: '380px',
-              margin: '0 auto 2rem auto',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
+              width: '100%',
+              maxWidth: '350px',
+              background: '#fff',
+              borderRadius: 12,
+              padding: '1.5rem',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: '1px solid #e5e7eb'
             }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                width: '100%',
-                margin: '0 0 1rem 0',
+                marginBottom: '1rem'
               }}>
                 <h2 style={{
                   margin: 0,
-                  fontSize: '1.4rem',
+                  fontSize: '1.2rem',
                   fontWeight: 600,
-                  color: '#1a1a1a',
+                  color: '#1a1a1a'
                 }}>Exam Schedules</h2>
                 <button
                   onClick={handleCreateExam}
@@ -497,100 +512,104 @@ const handleDelete = async (fileId) => {
                     background: '#2563eb',
                     color: '#fff',
                     border: 'none',
-                    borderRadius: 8,
-                    padding: '0.6rem',
+                    borderRadius: 6,
+                    padding: '0.5rem',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    justifyContent: 'center'
                   }}
                 >
-                  <FaPlus size={16} />
+                  <FaPlus size={14} />
                 </button>
               </div>
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 12,
-                maxWidth: '380px',
-                margin: '0 auto',
-              }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {exams.length === 0 ? (
                   <div style={{
-                    background: '#fff',
-                    borderRadius: 12,
-                    padding: '2rem 1.5rem',
+                    background: '#f8fafc',
+                    borderRadius: 8,
+                    padding: '1.5rem',
                     textAlign: 'center',
-                    border: '1px solid #e5e7eb',
+                    border: '1px solid #e2e8f0',
                     color: '#6b7280',
-                    fontSize: '1rem'
+                    fontSize: '0.875rem'
                   }}>
                     No exams found.
                   </div>
                 ) : (
                   exams.map((exam, idx) => (
-                    <div key={exam.e_id ? `exam-${exam.e_id}` : `exam-idx-${idx}`} style={mobileCardStyle}>
-                      <h3 style={{
-                        margin: 0,
-                        fontSize: '1.2rem',
-                        fontWeight: 600,
-                        color: '#1a1a1a',
-                        marginBottom: '0.5rem'
-                      }}>
-                        {exam.e_name}
-                      </h3>
-                      <div style={{
-                        fontSize: '1rem',
-                        color: '#6b7280',
-                        lineHeight: '1.4',
-                        marginBottom: '0.5rem'
-                      }}>
-                        {exam.e_date} • {exam.e_time} • {exam.duration} min
-                      </div>
-                      <div style={{
-                        fontSize: '0.9rem',
-                        color: '#9ca3af',
-                        marginBottom: '0.8rem'
-                      }}>
-                        Template: {exam.t_name}
-                      </div>
+                    <div key={exam.e_id ? `exam-${exam.e_id}` : `exam-idx-${idx}`} style={{
+                      background: '#f8fafc',
+                      borderRadius: 8,
+                      padding: '1rem',
+                      border: '1px solid #e2e8f0'
+                    }}>
                       <div style={{
                         display: 'flex',
-                        gap: 8,
-                        justifyContent: 'center',
-                        width: '100%'
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        marginBottom: '0.5rem'
                       }}>
-                        <button
-                          onClick={() => handleEditExam(exam)}
-                          style={{
-                            background: '#2563eb',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: 6,
-                            padding: '0.6rem 1rem',
-                            fontSize: '0.9rem',
-                            fontWeight: 500,
-                            cursor: 'pointer'
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDeleteExam(exam.e_id)}
-                          style={{
-                            background: '#dc2626',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: 6,
-                            padding: '0.6rem 1rem',
-                            fontSize: '0.9rem',
-                            fontWeight: 500,
-                            cursor: 'pointer'
-                          }}
-                        >
-                          Delete
-                        </button>
+                        <div style={{ flex: 1 }}>
+                          <h3 style={{
+                            margin: 0,
+                            fontSize: '1rem',
+                            fontWeight: 600,
+                            color: '#1a1a1a',
+                            marginBottom: '0.25rem'
+                          }}>
+                            {exam.e_name}
+                          </h3>
+                          <div style={{
+                            fontSize: '0.875rem',
+                            color: '#6b7280',
+                            lineHeight: '1.4'
+                          }}>
+                            {exam.e_date} • {exam.e_time} • {exam.duration} min
+                          </div>
+                          <div style={{
+                            fontSize: '0.75rem',
+                            color: '#9ca3af',
+                            marginTop: '0.25rem'
+                          }}>
+                            Template: {exam.t_name}
+                          </div>
+                        </div>
+                        <div style={{
+                          display: 'flex',
+                          gap: 6
+                        }}>
+                          <button
+                            onClick={() => handleEditExam(exam)}
+                            style={{
+                              background: '#2563eb',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: 4,
+                              padding: '0.4rem 0.6rem',
+                              fontSize: '0.75rem',
+                              fontWeight: 500,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteExam(exam.e_id)}
+                            style={{
+                              background: '#dc2626',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: 4,
+                              padding: '0.4rem 0.6rem',
+                              fontSize: '0.75rem',
+                              fontWeight: 500,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))

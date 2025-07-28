@@ -179,14 +179,25 @@ const ResultsPlaceholder = () => {
     );
   });
 
+  const isMobile = window.innerWidth <= 900;
+
   return (
     <DashboardLayout>
       <div className="exam-management" style={{ padding: '2rem 0 1rem 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-          <span style={{ fontSize: 36, color: '#2563eb' }}><i className="fas fa-chart-bar"></i></span>
-          <div>
-            <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Results & Reports</h1>
-            <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>View analytics and student exam results</div>
+        <div style={{
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          alignItems: 'center',
+          justifyContent: isMobile ? 'center' : 'flex-start',
+          gap: 12,
+          marginBottom: 8,
+          textAlign: isMobile ? 'center' : 'left',
+          width: '100%'
+        }}>
+          <span style={{ fontSize: 36, color: '#2563eb', alignSelf: isMobile ? 'center' : 'flex-start' }}><i className="fas fa-chart-bar"></i></span>
+          <div style={{ width: '100%' }}>
+            <h1 style={{ margin: 0, fontWeight: 700, fontSize: isMobile ? '1.5rem' : '2rem', color: '#2563eb', textAlign: isMobile ? 'center' : 'left' }}>Results & Reports</h1>
+            <div style={{ color: '#6b7280', fontSize: isMobile ? '0.9rem' : '1rem', fontWeight: 500, textAlign: isMobile ? 'center' : 'left' }}>View analytics and student exam results</div>
           </div>
         </div>
         <div className="exam-sections">
