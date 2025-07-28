@@ -245,9 +245,30 @@ const ClassesManagement = () => {
           </>
         )}
         {isMobile && (
-          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1.1rem', marginBottom: '1.1rem' }}>
-            <div className="search-box" style={{ position: 'relative', width: '100%', maxWidth: 340, margin: '0 auto' }}>
-              <FaSearch style={{ position: 'absolute', left: 16, right: 'unset', top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18, pointerEvents: 'none' }} />
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '1.1rem', 
+            marginBottom: '1.1rem',
+            padding: '0 20px',
+            alignItems: 'center',
+            width: '100%',
+            boxSizing: 'border-box'
+          }}>
+            <div className="search-box" style={{ 
+              position: 'relative', 
+              width: '100%', 
+              maxWidth: '350px'
+            }}>
+              <FaSearch style={{ 
+                position: 'absolute', 
+                left: 16, 
+                top: '50%', 
+                transform: 'translateY(-50%)', 
+                color: '#a0aec0', 
+                fontSize: 18, 
+                pointerEvents: 'none' 
+              }} />
               <input
                 type="text"
                 placeholder="Search classes..."
@@ -268,13 +289,30 @@ const ClassesManagement = () => {
             </div>
             <button
               className="add-user-btn"
-              style={{ width: '100%' }}
+              style={{ 
+                width: '100%',
+                maxWidth: '350px',
+                background: '#2563eb',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: '1rem',
+                border: 'none',
+                borderRadius: 10,
+                padding: '0.75rem 1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                boxShadow: '0 2px 8px #2563eb22',
+                cursor: 'pointer'
+              }}
               onClick={() => openModal(null)}
             >
               <FaPlus /> Add Class
             </button>
             <div style={{
-              minWidth: 110,
+              width: '100%',
+              maxWidth: '350px',
               minHeight: 70,
               background: '#f1f5f9',
               borderRadius: 16,
@@ -286,8 +324,7 @@ const ClassesManagement = () => {
               fontWeight: 700,
               fontSize: '1.5rem',
               color: '#2563eb',
-              margin: '0 auto',
-              marginTop: 8
+              padding: '1rem'
             }}>
               {classes.length}
               <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Classes</div>
@@ -295,7 +332,11 @@ const ClassesManagement = () => {
           </div>
         )}
         {isMobile ? (
-          <div className="users-cards-container" style={{ marginLeft: '2vw' }}>
+          <div className="users-cards-container" style={{ 
+            marginLeft: '2vw',
+            padding: '0 16px',
+            marginRight: '2vw'
+          }}>
             {filtered.map(s => (
               <div className="user-card" key={s.cls_id}>
                 <div className="user-card-header">
