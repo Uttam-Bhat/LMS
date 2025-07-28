@@ -5,6 +5,8 @@ import api from '../../services/authService';
 import AssignStudentModal from './AssignStudentModal';
 import ConfirmDialog from './ConfirmDialog';
 import CreateUserModal from './CreateUserModal';
+import LoadingSpinner from './LoadingSpinner';
+import NoDataMessage from './NoDataMessage';
 import StudentsManagement from './StudentsManagement';
 import './UserManagement.css';
 
@@ -74,10 +76,10 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
     try {
       await api.delete(`/admin/delete/${pendingDeleteId}`);
       setUsers(prevUsers => prevUsers.filter(user => user.id !== pendingDeleteId));
-      toast.success('User deleted successfully');
+      toast.success('User deleted successfully! 🗑️');
     } catch (error) {
       console.error('Failed to delete user:', error);
-      toast.error('Error deleting user');
+      toast.error('Failed to delete user. Please try again.');
     } finally {
       setConfirmOpen(false);
       setPendingDeleteId(null);
@@ -91,24 +93,41 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
     <>
       {activeSubPage === 'all-users' && (
         <div className="user-management">
-          <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, gap: 18 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-            <FaUserPlus size={38} color="#2563eb" style={{ flexShrink: 0 }} />
-            <div>
-              <h1 style={{ fontSize: '2.1rem', fontWeight: 700, color: '#2563eb', margin: 0 }}>User Management</h1>
-              <div style={{ color: '#6b7280', fontSize: '1.08rem', marginTop: 2 }}>Add, assign, and manage users</div>
+          {loading ? (
+            <LoadingSpinner message="Loading users..." />
+          ) : error ? (
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: '60vh',
+              background: '#f8fafc'
+            }}>
+              <div style={{ textAlign: 'center', color: '#dc2626' }}>
+                <div style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>Error loading users</div>
+                <div style={{ fontSize: '0.9rem', color: '#6b7280' }}>{error}</div>
+              </div>
             </div>
-          </div>
-            {/* Add User button only on desktop */}
-            {!isMobile && (
-            <button 
-              className="add-user-btn"
-              onClick={() => setShowCreateUserModal(true)}
-            >
-                <FaUserPlus /> Add New User
-            </button>
-          )}
-          </div>
+          ) : (
+            <>
+              <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, gap: 18 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+                <FaUserPlus size={38} color="#2563eb" style={{ flexShrink: 0 }} />
+                <div>
+                  <h1 style={{ fontSize: '2.1rem', fontWeight: 700, color: '#2563eb', margin: 0 }}>User Management</h1>
+                  <div style={{ color: '#6b7280', fontSize: '1.08rem', marginTop: 2 }}>Add, assign, and manage users</div>
+                </div>
+              </div>
+                {/* Add User button only on desktop */}
+                {!isMobile && (
+                <button 
+                  className="add-user-btn"
+                  onClick={() => setShowCreateUserModal(true)}
+                >
+                    <FaUserPlus /> Add New User
+                </button>
+              )}
+              </div>
 
           <div className="user-filters" style={{ 
             display: 'flex', 
@@ -205,59 +224,66 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
           {/* Responsive User Cards for Mobile - only render on mobile */}
           {isMobile && (
             <div className="users-cards-container">
-              {filteredUsers.map(user => (
-                <div className="user-card" key={user.id}>
-                  <div className="user-card-header">
-                    <FaUserCircle className="user-card-avatar" />
-                    <div className="user-card-info">
-                      <div className="user-card-name">{user.fullname}</div>
-                      <div className="user-card-email">{user.email}</div>
+              {filteredUsers.length === 0 ? (
+                <NoDataMessage type="users" />
+              ) : (
+                filteredUsers.map(user => (
+                  <div className="user-card" key={user.id}>
+                    <div className="user-card-header">
+                      <FaUserCircle className="user-card-avatar" />
+                      <div className="user-card-info">
+                        <div className="user-card-name">{user.fullname}</div>
+                        <div className="user-card-email">{user.email}</div>
+                      </div>
+                      <span className={`role-badge ${user.user_type || 'unknown'}`}>{(user.user_type || 'unknown').charAt(0).toUpperCase() + (user.user_type || 'unknown').slice(1)}</span>
                     </div>
-                    <span className={`role-badge ${user.user_type || 'unknown'}`}>{(user.user_type || 'unknown').charAt(0).toUpperCase() + (user.user_type || 'unknown').slice(1)}</span>
-                  </div>
-                  <div className="user-card-row">
-                    <span className="user-card-label">Actions:</span>
-                    <div className="action-buttons">
-                      <button className="edit-btn" title="Edit user" onClick={() => { setEditUserData(user); setShowCreateUserModal(true); }}>
-                        <FaPencilAlt />
-                      </button>
-                      <button className="delete-btn" title="Delete user" onClick={() => handleDelete(user.id)}>
-                        <FaTrashAlt />
-                      </button>
-                    </div>
-                  </div>
-                  {user.user_type === 'student' && (
                     <div className="user-card-row">
-                      <span className="user-card-label">Assign:</span>
-                      {assignedStudents[user.id] ? (
-                        <button className="assigned-btn" disabled>Assigned</button>
-                      ) : (
-                        <button className="assign-btn" onClick={() => { setAssigningUser(user); setShowAssignModal(true); }} disabled={assignedStudents[user.id]}>
-                          Assign
+                      <span className="user-card-label">Actions:</span>
+                      <div className="action-buttons">
+                        <button className="edit-btn" title="Edit user" onClick={() => { setEditUserData(user); setShowCreateUserModal(true); }}>
+                          <FaPencilAlt />
                         </button>
-                      )}
+                        <button className="delete-btn" title="Delete user" onClick={() => handleDelete(user.id)}>
+                          <FaTrashAlt />
+                        </button>
+                      </div>
                     </div>
-                  )}
-                </div>
-              ))}
+                    {user.user_type === 'student' && (
+                      <div className="user-card-row">
+                        <span className="user-card-label">Assign:</span>
+                        {assignedStudents[user.id] ? (
+                          <button className="assigned-btn" disabled>Assigned</button>
+                        ) : (
+                          <button className="assign-btn" onClick={() => { setAssigningUser(user); setShowAssignModal(true); }} disabled={assignedStudents[user.id]}>
+                            Assign
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
           )}
 
           {/* Desktop Table - only render on desktop */}
           {!isMobile && (
             <div className="users-table-container">
-              <table className="users-table">
-                <thead>
-                  <tr>
-                    <th>User</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Actions</th>
-                    {filteredUsers.some(u => u.user_type === 'student') && <th>Assign</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredUsers.map(user => (
+              {filteredUsers.length === 0 ? (
+                <NoDataMessage type="users" />
+              ) : (
+                <table className="users-table">
+                  <thead>
+                    <tr>
+                      <th>User</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Actions</th>
+                      {filteredUsers.some(u => u.user_type === 'student') && <th>Assign</th>}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredUsers.map(user => (
                     <tr key={user.id}>
                       <td>
                         <div className="user-info">
@@ -294,7 +320,8 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
                   ))}
                 </tbody>
               </table>
-            </div>
+            )}
+          </div>
           )}
 
           {(showCreateUserModal || editUserData) && (
@@ -349,6 +376,8 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
             onCancel={() => { setConfirmOpen(false); setPendingDeleteId(null); }}
           />
 
+            </>
+          )}
         </div>
       )}
       {activeSubPage === 'students' && (

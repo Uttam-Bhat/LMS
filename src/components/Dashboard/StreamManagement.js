@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import { FaPlus, FaSearch, FaStream } from 'react-icons/fa';
 import ConfirmDialog from './ConfirmDialog';
 import DashboardLayout from './DashboardLayout';
+import LoadingSpinner from './LoadingSpinner';
+import NoDataMessage from './NoDataMessage';
 import './StreamManagement.css';
 
 const StreamManagement = () => {
@@ -14,6 +16,7 @@ const StreamManagement = () => {
   const [form, setForm] = useState({ name: '', description: '', created: '', classId: '' });
   const [classes, setClasses] = useState([]);
   const [streamList, setStreamList] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
   const isMobile = window.innerWidth <= 900;
@@ -29,19 +32,21 @@ const StreamManagement = () => {
   };
 
   useEffect(() => {
-    // Fetch classes for dropdown
-    const fetchClasses = async () => {
+    const loadData = async () => {
+      setLoading(true);
       try {
+        // Fetch classes for dropdown
         const response = await api.get('/class/display');
         setClasses(response.data);
+        await fetchStreams();
       } catch (error) {
-        console.error('Error fetching classes', error);
-        setClasses([]);
+        console.error('Error loading data', error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchClasses();
-    fetchStreams();
+    loadData();
   }, []);
 
   const openModal = (item) => {
@@ -125,7 +130,7 @@ const StreamManagement = () => {
     try {
       await api.delete(`/stream/delete/${pendingDeleteId}`);
       fetchStreams();
-      toast.success('Stream deleted successfully!');
+      toast.success('Stream deleted successfully! 🗑️');
     } catch (err) {
       console.error('Error deleting stream:', err);
       toast.error('Failed to delete stream. Please try again.');
@@ -153,9 +158,11 @@ const StreamManagement = () => {
       if (editItem) {
         // Edit mode
         await api.put(`/stream/edit/${editItem.sid}`, payload);
+        toast.success('Stream updated successfully! ✏️');
       } else {
         // Add mode
         await api.post('/stream/add', payload);
+        toast.success('Stream added successfully! ➕');
       }
 
       setShowModal(false);
@@ -198,17 +205,21 @@ const getUniqueClasses = () => {
 
   return (
     <DashboardLayout>
-      {!isMobile && (
-        <div className="stream-management-header" style={{ padding: '2rem 0 1rem 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <FaStream size={32} color="#2563eb" />
-            <div>
-              <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Manage Streams</h1>
-              <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic streams</div>
+      {loading ? (
+        <LoadingSpinner message="Loading streams..." />
+      ) : (
+        <>
+          {!isMobile && (
+            <div className="stream-management-header" style={{ padding: '2rem 0 1rem 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <FaStream size={32} color="#2563eb" />
+                <div>
+                  <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Manage Streams</h1>
+                  <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic streams</div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          )}
       {/* Controls: search, add, count */}
       {!isMobile && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, maxWidth: 1100, margin: '0 auto 24px auto' }}>
@@ -418,7 +429,10 @@ const getUniqueClasses = () => {
               width: '100%',
               maxWidth: '350px'
             }}>
-              {filtered.map(s => (
+              {filtered.length === 0 ? (
+                <NoDataMessage type="streams" />
+              ) : (
+                filtered.map(s => (
                 <div key={s.id || s.sid} style={{
                   background: '#fff',
                   borderRadius: 12,
@@ -505,38 +519,43 @@ const getUniqueClasses = () => {
                     )}
                   </div>
                 </div>
-              ))}
+              ))
+            )}
             </div>
           </>
         ) : (
           <div className="stream-table-container">
-            <table className="stream-table">
-              <thead>
-                <tr><th>Name</th><th>Description</th><th>Class</th><th>Created</th><th>Action</th></tr>
-              </thead>
-              <tbody>
-              {filtered.map(s => (
-                <tr key={s.id || s.sid}>
-                  <td>{s.sname || s.name || s.stream_name || 'N/A'}</td>
-                  <td>{s.description || s.des}</td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{ background: '#e8f0fe', color: '#2563eb', fontWeight: 600, padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem' }}>
-                        {s.class_details?.class_name || s.className || s.class_name || 'N/A'}
+            {filtered.length === 0 ? (
+              <NoDataMessage type="streams" />
+            ) : (
+              <table className="stream-table">
+                <thead>
+                  <tr><th>Name</th><th>Description</th><th>Class</th><th>Created</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                {filtered.map(s => (
+                  <tr key={s.id || s.sid}>
+                    <td>{s.sname || s.name || s.stream_name || 'N/A'}</td>
+                    <td>{s.description || s.des}</td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ background: '#e8f0fe', color: '#2563eb', fontWeight: 600, padding: '2px 10px', borderRadius: 8, fontSize: '0.98rem' }}>
+                          {s.class_details?.class_name || s.className || s.class_name || 'N/A'}
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td>{s.created || s.cdate}</td>
-                  <td>
-                    <div className="stream-action-buttons">
-                      <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
-                      <button className="stream-delete-btn" onClick={() => handleDelete(s.id || s.sid)}>Delete</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              </tbody>
-            </table>
+                    </td>
+                    <td>{s.created || s.cdate}</td>
+                    <td>
+                      <div className="stream-action-buttons">
+                        <button className="stream-edit-btn" onClick={() => openModal(s)}>Edit</button>
+                        <button className="stream-delete-btn" onClick={() => handleDelete(s.id || s.sid)}>Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                </tbody>
+              </table>
+            )}
           </div>
         )}
 
@@ -601,6 +620,8 @@ const getUniqueClasses = () => {
           </div>
         )}
       </div>
+          </>
+        )}
       <ConfirmDialog
         open={confirmOpen}
         title="Delete Stream?"

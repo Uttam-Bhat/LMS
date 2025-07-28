@@ -24,6 +24,7 @@ const ExamManagement = () => {
   const [exams, setExams] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [editExam, setEditExam] = useState(null);
+  const isMobile = window.innerWidth <= 900;
 
 
   const fileInputRef = React.useRef();
@@ -162,16 +163,442 @@ const handleDelete = async (fileId) => {
   }
 };
 
+  // Card style for templates, files, and exams (remove border, keep boxShadow, center content)
+  const mobileCardStyle = {
+    background: '#fff',
+    borderRadius: 16,
+    padding: '1.5rem',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+    // border: '1px solid #e5e7eb', // REMOVE this line
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
+  };
+  // Upload area style (remove border, keep dashed border, center content)
+  const mobileUploadAreaStyle = {
+    maxWidth: '420px',
+    border: '3px dashed #d1d5db',
+    borderRadius: 16,
+    padding: '3rem 1.5rem',
+    textAlign: 'center',
+    background: '#f9fafb',
+    cursor: 'pointer',
+    margin: '0 auto 1.5rem auto',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  };
+
   return (
     <DashboardLayout>
       <div className="exam-management" style={{ padding: '2rem 0 1rem 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-          <span style={{ fontSize: 36, color: '#2563eb' }}><FaFileAlt /></span>
-          <div>
-            <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Exam Management</h1>
-            <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Create, edit, and manage exams and question banks</div>
+        {!isMobile && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+            <span style={{ fontSize: 36, color: '#2563eb' }}><FaFileAlt /></span>
+            <div>
+              <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Exam Management</h1>
+              <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Create, edit, and manage exams and question banks</div>
+            </div>
           </div>
-        </div>
+        )}
+        
+        {isMobile && (
+          <div style={{
+            width: '100vw',
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            padding: '0',
+            background: '#fff',
+          }}>
+            {/* Exam Templates Section */}
+            <div style={{
+              maxWidth: '380px',
+              margin: '0 auto 2rem auto',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+                margin: '0 0 1rem 0',
+              }}>
+                <h2 style={{
+                  margin: 0,
+                  fontSize: '1.4rem',
+                  fontWeight: 600,
+                  color: '#1a1a1a',
+                }}>Exam Templates</h2>
+                <button
+                  onClick={handleCreateTemplate}
+                  style={{
+                    background: '#2563eb',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '0.6rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <FaPlus size={16} />
+                </button>
+              </div>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 12,
+                maxWidth: '380px',
+                margin: '0 auto',
+              }}>
+                {templates.map((template, idx) => (
+                  <div key={`template-${template.t_id}-${idx}`} style={mobileCardStyle}>
+                    <h3 style={{
+                      margin: 0,
+                      fontSize: '1.2rem',
+                      fontWeight: 600,
+                      color: '#1a1a1a',
+                      marginBottom: '0.5rem',
+                      textAlign: 'center',
+                      width: '100%'
+                    }}>
+                      {template.title}
+                    </h3>
+                    <div style={{
+                      fontSize: '1rem',
+                      color: '#6b7280',
+                      marginBottom: '0.8rem',
+                      textAlign: 'center',
+                      width: '100%'
+                    }}>
+                      • {template.questions.length} questions
+                    </div>
+                    <div style={{
+                      display: 'flex',
+                      gap: 8,
+                      justifyContent: 'center',
+                      width: '100%'
+                    }}>
+                      <button
+                        onClick={() => handleEditTemplate(template)}
+                        style={{
+                          background: '#2563eb',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '0.6rem 1rem',
+                          fontSize: '0.9rem',
+                          fontWeight: 500,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteTemplate(template.t_id)}
+                        style={{
+                          background: '#dc2626',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '0.6rem 1rem',
+                          fontSize: '0.9rem',
+                          fontWeight: 500,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Question Bank Section */}
+            <div style={{
+              maxWidth: '380px',
+              margin: '0 auto 2rem auto',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+                margin: '0 0 1rem 0',
+              }}>
+                <h2 style={{
+                  margin: 0,
+                  fontSize: '1.4rem',
+                  fontWeight: 600,
+                  color: '#1a1a1a',
+                }}>Question Bank</h2>
+                <button
+                  onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                  style={{
+                    background: '#2563eb',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '0.6rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <FaUpload size={16} />
+                </button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      handleFileUpload(e.target.files[0]);
+                    }
+                  }}
+                />
+              </div>
+              <div
+                style={{
+                  maxWidth: '380px',
+                  border: '3px dashed #d1d5db',
+                  borderRadius: 12,
+                  padding: '2rem 1rem',
+                  textAlign: 'center',
+                  background: '#f9fafb',
+                  cursor: 'pointer',
+                  margin: '0 auto 1rem auto',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    handleFileUpload(e.dataTransfer.files[0]);
+                    e.dataTransfer.clearData();
+                  }
+                }}
+                onClick={() => fileInputRef.current && fileInputRef.current.click()}
+              >
+                <FaFileAlt size={36} color="#9ca3af" style={{ marginBottom: '0.8rem' }} />
+                <p style={{
+                  margin: 0,
+                  fontSize: '1rem',
+                  color: '#6b7280',
+                  fontWeight: 500,
+                  textAlign: 'center',
+                  width: '100%'
+                }}>
+                  Tap to upload question files
+                </p>
+              </div>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 12,
+                maxWidth: '380px',
+                margin: '0 auto',
+              }}>
+                {uploadedFiles.map((file, idx) => (
+                  <div key={`file-${file.file_id || idx}`} style={mobileCardStyle}>
+                    <h3 style={{
+                      margin: 0,
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                      color: '#1a1a1a',
+                      marginBottom: '0.8rem'
+                    }}>
+                      {file.file_name}
+                    </h3>
+                    <div style={{
+                      display: 'flex',
+                      gap: 8,
+                      justifyContent: 'center',
+                      width: '100%'
+                    }}>
+                      <button
+                        onClick={() => window.open(`http://localhost:3000/${file.file_path.replace("\\", "/")}`, "_blank")}
+                        style={{
+                          background: '#2563eb',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '0.6rem 1rem',
+                          fontSize: '0.9rem',
+                          fontWeight: 500,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={() => handleDelete(file.file_id)}
+                        style={{
+                          background: '#dc2626',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '0.6rem 1rem',
+                          fontSize: '0.9rem',
+                          fontWeight: 500,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Exam Schedules Section */}
+            <div style={{
+              maxWidth: '380px',
+              margin: '0 auto 2rem auto',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+                margin: '0 0 1rem 0',
+              }}>
+                <h2 style={{
+                  margin: 0,
+                  fontSize: '1.4rem',
+                  fontWeight: 600,
+                  color: '#1a1a1a',
+                }}>Exam Schedules</h2>
+                <button
+                  onClick={handleCreateExam}
+                  style={{
+                    background: '#2563eb',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '0.6rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <FaPlus size={16} />
+                </button>
+              </div>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 12,
+                maxWidth: '380px',
+                margin: '0 auto',
+              }}>
+                {exams.length === 0 ? (
+                  <div style={{
+                    background: '#fff',
+                    borderRadius: 12,
+                    padding: '2rem 1.5rem',
+                    textAlign: 'center',
+                    border: '1px solid #e5e7eb',
+                    color: '#6b7280',
+                    fontSize: '1rem'
+                  }}>
+                    No exams found.
+                  </div>
+                ) : (
+                  exams.map((exam, idx) => (
+                    <div key={exam.e_id ? `exam-${exam.e_id}` : `exam-idx-${idx}`} style={mobileCardStyle}>
+                      <h3 style={{
+                        margin: 0,
+                        fontSize: '1.2rem',
+                        fontWeight: 600,
+                        color: '#1a1a1a',
+                        marginBottom: '0.5rem'
+                      }}>
+                        {exam.e_name}
+                      </h3>
+                      <div style={{
+                        fontSize: '1rem',
+                        color: '#6b7280',
+                        lineHeight: '1.4',
+                        marginBottom: '0.5rem'
+                      }}>
+                        {exam.e_date} • {exam.e_time} • {exam.duration} min
+                      </div>
+                      <div style={{
+                        fontSize: '0.9rem',
+                        color: '#9ca3af',
+                        marginBottom: '0.8rem'
+                      }}>
+                        Template: {exam.t_name}
+                      </div>
+                      <div style={{
+                        display: 'flex',
+                        gap: 8,
+                        justifyContent: 'center',
+                        width: '100%'
+                      }}>
+                        <button
+                          onClick={() => handleEditExam(exam)}
+                          style={{
+                            background: '#2563eb',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: 6,
+                            padding: '0.6rem 1rem',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteExam(exam.e_id)}
+                          style={{
+                            background: '#dc2626',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: 6,
+                            padding: '0.6rem 1rem',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        )}
         {showCreateExamModal && (
           <CreateExamModal 
             onClose={() => { setShowCreateExamModal(false); setEditExam(null); refreshExams(); }}
@@ -189,137 +616,143 @@ const handleDelete = async (fileId) => {
         )}
         <div className="exam-sections">
           {/* Exam Templates Section */}
-          <div className="exam-section-card">
-            <div className="section-header">
-              <h2>Exam Templates</h2>
-              <button title="Create Template" onClick={handleCreateTemplate}>
-                <FaPlus />
-              </button>
-            </div>
-            <div className="template-list">
-              {templates.map((template, idx) => (
-                <div key={`template-${template.t_id}-${idx}`} className="template-item">
-                  <div className="item-info">
-                    <span className="item-title">{template.title}</span>
-                    <span className="item-details">
-                      {template.subject} • {template.questions.length} questions
-                    </span>
-                  </div>
-                  <div className="item-actions">
-                    <button className="action-btn edit" title="Edit template" onClick={() => handleEditTemplate(template)}>
-                      <FaEdit />
-                    </button>
-                   <button
-                    className="action-btn delete"
-                    title="Delete template"
-                    onClick={() => {
-                    console.log('Deleting template:', template);
-                    handleDeleteTemplate(template.t_id); 
-                    }}
-                  >
-              <FaTrashAlt />
-              </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Question Bank Section */}
-          <div className="exam-section-card">
-            <div className="section-header">
-              <h2>Question Bank</h2>
-              <button title="Upload Questions" onClick={() => fileInputRef.current && fileInputRef.current.click()}>
-                <FaUpload />
-              </button>
-              <input
-                type="file"
-                  ref={fileInputRef}
-                  style={{ display: 'none' }}
-                  onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    handleFileUpload(e.target.files[0]);
-                  }
-              }}
-            />
-            </div>
-            <div className="question-bank">
-              <div
-                className="upload-area"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                e.preventDefault();
-                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                    handleFileUpload(e.dataTransfer.files[0]);
-                    e.dataTransfer.clearData();
-                }
-               }}
-            onClick={() => fileInputRef.current && fileInputRef.current.click()}
-            >
-            <FaFileAlt className="upload-icon" />
-            <p className="upload-text">
-             Drag and drop question files here or click to browse
-           </p>
-          </div>
-              {uploadedFiles.map((file, idx) => (
-  <div key={`file-${file.file_id || idx}`} className="question-set">
-    <div className="item-info">
-      <span className="item-title">{file.file_name}</span>
-    </div>
-    <div className="item-actions">
-      <button
-        className="action-btn edit"
-        title="View File"
-        onClick={() => window.open(`http://localhost:3000/${file.file_path.replace("\\", "/")}`, "_blank")}
-      >
-        <FaEye />
-      </button>
-      <button
-        className="action-btn delete"
-        title="Delete File"
-        onClick={() => handleDelete(file.file_id)}
-      >
-        <FaTrashAlt />
-      </button>
-    </div>
-  </div>
-))}
-            </div>
-          </div>
-
-          {/* Exam Schedules Section */}
-          <div className="exam-section-card">
-            <div className="section-header">
-              <h2>Exam Schedules</h2>
-              <button title="Add Schedule" onClick={handleCreateExam}>
-                <FaPlus />
-              </button>
-            </div>
-            <div className="schedule-list">
-              {exams.length === 0 ? (
-                <div className="no-exams">No exams found.</div>
-              ) : (
-                exams.map((exam, idx) => (
-                  <div key={exam.e_id ? `exam-${exam.e_id}` : `exam-idx-${idx}`} className="schedule-item">
+          {!isMobile && (
+            <div className="exam-section-card">
+              <div className="section-header">
+                <h2>Exam Templates</h2>
+                <button title="Create Template" onClick={handleCreateTemplate}>
+                  <FaPlus />
+                </button>
+              </div>
+              <div className="template-list">
+                {templates.map((template, idx) => (
+                  <div key={`template-${template.t_id}-${idx}`} className="template-item">
                     <div className="item-info">
-                      <span className="item-title">{exam.e_name}</span>
+                      <span className="item-title">{template.title}</span>
                       <span className="item-details">
-                        {exam.e_date} • {exam.e_time} • {exam.duration} • Template: {exam.t_name}
+                        {template.subject} • {template.questions.length} questions
                       </span>
                     </div>
                     <div className="item-actions">
-                      <button className="action-btn edit" title="Edit exam" onClick={() => handleEditExam(exam)}>
+                      <button className="action-btn edit" title="Edit template" onClick={() => handleEditTemplate(template)}>
                         <FaEdit />
                       </button>
-                      <button className="action-btn delete" title="Delete exam" onClick={() => handleDeleteExam(exam.e_id)}>
-                        <FaTrashAlt />
-                      </button>
+                     <button
+                      className="action-btn delete"
+                      title="Delete template"
+                      onClick={() => {
+                      console.log('Deleting template:', template);
+                      handleDeleteTemplate(template.t_id); 
+                      }}
+                    >
+                <FaTrashAlt />
+                </button>
                     </div>
                   </div>
-                ))
-              )}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Question Bank Section */}
+          {!isMobile && (
+            <div className="exam-section-card">
+              <div className="section-header">
+                <h2>Question Bank</h2>
+                <button title="Upload Questions" onClick={() => fileInputRef.current && fileInputRef.current.click()}>
+                  <FaUpload />
+                </button>
+                <input
+                  type="file"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      handleFileUpload(e.target.files[0]);
+                    }
+                }}
+              />
+              </div>
+              <div className="question-bank">
+                <div
+                  className="upload-area"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                  e.preventDefault();
+                  if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                      handleFileUpload(e.dataTransfer.files[0]);
+                      e.dataTransfer.clearData();
+                  }
+                 }}
+              onClick={() => fileInputRef.current && fileInputRef.current.click()}
+              >
+              <FaFileAlt className="upload-icon" />
+              <p className="upload-text">
+               Drag and drop question files here or click to browse
+             </p>
+            </div>
+                {uploadedFiles.map((file, idx) => (
+    <div key={`file-${file.file_id || idx}`} className="question-set">
+      <div className="item-info">
+        <span className="item-title">{file.file_name}</span>
+      </div>
+      <div className="item-actions">
+        <button
+          className="action-btn edit"
+          title="View File"
+          onClick={() => window.open(`http://localhost:3000/${file.file_path.replace("\\", "/")}`, "_blank")}
+        >
+          <FaEye />
+        </button>
+        <button
+          className="action-btn delete"
+          title="Delete File"
+          onClick={() => handleDelete(file.file_id)}
+        >
+          <FaTrashAlt />
+        </button>
+      </div>
+    </div>
+  ))}
+              </div>
+            </div>
+          )}
+
+          {/* Exam Schedules Section */}
+          {!isMobile && (
+            <div className="exam-section-card">
+              <div className="section-header">
+                <h2>Exam Schedules</h2>
+                <button title="Add Schedule" onClick={handleCreateExam}>
+                  <FaPlus />
+                </button>
+              </div>
+              <div className="schedule-list">
+                {exams.length === 0 ? (
+                  <div className="no-exams">No exams found.</div>
+                ) : (
+                  exams.map((exam, idx) => (
+                    <div key={exam.e_id ? `exam-${exam.e_id}` : `exam-idx-${idx}`} className="schedule-item">
+                      <div className="item-info">
+                        <span className="item-title">{exam.e_name}</span>
+                        <span className="item-details">
+                          {exam.e_date} • {exam.e_time} • {exam.duration} • Template: {exam.t_name}
+                        </span>
+                      </div>
+                      <div className="item-actions">
+                        <button className="action-btn edit" title="Edit exam" onClick={() => handleEditExam(exam)}>
+                          <FaEdit />
+                        </button>
+                        <button className="action-btn delete" title="Delete exam" onClick={() => handleDeleteExam(exam.e_id)}>
+                          <FaTrashAlt />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>

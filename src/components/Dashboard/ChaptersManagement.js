@@ -4,6 +4,8 @@ import { FaBook, FaPlus, FaSearch } from 'react-icons/fa';
 import api from '../../services/authService';
 import ConfirmDialog from './ConfirmDialog';
 import DashboardLayout from './DashboardLayout';
+import LoadingSpinner from './LoadingSpinner';
+import NoDataMessage from './NoDataMessage';
 import './StreamManagement.css';
 
 // Utility: Convert date from dd-mm-yyyy to yyyy-mm-dd for the date input
@@ -161,9 +163,11 @@ const ChaptersManagement = () => {
       if (editItem) {
         // Edit mode
         await api.put(`http://localhost:3000/api/chapter/edit/${editItem.ch_id}`, payload);
+        toast.success('Chapter updated successfully! ✏️');
       } else {
         // Add mode
         await api.post('http://localhost:3000/api/chapter/add', payload);
+        toast.success('Chapter added successfully! ➕');
       }
       fetchChapters();
       setShowModal(false);
@@ -186,7 +190,7 @@ const ChaptersManagement = () => {
     try {
       await api.delete(`http://localhost:3000/api/chapter/delete/${pendingDeleteId}`);
       fetchChapters();
-      toast.success('Chapter deleted successfully!');
+      toast.success('Chapter deleted successfully! 🗑️');
     } catch (err) {
       console.error('Error deleting chapter:', err);
       toast.error('Failed to delete chapter. Please try again.');
@@ -225,17 +229,21 @@ const ChaptersManagement = () => {
 
   return (
     <DashboardLayout>
-      {!isMobile && (
-      <div className="chapter-management-header" style={{ padding: '2rem 0 1rem 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <FaBook size={32} color="#2563eb" />
-          <div>
-            <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Manage Chapters</h1>
-            <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic chapters</div>
+      {loading ? (
+        <LoadingSpinner message="Loading chapters..." />
+      ) : (
+        <>
+          {!isMobile && (
+          <div className="chapter-management-header" style={{ padding: '2rem 0 1rem 0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <FaBook size={32} color="#2563eb" />
+              <div>
+                <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Manage Chapters</h1>
+                <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic chapters</div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      )}
+          )}
       {!isMobile && (
         <div style={{ maxWidth: 1400, margin: '0 auto 24px auto', padding: '0 1rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'nowrap', justifyContent: 'space-between' }}>
@@ -581,10 +589,8 @@ const ChaptersManagement = () => {
       )}
       {!isMobile && (
       <div className="stream-table-container">
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '2rem' }}>
-            <p>Loading chapters...</p>
-          </div>
+        {filteredChapters.length === 0 ? (
+          <NoDataMessage type="chapters" />
         ) : (
           <table className="stream-table">
             <thead>
@@ -636,12 +642,11 @@ const ChaptersManagement = () => {
           width: '100%',
           boxSizing: 'border-box',
           padding: '0 20px',
-          gap: 16
+          gap: 16,
+          marginTop: '24px'
         }}>
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <p>Loading chapters...</p>
-            </div>
+          {filteredChapters.length === 0 ? (
+            <NoDataMessage type="chapters" />
           ) : (
             <div style={{
               display: 'flex',
@@ -865,6 +870,8 @@ const ChaptersManagement = () => {
           </div>
         </div>
       )}
+          </>
+        )}
       <ConfirmDialog
         open={confirmOpen}
         title="Delete Chapter?"
