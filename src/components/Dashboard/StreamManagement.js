@@ -198,15 +198,17 @@ const getUniqueClasses = () => {
 
   return (
     <DashboardLayout>
-      <div className="stream-management-header" style={{ padding: '2rem 0 1rem 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <FaStream size={32} color="#2563eb" />
-          <div>
-            <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Manage Streams</h1>
-            <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic streams</div>
+      {!isMobile && (
+        <div className="stream-management-header" style={{ padding: '2rem 0 1rem 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <FaStream size={32} color="#2563eb" />
+            <div>
+              <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Manage Streams</h1>
+              <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic streams</div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
       {/* Controls: search, add, count */}
       {!isMobile && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, maxWidth: 1100, margin: '0 auto 24px auto' }}>
@@ -296,9 +298,36 @@ const getUniqueClasses = () => {
       <div className="stream-management">
         {isMobile ? (
           <>
-            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1.1rem', marginBottom: '1.1rem' }}>
-              <div className="search-box" style={{ position: 'relative', width: '100%', maxWidth: 340, margin: '0 auto' }}>
-                <FaSearch style={{ position: 'absolute', left: 16, right: 'unset', top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18, pointerEvents: 'none' }} />
+            {/* Mobile: Centered heading and subtitle */}
+            <div style={{ padding: '1rem 0 1.5rem 0', textAlign: 'center' }}>
+              <FaStream size={36} color="#2563eb" style={{ marginBottom: 8 }} />
+              <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb', letterSpacing: 0.2 }}>Manage Streams</h1>
+              <div style={{ color: '#6b7280', fontSize: '1.08rem', fontWeight: 500, marginTop: 2 }}>Add, assign, and manage academic streams</div>
+            </div>
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '1rem', 
+              marginBottom: '1rem',
+              padding: '0 20px',
+              alignItems: 'center',
+              width: '100%',
+              boxSizing: 'border-box'
+            }}>
+              <div className="search-box" style={{ 
+                position: 'relative', 
+                width: '100%', 
+                maxWidth: '350px'
+              }}>
+                <FaSearch style={{ 
+                  position: 'absolute', 
+                  left: 16, 
+                  top: '50%', 
+                  transform: 'translateY(-50%)', 
+                  color: '#a0aec0', 
+                  fontSize: 18, 
+                  pointerEvents: 'none' 
+                }} />
                 <input
                   type="text"
                   placeholder="Search streams..."
@@ -317,15 +346,54 @@ const getUniqueClasses = () => {
                   }}
                 />
               </div>
+              {/* Class dropdown filter for mobile */}
+              <select
+                value={selectedClass}
+                onChange={e => setSelectedClass(e.target.value)}
+                style={{
+                  width: '100%',
+                  maxWidth: '350px',
+                  padding: '0.75rem 1.2rem',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: 8,
+                  fontSize: '1rem',
+                  background: '#f9fafb',
+                  color: '#1a1a1a',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <option value=''>All Classes</option>
+                {classes.map(cls => (
+                  <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
+                ))}
+              </select>
               <button
                 className="add-user-btn"
-                style={{ width: '100%' }}
+                style={{ 
+                  width: '100%',
+                  maxWidth: '350px',
+                  background: '#2563eb',
+                  color: '#fff',
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                  border: 'none',
+                  borderRadius: 10,
+                  padding: '0.75rem 1.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  boxShadow: '0 2px 8px #2563eb22',
+                  cursor: 'pointer'
+                }}
                 onClick={() => { setShowModal(true); setEditItem(null); }}
               >
                 <FaPlus /> Add Stream
               </button>
               <div style={{
-                minWidth: 110,
+                width: '100%',
+                maxWidth: '350px',
                 minHeight: 70,
                 background: '#f1f5f9',
                 borderRadius: 16,
@@ -337,8 +405,7 @@ const getUniqueClasses = () => {
                 fontWeight: 700,
                 fontSize: '1.5rem',
                 color: '#2563eb',
-                margin: '0 auto',
-                marginTop: 8
+                padding: '1rem'
               }}>
                 {streamList.length}
                 <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Streams</div>
