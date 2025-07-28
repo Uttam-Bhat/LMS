@@ -12,6 +12,7 @@ const ClassesManagement = () => {
   const [editItem, setEditItem] = useState(null);
   const [form, setForm] = useState({ class_name: '', des: '', section: '', cdate: '' });
   const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState('');
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
@@ -131,6 +132,7 @@ const ClassesManagement = () => {
   };
 
   const fetchClasses = async () => {
+    setLoading(true);
     try {
       const response = await api.get('/class/display');
       // Ensure every class object has a cls_id property and map start_date/end_date
@@ -145,6 +147,8 @@ const ClassesManagement = () => {
       setClasses(dataWithIds);
     } catch (error) {
       console.error('Failed to fetch classes:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -331,43 +335,122 @@ const ClassesManagement = () => {
             </div>
           </div>
         )}
-        {isMobile ? (
-          <div className="users-cards-container" style={{ 
-            marginLeft: '2vw',
-            padding: '0 16px',
-            marginRight: '2vw'
+        {isMobile && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: '100%',
+            boxSizing: 'border-box',
+            padding: '0 20px',
+            gap: 16
           }}>
-            {filtered.map(s => (
-              <div className="user-card" key={s.cls_id}>
-                <div className="user-card-header">
-                  <div className="user-card-info">
-                    <div className="user-card-name">{s.class_name}</div>
-                    <div className="user-card-email">Section: {s.section}</div>
-                  </div>
-                </div>
-                <div className="user-card-row">
-                  <span className="user-card-label">Description:</span>
-                  <span>{s.des}</span>
-                </div>
-                <div className="user-card-row">
-                  <span className="user-card-label">Created:</span>
-                  <span>{s.cdate}</span>
-                </div>
-                <div className="user-card-row">
-                  <span className="user-card-label">Actions:</span>
-                  <div className="action-buttons">
-                    <button className="edit-btn" title="Edit class" onClick={() => openModal(s)}>
-                      Edit
-                    </button>
-                    <button className="delete-btn" title="Delete class" onClick={() => handleDelete(s.cls_id)}>
-                      Delete
-                    </button>
-                  </div>
-                </div>
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <p>Loading classes...</p>
               </div>
-            ))}
+            ) : (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 12,
+                width: '100%',
+                maxWidth: '350px'
+              }}>
+                {filtered.map(s => (
+                  <div key={s.cls_id} style={{
+                    background: '#fff',
+                    borderRadius: 12,
+                    padding: '1rem',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    border: '1px solid #e5e7eb'
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      marginBottom: '0.5rem'
+                    }}>
+                      <div>
+                        <h3 style={{
+                          margin: 0,
+                          fontSize: '1.1rem',
+                          fontWeight: 600,
+                          color: '#1a1a1a'
+                        }}>
+                          {s.class_name}
+                        </h3>
+                        <div style={{
+                          fontSize: '0.9rem',
+                          color: '#6b7280',
+                          marginTop: '0.25rem'
+                        }}>
+                          Section: {s.section}
+                        </div>
+                      </div>
+                      <div style={{
+                        display: 'flex',
+                        gap: 8
+                      }}>
+                        <button
+                          onClick={() => openModal(s)}
+                          style={{
+                            background: '#2563eb',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: 6,
+                            padding: '0.5rem 0.75rem',
+                            fontSize: '0.8rem',
+                            fontWeight: 500,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(s.cls_id)}
+                          style={{
+                            background: '#dc2626',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: 6,
+                            padding: '0.5rem 0.75rem',
+                            fontSize: '0.8rem',
+                            fontWeight: 500,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 4,
+                      fontSize: '0.9rem',
+                      color: '#6b7280'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontWeight: 500 }}>Created:</span>
+                        <span>{s.cdate}</span>
+                      </div>
+                      {s.des && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span style={{ fontWeight: 500 }}>Description:</span>
+                          <span>{s.des}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        ) : (
+        )}
+
+        {!isMobile && (
           <div className="stream-table-container">
             <table className="stream-table">
               <thead>

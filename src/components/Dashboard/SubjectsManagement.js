@@ -509,43 +509,130 @@ const SubjectsManagement = () => {
           </div>
         </>
       )}
-      {isMobile ? (
-        <div className="users-cards-container">
-          {filteredSubjects.map(s => (
-            <div className="user-card" key={s.su_id || s.id}>
-              <div className="user-card-header">
-                <div className="user-card-info">
-                  <div className="user-card-name">{s.su_name}</div>
-                  <div className="user-card-email">Code: {s.sub_code}</div>
-                </div>
-              </div>
-              <div className="user-card-row">
-                <span className="user-card-label">Description:</span>
-                <span>{s.des}</span>
-              </div>
-              <div className="user-card-row">
-                <span className="user-card-label">Stream:</span>
-                <span>{s.stream_info?.sname || s.stream_name || 'N/A'}</span>
-              </div>
-              <div className="user-card-row">
-                <span className="user-card-label">Created:</span>
-                <span>{s.cdate}</span>
-              </div>
-              <div className="user-card-row">
-                <span className="user-card-label">Actions:</span>
-                <div className="action-buttons">
-                  <button className="edit-btn" title="Edit subject" onClick={() => openModal(s)}>
-                    Edit
-                  </button>
-                  <button className="delete-btn" title="Delete subject" onClick={() => handleDelete(s.su_id || s.id)}>
-                    Delete
-                  </button>
-                </div>
-              </div>
+      {isMobile && (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '0 20px',
+          gap: 16
+        }}>
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '2rem' }}>
+              <p>Loading subjects...</p>
             </div>
-          ))}
+          ) : (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12,
+              width: '100%',
+              maxWidth: '350px'
+            }}>
+              {filteredSubjects.map(s => (
+                <div key={s.su_id || s.id} style={{
+                  background: '#fff',
+                  borderRadius: 12,
+                  padding: '1rem',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  border: '1px solid #e5e7eb'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    marginBottom: '0.5rem'
+                  }}>
+                    <div>
+                      <h3 style={{
+                        margin: 0,
+                        fontSize: '1.1rem',
+                        fontWeight: 600,
+                        color: '#1a1a1a'
+                      }}>
+                        {s.su_name}
+                      </h3>
+                      <div style={{
+                        fontSize: '0.9rem',
+                        color: '#6b7280',
+                        marginTop: '0.25rem'
+                      }}>
+                        Code: {s.sub_code}
+                      </div>
+                    </div>
+                    <div style={{
+                      display: 'flex',
+                      gap: 8
+                    }}>
+                      <button
+                        onClick={() => openModal(s)}
+                        style={{
+                          background: '#2563eb',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '0.5rem 0.75rem',
+                          fontSize: '0.8rem',
+                          fontWeight: 500,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(s.su_id || s.id)}
+                        style={{
+                          background: '#dc2626',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '0.5rem 0.75rem',
+                          fontSize: '0.8rem',
+                          fontWeight: 500,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4,
+                    fontSize: '0.9rem',
+                    color: '#6b7280'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontWeight: 500 }}>Class:</span>
+                      <span>{s.class_name || s.class_info?.class_name || s.stream_info?.class_info?.class_name || 'N/A'}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontWeight: 500 }}>Stream:</span>
+                      <span>{s.stream_info?.sname || s.stream_name || 'N/A'}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontWeight: 500 }}>Created:</span>
+                      <span>{s.cdate}</span>
+                    </div>
+                    {s.des && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontWeight: 500 }}>Description:</span>
+                        <span>{s.des}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      ) : (
+      )}
+
+      {!isMobile && (
         <div className="stream-table-container">
           {loading ? (
             <div style={{ textAlign: 'center', padding: '2rem' }}>

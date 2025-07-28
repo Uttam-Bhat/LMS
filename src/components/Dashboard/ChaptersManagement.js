@@ -696,44 +696,36 @@ const ChaptersManagement = () => {
                       </div>
                     </div>
                     
-                    <div style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 4,
-                      fontSize: '0.9rem',
-                      color: '#6b7280'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ fontWeight: 500 }}>Class:</span>
-                        <span>{classInfo.class_name || 'N/A'}</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ fontWeight: 500 }}>Stream:</span>
-                        <span>{streamInfo.sname || 'N/A'}</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ fontWeight: 500 }}>Subject:</span>
-                        <span>{subjectInfo.su_name || 'N/A'}</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ fontWeight: 500 }}>Created:</span>
-                        <span>{chapter.cdate}</span>
-                      </div>
+                                      <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4,
+                    fontSize: '0.9rem',
+                    color: '#6b7280'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontWeight: 500 }}>Class:</span>
+                      <span>{classInfo.class_name || 'N/A'}</span>
                     </div>
-                    
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontWeight: 500 }}>Stream:</span>
+                      <span>{streamInfo.sname || 'N/A'}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontWeight: 500 }}>Subject:</span>
+                      <span>{subjectInfo.su_name || 'N/A'}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontWeight: 500 }}>Created:</span>
+                      <span>{chapter.cdate}</span>
+                    </div>
                     {chapter.des && (
-                      <div style={{
-                        marginTop: '0.75rem',
-                        padding: '0.75rem',
-                        background: '#f9fafb',
-                        borderRadius: 8,
-                        fontSize: '0.9rem',
-                        color: '#374151'
-                      }}>
-                        <div style={{ fontWeight: 500, marginBottom: '0.25rem' }}>Description:</div>
-                        {chapter.des}
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontWeight: 500 }}>Description:</span>
+                        <span>{chapter.des}</span>
                       </div>
                     )}
+                  </div>
                   </div>
                 );
               })}

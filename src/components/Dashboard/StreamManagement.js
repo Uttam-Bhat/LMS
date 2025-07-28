@@ -411,33 +411,98 @@ const getUniqueClasses = () => {
                 <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Streams</div>
               </div>
             </div>
-            <div className="users-cards-container">
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12,
+              width: '100%',
+              maxWidth: '350px'
+            }}>
               {filtered.map(s => (
-                <div className="user-card" key={s.id || s.sid}>
-                  <div className="user-card-header">
-                    <div className="user-card-info">
-                      <div className="user-card-name">{s.sname || s.name || s.stream_name || 'N/A'}</div>
-                      <div className="user-card-email">Class: {s.class_details?.class_name || s.className || s.class_name || 'N/A'}</div>
+                <div key={s.id || s.sid} style={{
+                  background: '#fff',
+                  borderRadius: 12,
+                  padding: '1rem',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  border: '1px solid #e5e7eb'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    marginBottom: '0.5rem'
+                  }}>
+                    <div>
+                      <h3 style={{
+                        margin: 0,
+                        fontSize: '1.1rem',
+                        fontWeight: 600,
+                        color: '#1a1a1a'
+                      }}>
+                        {s.sname || s.name || s.stream_name || 'N/A'}
+                      </h3>
+                      <div style={{
+                        fontSize: '0.9rem',
+                        color: '#6b7280',
+                        marginTop: '0.25rem'
+                      }}>
+                        Class: {s.class_details?.class_name || s.className || s.class_name || 'N/A'}
+                      </div>
                     </div>
-                  </div>
-                  <div className="user-card-row">
-                    <span className="user-card-label">Description:</span>
-                    <span>{s.description || s.des}</span>
-                  </div>
-                  <div className="user-card-row">
-                    <span className="user-card-label">Created:</span>
-                    <span>{s.created || s.cdate}</span>
-                  </div>
-                  <div className="user-card-row">
-                    <span className="user-card-label">Actions:</span>
-                    <div className="action-buttons">
-                      <button className="edit-btn" title="Edit stream" onClick={() => openModal(s)}>
+                    <div style={{
+                      display: 'flex',
+                      gap: 8
+                    }}>
+                      <button
+                        onClick={() => openModal(s)}
+                        style={{
+                          background: '#2563eb',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '0.5rem 0.75rem',
+                          fontSize: '0.8rem',
+                          fontWeight: 500,
+                          cursor: 'pointer'
+                        }}
+                      >
                         Edit
                       </button>
-                      <button className="delete-btn" title="Delete stream" onClick={() => handleDelete(s.id || s.sid)}>
+                      <button
+                        onClick={() => handleDelete(s.id || s.sid)}
+                        style={{
+                          background: '#dc2626',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '0.5rem 0.75rem',
+                          fontSize: '0.8rem',
+                          fontWeight: 500,
+                          cursor: 'pointer'
+                        }}
+                      >
                         Delete
                       </button>
                     </div>
+                  </div>
+                  
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4,
+                    fontSize: '0.9rem',
+                    color: '#6b7280'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontWeight: 500 }}>Created:</span>
+                      <span>{s.created || s.cdate}</span>
+                    </div>
+                    {(s.description || s.des) && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontWeight: 500 }}>Description:</span>
+                        <span>{s.description || s.des}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
