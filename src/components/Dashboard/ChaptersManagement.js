@@ -226,157 +226,176 @@ const ChaptersManagement = () => {
   return (
     <DashboardLayout>
       {!isMobile && (
-        <div className="chapter-management-header" style={{ padding: '2rem 0 1rem 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <FaBook size={32} color="#2563eb" />
-            <div>
-              <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Manage Chapters</h1>
-              <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic chapters</div>
-            </div>
+      <div className="chapter-management-header" style={{ padding: '2rem 0 1rem 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <FaBook size={32} color="#2563eb" />
+          <div>
+            <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Manage Chapters</h1>
+            <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic chapters</div>
           </div>
         </div>
+      </div>
       )}
       {!isMobile && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 24, maxWidth: 1100, margin: '0 auto 24px auto' }}>
-          {/* Filter/search bar and add button */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
-            <div style={{ position: 'relative', flex: 1,justifyContent:'space-between'}}>
-              <FaSearch style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }} />
-              <input
-                type="text"
-                placeholder="Search chapters..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
+        <div style={{ maxWidth: 1400, margin: '0 auto 24px auto', padding: '0 1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+            {/* Search bar - Separate div */}
+            <div style={{ flex: '0 0 200px' }}>
+              <div style={{ position: 'relative' }}>
+                <FaSearch style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 16 }} />
+                <input
+                  type="text"
+                  placeholder="Search chapters..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.6rem 0.8rem 0.6rem 2rem',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: 6,
+                    fontSize: '0.9rem',
+                    background: '#f9fafb',
+                    color: '#1a1a1a',
+                    outline: 'none',
+                  }}
+                />
+              </div>
+            </div>
+            
+            {/* Class dropdown - Separate div */}
+            <div style={{ flex: '0 0 auto' }}>
+              <select
+                value={selectedClass}
+                onChange={e => {
+                  setSelectedClass(e.target.value);
+                  setSelectedStream('');
+                  setSelectedSubject('');
+                }}
                 style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem 0.75rem 2.5rem',
+                  padding: '0.6rem 0.8rem',
                   border: '1px solid #e5e7eb',
-                  borderRadius: 8,
-                  fontSize: '1rem',
+                  borderRadius: 6,
+                  fontSize: '0.9rem',
                   background: '#f9fafb',
                   color: '#1a1a1a',
                   outline: 'none',
+                  minWidth: 140,
+                  maxWidth: 160
                 }}
-              />
+              >
+                <option value=''>All Classes</option>
+                {classes.map(cls => (
+                  <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
+                ))}
+              </select>
             </div>
-            {/* Class dropdown filter */}
-            <select
-              value={selectedClass}
-              onChange={e => {
-                setSelectedClass(e.target.value);
-                setSelectedStream('');
-                setSelectedSubject('');
-              }}
-              style={{
-                padding: '0.7rem 1.2rem',
-                border: '1px solid #e5e7eb',
-                borderRadius: 8,
-                fontSize: '1rem',
-                background: '#f9fafb',
-                color: '#1a1a1a',
-                outline: 'none',
-                minWidth: 160,
-                marginLeft: 8
-              }}
-            >
-              <option value=''>All Classes</option>
-              {classes.map(cls => (
-                <option key={cls.cls_id} value={cls.cls_id}>{cls.class_name}</option>
-              ))}
-            </select>
-            {/* Stream dropdown filter, filtered by selected class */}
-            <select
-              value={selectedStream}
-              onChange={e => {
-                setSelectedStream(e.target.value);
-                setSelectedSubject('');
-              }}
-              style={{
-                padding: '0.7rem 1.2rem',
-                border: '1px solid #e5e7eb',
-                borderRadius: 8,
-                fontSize: '1rem',
-                background: '#f9fafb',
-                color: '#1a1a1a',
-                outline: 'none',
-                minWidth: 160,
-                marginLeft: 8
-              }}
-              disabled={!selectedClass}
-            >
-              <option value=''>All Streams</option>
-              {streams.filter(stream => !selectedClass || String(stream.class_details?.cls_id) === String(selectedClass)).map(stream => (
-                <option key={stream.sid} value={stream.sid}>{(stream.sname || '').trim()}</option>
-              ))}
-            </select>
-            {/* Subject dropdown filter, filtered by selected stream */}
-            <select
-              value={selectedSubject}
-              onChange={e => setSelectedSubject(e.target.value)}
-              style={{
-                padding: '0.7rem 1.2rem',
-                border: '1px solid #e5e7eb',
-                borderRadius: 8,
-                fontSize: '1rem',
-                background: '#f9fafb',
-                color: '#1a1a1a',
-                outline: 'none',
-                minWidth: 160,
-                marginLeft: 8
-              }}
-              disabled={!selectedStream}
-            >
-              <option value=''>All Subjects</option>
-              {subjects.filter(sub => !selectedStream || String(sub.stream_info?.sid) === String(selectedStream)).map(sub => (
-                <option key={sub.su_id} value={sub.su_id}>{sub.su_name}</option>
-              ))}
-            </select>
-            <button
-              className="add-stream-btn"
-              style={{
-                background: '#2563eb',
-                color: '#fff',
-                fontWeight: 600,
-                fontSize: '1.1rem',
-                border: 'none',
-                borderRadius: 10,
-                padding: '0.75rem 2rem',
+            
+            {/* Stream dropdown - Separate div */}
+            <div style={{ flex: '0 0 auto' }}>
+              <select
+                value={selectedStream}
+                onChange={e => {
+                  setSelectedStream(e.target.value);
+                  setSelectedSubject('');
+                }}
+                style={{
+                  padding: '0.6rem 0.8rem',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: 6,
+                  fontSize: '0.9rem',
+                  background: '#f9fafb',
+                  color: '#1a1a1a',
+                  outline: 'none',
+                  minWidth: 120,
+                  maxWidth: 130
+                }}
+                disabled={!selectedClass}
+              >
+                <option value=''>All Streams</option>
+                {streams.filter(stream => !selectedClass || String(stream.class_details?.cls_id) === String(selectedClass)).map(stream => (
+                  <option key={stream.sid} value={stream.sid}>{(stream.sname || '').trim()}</option>
+                ))}
+              </select>
+            </div>
+            
+            {/* Subject dropdown - Separate div */}
+            <div style={{ flex: '0 0 auto' }}>
+              <select
+                value={selectedSubject}
+                onChange={e => setSelectedSubject(e.target.value)}
+                style={{
+                  padding: '0.6rem 0.8rem',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: 6,
+                  fontSize: '0.9rem',
+                  background: '#f9fafb',
+                  color: '#1a1a1a',
+                  outline: 'none',
+                  minWidth: 160,
+                  maxWidth: 180
+                }}
+                disabled={!selectedStream}
+              >
+                <option value=''>All Subjects</option>
+                {subjects.filter(sub => !selectedStream || String(sub.stream_info?.sid) === String(selectedStream)).map(sub => (
+                  <option key={sub.su_id} value={sub.su_id}>{sub.su_name}</option>
+                ))}
+              </select>
+            </div>
+            
+            {/* Add Chapter button - Separate div */}
+            <div style={{ flex: '0 0 auto' }}>
+              <button
+                className="add-stream-btn"
+                style={{
+                  background: '#2563eb',
+                  color: '#fff',
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                  border: 'none',
+                  borderRadius: 8,
+                  padding: '0.6rem 1.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  boxShadow: '0 2px 8px #2563eb22',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap'
+                }}
+                onClick={() => {
+                  if (subjects.length === 0) {
+                    toast('Please wait for subjects to load before adding a chapter.');
+                    return;
+                  }
+                  setShowModal(true);
+                  setEditItem(null);
+                  setForm({ ch_name: '', des: '', cdate: '', su_name: '' });
+                }}
+              >
+                <FaPlus size={14} /> Add Chapter
+              </button>
+            </div>
+            
+            {/* Count box - Separate div */}
+            <div style={{ flex: '0 0 auto' }}>
+              <div style={{
+                minWidth: 100,
+                minHeight: 60,
+                background: '#f1f5f9',
+                borderRadius: 12,
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
-                gap: 10,
-                boxShadow: '0 2px 8px #2563eb22',
-                cursor: 'pointer',
-              }}
-              onClick={() => {
-                if (subjects.length === 0) {
-                  toast('Please wait for subjects to load before adding a chapter.');
-                  return;
-                }
-                setShowModal(true);
-                setEditItem(null);
-                setForm({ ch_name: '', des: '', cdate: '', su_name: '' });
-              }}
-            >
-              <FaPlus /> Add Chapter
-            </button>
-          </div>
-          {/* Count box */}
-          <div style={{
-            minWidth: 110,
-            minHeight: 70,
-            background: '#f1f5f9',
-            borderRadius: 16,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 2px 8px #0001',
-            fontWeight: 700,
-            fontSize: '1.5rem',
-            color: '#2563eb',
-          }}>
-            {chapters.length}
-            <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Chapters</div>
+                justifyContent: 'center',
+                boxShadow: '0 2px 8px #0001',
+                fontWeight: 700,
+                fontSize: '1.3rem',
+                color: '#2563eb'
+              }}>
+                {chapters.length}
+                <div style={{ fontWeight: 500, fontSize: '0.8rem', color: '#64748b', marginTop: 2 }}>Total Chapters</div>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -561,51 +580,51 @@ const ChaptersManagement = () => {
         </div>
       )}
       {!isMobile && (
-        <div className="stream-table-container">
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <p>Loading chapters...</p>
-            </div>
-          ) : (
-            <table className="stream-table">
-              <thead>
-                <tr>
-                  <th>Class</th>
-                  <th>Stream</th>
-                  <th>Subject</th>
-                  <th>Name</th>
-                  <th>Description</th>
-                  <th>Created</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredChapters.map(chapter => {
-                  // Use the new nested structure from backend
-                  const subjectInfo = chapter.subject_info || {};
-                  const streamInfo = subjectInfo.stream_info || {};
-                  const classInfo = streamInfo.class_info || {};
+      <div className="stream-table-container">
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '2rem' }}>
+            <p>Loading chapters...</p>
+          </div>
+        ) : (
+          <table className="stream-table">
+            <thead>
+              <tr>
+                <th>Class</th>
+                <th>Stream</th>
+                <th>Subject</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Created</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredChapters.map(chapter => {
+                // Use the new nested structure from backend
+                const subjectInfo = chapter.subject_info || {};
+                const streamInfo = subjectInfo.stream_info || {};
+                const classInfo = streamInfo.class_info || {};
 
-                  return (
-                    <tr key={chapter.ch_id}>
-                      <td>{classInfo.class_name || 'N/A'}</td>
-                      <td>{streamInfo.sname || 'N/A'}</td>
-                      <td>{subjectInfo.su_name || 'N/A'}</td>
-                      <td>{chapter.ch_name}</td>
-                      <td>{chapter.des}</td>
-                      <td>{chapter.cdate}</td>
-                      <td>
-                        <div className="stream-action-buttons">
-                          <button className="stream-edit-btn" onClick={() => openModal(chapter)}>Edit</button>
-                          <button className="stream-delete-btn" onClick={() => handleDelete(chapter.ch_id)}>Delete</button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
+                return (
+                  <tr key={chapter.ch_id}>
+                    <td>{classInfo.class_name || 'N/A'}</td>
+                    <td>{streamInfo.sname || 'N/A'}</td>
+                    <td>{subjectInfo.su_name || 'N/A'}</td>
+                    <td>{chapter.ch_name}</td>
+                    <td>{chapter.des}</td>
+                    <td>{chapter.cdate}</td>
+                    <td>
+                      <div className="stream-action-buttons">
+                        <button className="stream-edit-btn" onClick={() => openModal(chapter)}>Edit</button>
+                        <button className="stream-delete-btn" onClick={() => handleDelete(chapter.ch_id)}>Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
         </div>
       )}
 
@@ -694,7 +713,7 @@ const ChaptersManagement = () => {
                           Delete
                         </button>
                       </div>
-                    </div>
+      </div>
                     
                                       <div style={{
                     display: 'flex',

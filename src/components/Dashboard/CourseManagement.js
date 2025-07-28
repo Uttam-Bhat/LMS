@@ -130,7 +130,7 @@ const CourseManagement = () => {
     const matchesType = !selectedCourseType || (course.course_type && course.course_type.toLowerCase() === selectedCourseType.toLowerCase());
     return (
       (courseName.includes(searchTerm) || 
-      teacherId.includes(searchTerm) || 
+           teacherId.includes(searchTerm) || 
       teacherName.includes(searchTerm)) &&
       matchesType
     );
@@ -239,22 +239,22 @@ const CourseManagement = () => {
                 flexDirection: 'row',
                 justifyContent: 'space-between'
               }}>
-                <i className="fas fa-search" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }}></i>
-                <input
-                  type="text"
-                  placeholder="Search courses..."
-                  value={searchQuery}
-                  onChange={handleSearch}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem 0.75rem 2.5rem',
-                    border: '1px solid #e1e1e1',
-                    borderRadius: 8,
-                    fontSize: '0.95rem',
+              <i className="fas fa-search" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }}></i>
+              <input
+                type="text"
+                placeholder="Search courses..."
+                value={searchQuery}
+                onChange={handleSearch}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem 0.75rem 2.5rem',
+                  border: '1px solid #e1e1e1',
+                  borderRadius: 8,
+                  fontSize: '0.95rem',
                     boxSizing: 'border-box'
-                  }}
-                />
-              </div>
+                }}
+              />
+            </div>
               {/* Course type dropdown filter */}
               <select
                 value={selectedCourseType}

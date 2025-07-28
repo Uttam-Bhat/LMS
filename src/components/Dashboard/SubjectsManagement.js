@@ -222,15 +222,15 @@ const SubjectsManagement = () => {
   return (
     <DashboardLayout>
       {!isMobile && (
-        <div className="subject-management-header" style={{ padding: '2rem 0 1rem 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <FaBookOpen size={32} color="#2563eb" />
-            <div>
+      <div className="subject-management-header" style={{ padding: '2rem 0 1rem 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <FaBookOpen size={32} color="#2563eb" />
+          <div>
               <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Manage Subjects</h1>
-              <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic subjects</div>
-            </div>
+            <div style={{ color: '#6b7280', fontSize: '1rem', fontWeight: 500 }}>Add and manage academic subjects</div>
           </div>
         </div>
+      </div>
       )}
       {!isMobile && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, maxWidth: 1100, margin: '0 auto 24px auto' }}>
@@ -386,24 +386,24 @@ const SubjectsManagement = () => {
                 fontSize: 18, 
                 pointerEvents: 'none' 
               }} />
-              <input
-                type="text"
-                placeholder="Search subjects..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem 0.75rem 2.5rem',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: 8,
-                  fontSize: '1rem',
-                  background: '#f9fafb',
-                  color: '#1a1a1a',
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
+            <input
+              type="text"
+              placeholder="Search subjects..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.75rem 1rem 0.75rem 2.5rem',
+                border: '1px solid #e5e7eb',
+                borderRadius: 8,
+                fontSize: '1rem',
+                background: '#f9fafb',
+                color: '#1a1a1a',
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
             {/* Class dropdown filter for mobile */}
             <select
               value={selectedClass}
@@ -456,8 +456,8 @@ const SubjectsManagement = () => {
                   </option>
                 ))}
             </select>
-            <button
-              className="add-stream-btn"
+          <button
+            className="add-stream-btn"
               style={{ 
                 width: '100%',
                 maxWidth: '350px',
@@ -475,38 +475,38 @@ const SubjectsManagement = () => {
                 boxShadow: '0 2px 8px #2563eb22',
                 cursor: 'pointer'
               }}
-              onClick={() => {
-                if (streams.length === 0) {
-                  toast('Please wait for streams to load before adding a subject.');
-                  return;
-                }
-                setShowModal(true);
-                setEditItem(null);
-                setForm({ code: '', name: '', description: '', created: '', streamId: '' });
-              }}
-            >
-              <FaPlus /> Add Subject
-            </button>
-            <div style={{
+            onClick={() => {
+              if (streams.length === 0) {
+                toast('Please wait for streams to load before adding a subject.');
+                return;
+              }
+              setShowModal(true);
+              setEditItem(null);
+              setForm({ code: '', name: '', description: '', created: '', streamId: '' });
+            }}
+          >
+            <FaPlus /> Add Subject
+          </button>
+          <div style={{
               width: '100%',
               maxWidth: '350px',
-              minHeight: 70,
-              background: '#f1f5f9',
-              borderRadius: 16,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 2px 8px #0001',
-              fontWeight: 700,
-              fontSize: '1.5rem',
-              color: '#2563eb',
+            minHeight: 70,
+            background: '#f1f5f9',
+            borderRadius: 16,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px #0001',
+            fontWeight: 700,
+            fontSize: '1.5rem',
+            color: '#2563eb',
               padding: '1rem'
-            }}>
-              {subjects.length}
-              <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Subjects</div>
-            </div>
+          }}>
+            {subjects.length}
+            <div style={{ fontWeight: 500, fontSize: '0.95rem', color: '#64748b', marginTop: 2 }}>Total Subjects</div>
           </div>
+        </div>
         </>
       )}
       {isMobile && (
@@ -531,7 +531,7 @@ const SubjectsManagement = () => {
               width: '100%',
               maxWidth: '350px'
             }}>
-              {filteredSubjects.map(s => (
+          {filteredSubjects.map(s => (
                 <div key={s.su_id || s.id} style={{
                   background: '#fff',
                   borderRadius: 12,
@@ -560,8 +560,8 @@ const SubjectsManagement = () => {
                         marginTop: '0.25rem'
                       }}>
                         Code: {s.sub_code}
-                      </div>
-                    </div>
+                </div>
+              </div>
                     <div style={{
                       display: 'flex',
                       gap: 8
@@ -579,8 +579,8 @@ const SubjectsManagement = () => {
                           cursor: 'pointer'
                         }}
                       >
-                        Edit
-                      </button>
+                    Edit
+                  </button>
                       <button
                         onClick={() => handleDelete(s.su_id || s.id)}
                         style={{
@@ -594,10 +594,10 @@ const SubjectsManagement = () => {
                           cursor: 'pointer'
                         }}
                       >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
+                    Delete
+                  </button>
+                </div>
+              </div>
                   
                   <div style={{
                     display: 'flex',

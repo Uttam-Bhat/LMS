@@ -357,7 +357,7 @@ const ClassesManagement = () => {
                 width: '100%',
                 maxWidth: '350px'
               }}>
-                {filtered.map(s => (
+            {filtered.map(s => (
                   <div key={s.cls_id} style={{
                     background: '#fff',
                     borderRadius: 12,
@@ -386,8 +386,8 @@ const ClassesManagement = () => {
                           marginTop: '0.25rem'
                         }}>
                           Section: {s.section}
-                        </div>
-                      </div>
+                  </div>
+                </div>
                       <div style={{
                         display: 'flex',
                         gap: 8
@@ -405,8 +405,8 @@ const ClassesManagement = () => {
                             cursor: 'pointer'
                           }}
                         >
-                          Edit
-                        </button>
+                      Edit
+                    </button>
                         <button
                           onClick={() => handleDelete(s.cls_id)}
                           style={{
@@ -420,10 +420,10 @@ const ClassesManagement = () => {
                             cursor: 'pointer'
                           }}
                         >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
+                      Delete
+                    </button>
+                  </div>
+                </div>
                     
                     <div style={{
                       display: 'flex',
