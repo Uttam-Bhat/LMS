@@ -1,12 +1,12 @@
-import api from '../../services/authService';
 import { useEffect, useState } from 'react';
-import { FaPencilAlt, FaSearch, FaTrashAlt, FaUserCircle, FaUserPlus } from 'react-icons/fa';
-import CreateUserModal from './CreateUserModal';
-import './UserManagement.css';
-import AssignStudentModal from './AssignStudentModal';
 import toast from 'react-hot-toast';
+import { FaPencilAlt, FaSearch, FaTrashAlt, FaUserCircle, FaUserPlus } from 'react-icons/fa';
+import api from '../../services/authService';
+import AssignStudentModal from './AssignStudentModal';
 import ConfirmDialog from './ConfirmDialog';
+import CreateUserModal from './CreateUserModal';
 import StudentsManagement from './StudentsManagement';
+import './UserManagement.css';
 
 const UserManagement = ({ activeSubPage = 'all-users' }) => {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -110,8 +110,14 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
             )}
           </div>
 
-          <div className="user-filters">
-            <div className="search-box" style={{ position: 'relative', width: 300 }}>
+          <div className="user-filters" style={{ 
+            display: 'flex', 
+            flexDirection: isMobile ? 'column' : 'row', 
+            gap: isMobile ? 12 : 20, 
+            alignItems: isMobile ? 'stretch' : 'center',
+            padding: isMobile ? '0 16px' : '0'
+          }}>
+            <div className="search-box" style={{ position: 'relative', width: isMobile ? '100%' : 300 }}>
               <span className="search-icon" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#a0aec0', fontSize: 18 }}><FaSearch /></span>
               <input
                 type="text"
@@ -124,30 +130,77 @@ const UserManagement = ({ activeSubPage = 'all-users' }) => {
                   border: '1px solid #e1e1e1',
                   borderRadius: 8,
                   fontSize: '0.95rem',
+                  boxSizing: 'border-box'
                 }}
               />
             </div>
-            <div className="filter-buttons">
+            <div className="filter-buttons" style={{ 
+              display: 'flex', 
+              gap: 8, 
+              justifyContent: isMobile ? 'space-between' : 'flex-start',
+              width: isMobile ? '100%' : 'auto'
+            }}>
               <button
                 className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
                 onClick={() => handleFilterChange('all')}
+                style={isMobile ? { 
+                  flex: '1',
+                  fontSize: '0.9rem',
+                  padding: '0.6rem 0.8rem'
+                } : {}}
               >
                 All Users
               </button>
               <button
                 className={`filter-btn ${activeFilter === 'teacher' ? 'active' : ''}`}
                 onClick={() => handleFilterChange('teacher')}
+                style={isMobile ? { 
+                  flex: '1',
+                  fontSize: '0.9rem',
+                  padding: '0.6rem 0.8rem'
+                } : {}}
               >
                 Teachers
               </button>
               <button
                 className={`filter-btn ${activeFilter === 'student' ? 'active' : ''}`}
                 onClick={() => handleFilterChange('student')}
+                style={isMobile ? { 
+                  flex: '1',
+                  fontSize: '0.9rem',
+                  padding: '0.6rem 0.8rem'
+                } : {}}
               >
                 Students
               </button>
             </div>
           </div>
+
+          {/* Add User button for mobile */}
+          {isMobile && (
+            <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'center' }}>
+              <button 
+                className="add-user-btn"
+                onClick={() => setShowCreateUserModal(true)}
+                style={{
+                  background: '#2563eb',
+                  color: '#fff',
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                  border: 'none',
+                  borderRadius: 10,
+                  padding: '0.75rem 1.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  boxShadow: '0 2px 8px #2563eb22',
+                  cursor: 'pointer'
+                }}
+              >
+                <FaUserPlus /> Add New User
+              </button>
+            </div>
+          )}
 
           {/* Responsive User Cards for Mobile - only render on mobile */}
           {isMobile && (
