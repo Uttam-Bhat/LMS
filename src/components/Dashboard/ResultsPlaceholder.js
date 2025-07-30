@@ -200,7 +200,12 @@ const ResultsPlaceholder = () => {
             <div style={{ color: '#6b7280', fontSize: isMobile ? '0.9rem' : '1rem', fontWeight: 500, textAlign: isMobile ? 'center' : 'left' }}>View analytics and student exam results</div>
           </div>
         </div>
-        <div className="exam-sections">
+        <div className="exam-sections" style={{ 
+          display: isMobile ? 'block' : 'grid', 
+          gridTemplateColumns: isMobile ? 'none' : '1fr 1fr', 
+          gap: '2rem', 
+          alignItems: 'start' 
+        }}>
           <div className="exam-section-card">
             <div className="section-header">
               <h2>Summary</h2>
@@ -221,7 +226,7 @@ const ResultsPlaceholder = () => {
               </div>
             )}
           </div>
-          <div className="exam-section-card" style={{ marginTop: '2rem' }}>
+          <div className="exam-section-card" style={{ marginTop: isMobile ? '2rem' : '0' }}>
             <div className="section-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 18 }}>
               <h2>Student Results</h2>
               <div style={{ position: 'relative', width: 180, flexShrink: 0 }}>
@@ -241,7 +246,16 @@ const ResultsPlaceholder = () => {
                 />
               </div>
             </div>
-            <div style={{ margin: '1.5rem 0', borderRadius: 12, background: '#f8fafc', boxShadow: '0 2px 8px #e0e7ef', padding: '1.5rem 2rem' }}>
+            <div style={{ 
+              margin: '1.5rem 0', 
+              borderRadius: 12, 
+              background: '#f8fafc', 
+              boxShadow: '0 2px 8px #e0e7ef', 
+              padding: '1.5rem 2rem',
+              maxHeight: '600px',
+              overflowY: 'auto',
+              overflowX: 'hidden'
+            }}>
               {loading ? (
                 <div>Loading...</div>
               ) : students.length === 0 ? (
