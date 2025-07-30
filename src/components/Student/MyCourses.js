@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import StudentLayout from './StudentLayout';
 import './StudentDashboard.css';
-import { FaBook } from 'react-icons/fa';
+import { FaBook, FaCertificate } from 'react-icons/fa';
 import api from '../../services/authService';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import CertificateModal from './CertificateModal';
 
 const MyCourses = () => {
   const [enrollments, setEnrollments] = useState([]);
@@ -20,6 +21,12 @@ const MyCourses = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingCancelId, setPendingCancelId] = useState(null);
   const [cancelMsg, setCancelMsg] = useState('');
+  const [certificateModal, setCertificateModal] = useState({
+    isOpen: false,
+    courseName: '',
+    studentName: '',
+    completionDate: new Date()
+  });
 
   // Keep completionMap in sync with localStorage (in case Materials.js updates it)
   useEffect(() => {
@@ -86,6 +93,32 @@ const MyCourses = () => {
     }
   };
 
+  const handleClaimCertificate = async (courseName) => {
+    try {
+      // Get student's full name from user data
+      const userEmail = localStorage.getItem('user_email');
+      const userRes = await api.get('/admin/users');
+      const userList = Array.isArray(userRes.data) ? userRes.data : [userRes.data];
+      const user = userList.find(u => u.email === userEmail);
+      const studentName = user?.fullname || 'Student';
+      
+      setCertificateModal({
+        isOpen: true,
+        courseName: courseName,
+        studentName: studentName,
+        completionDate: new Date()
+      });
+    } catch (error) {
+      console.error('Error fetching student name:', error);
+      setCertificateModal({
+        isOpen: true,
+        courseName: courseName,
+        studentName: 'Student',
+        completionDate: new Date()
+      });
+    }
+  };
+
   return (
     <StudentLayout>
       {cancelMsg && (
@@ -137,6 +170,7 @@ const MyCourses = () => {
               const courseId = course.courseId || course.cid || enroll.er_id;
               let completion = completionMap[course.coursename] || 0;
               let status = completion >= 100 ? 'completed' : 'active';
+              const isCompleted = completion >= 100;
               return (
                 <div key={enroll.er_id} className="course-card">
                   <div className="course-header">
@@ -181,6 +215,38 @@ const MyCourses = () => {
                     >
                       View
                     </button>
+                    {isCompleted && (
+                      <button
+                        className="student-action-btn certificate"
+                        title="Claim Certificate"
+                        onClick={() => handleClaimCertificate(course.coursename)}
+                        style={{
+                          background: '#059669',
+                          color: '#fff',
+                          border: '1px solid #059669',
+                          marginLeft: 10,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          fontWeight: 600,
+                          boxShadow: '0 2px 4px rgba(5, 150, 105, 0.2)',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onMouseOver={(e) => {
+                          e.target.style.background = '#047857';
+                          e.target.style.boxShadow = '0 4px 8px rgba(5, 150, 105, 0.3)';
+                          e.target.style.transform = 'translateY(-1px)';
+                        }}
+                        onMouseOut={(e) => {
+                          e.target.style.background = '#059669';
+                          e.target.style.boxShadow = '0 2px 4px rgba(5, 150, 105, 0.2)';
+                          e.target.style.transform = 'translateY(0)';
+                        }}
+                      >
+                        <FaCertificate size={12} />
+                        Claim Certificate
+                      </button>
+                    )}
                     <button
                       className="student-action-btn cancel"
                       title="Cancel Enrollment"
@@ -197,6 +263,16 @@ const MyCourses = () => {
           )}
         </div>
       </div>
+      
+      {/* Certificate Modal */}
+      <CertificateModal
+        isOpen={certificateModal.isOpen}
+        onClose={() => setCertificateModal({ ...certificateModal, isOpen: false })}
+        courseName={certificateModal.courseName}
+        studentName={certificateModal.studentName}
+        completionDate={certificateModal.completionDate}
+      />
+      
       {confirmOpen && (
         <div className="modal-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(30,34,90,0.18)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 2px 12px #2563eb18', padding: '2.2rem 2.5rem', minWidth: 320, maxWidth: 380, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

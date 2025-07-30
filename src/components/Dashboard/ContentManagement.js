@@ -60,7 +60,7 @@ const ContentManagement = () => {
   const fetchContents = async () => {
     setLoading(true);
     try {
-      const res = await api.get('http://localhost:3000/api/content/display');
+      const res = await api.get('/content/display');
       let contentArr = [];
       if (Array.isArray(res.data)) {
         contentArr = res.data;
@@ -105,12 +105,12 @@ const ContentManagement = () => {
     }
     try {
       if (editContent) {
-        await api.put(`http://localhost:3000/api/content/update/${editContent.ct_id}`, formData, {
+        await api.put(`/content/update/${editContent.ct_id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" }
         });
         toast.success('Content updated successfully');
       } else {
-        await api.post("http://localhost:3000/api/content/add", formData, {
+        await api.post("/content/add", formData, {
           headers: { "Content-Type": "multipart/form-data" }
         });
         toast.success('Content added successfully');
@@ -131,7 +131,7 @@ const ContentManagement = () => {
 
   const confirmDelete = async () => {
     try {
-      await api.delete(`http://localhost:3000/api/content/delete/${pendingDeleteId}`);
+      await api.delete(`/content/delete/${pendingDeleteId}`);
       fetchContents();
       toast.success('Content deleted successfully!');
     } catch (err) {
