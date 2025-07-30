@@ -105,7 +105,7 @@ const ContentManagement = () => {
     }
     try {
       if (editContent) {
-        await api.put(`/content/update/${editContent.ct_id}`, formData, {
+        await api.put(`/content/edit/${editContent.ct_id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" }
         });
         toast.success('Content updated successfully');
