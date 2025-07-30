@@ -46,6 +46,9 @@
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  height: 500px; /* Fixed height for consistent card heights */
+  display: flex;
+  flex-direction: column;
 }
 
 .section-header {
@@ -55,6 +58,7 @@
   margin-bottom: 1rem;
   padding-bottom: 0.75rem;
   border-bottom: 1px solid #e1e1e1;
+  flex-shrink: 0; /* Prevent header from shrinking */
 }
 
 .section-header h2 {
@@ -87,6 +91,37 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  flex: 1; /* Take remaining space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+  padding-right: 4px; /* Space for scrollbar */
+}
+
+/* Custom scrollbar styling */
+.template-list::-webkit-scrollbar,
+.question-bank::-webkit-scrollbar,
+.schedule-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.template-list::-webkit-scrollbar-track,
+.question-bank::-webkit-scrollbar-track,
+.schedule-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.template-list::-webkit-scrollbar-thumb,
+.question-bank::-webkit-scrollbar-thumb,
+.schedule-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.template-list::-webkit-scrollbar-thumb:hover,
+.question-bank::-webkit-scrollbar-thumb:hover,
+.schedule-list::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 .template-item,
@@ -98,27 +133,33 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0; /* Prevent items from shrinking */
 }
 
 .item-info {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  flex: 1; /* Take available space */
+  min-width: 0; /* Allow text to wrap */
 }
 
 .item-title {
   font-weight: 500;
   color: #1a1a1a;
+  word-wrap: break-word; /* Allow long titles to wrap */
 }
 
 .item-details {
   font-size: 0.9rem;
   color: #666;
+  word-wrap: break-word; /* Allow long details to wrap */
 }
 
 .item-actions {
   display: flex;
   gap: 0.5rem;
+  flex-shrink: 0; /* Prevent actions from shrinking */
 }
 
 .action-btn {
@@ -183,6 +224,7 @@
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
+  flex-shrink: 0; /* Prevent upload area from shrinking */
 }
 
 .upload-area:hover {
@@ -199,4 +241,17 @@
 .upload-text {
   color: #666;
   font-size: 0.9rem;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 900px) {
+  .exam-section-card {
+    height: auto; /* Allow natural height on mobile */
+  }
+  
+  .template-list,
+  .question-bank,
+  .schedule-list {
+    overflow-y: visible; /* No scrolling on mobile */
+  }
 } 
