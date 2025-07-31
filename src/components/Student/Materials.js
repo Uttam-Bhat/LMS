@@ -94,7 +94,7 @@ const Materials = () => {
           {!isMobile && (
             <div style={{ padding: '2rem 0 1rem 0' ,display:'flex'}}>
               <div style={{ display: 'flex',flexDirection:'column', gap: 12 }}>
-                <div style={{display:'flex',flexDirection:'row',gap:10}}>
+                <div style={{display:'flex',flexDirection:'row',gap:12}}>
                   <FaFolderOpen size={32} color="#2563eb" />
                   <h1 style={{ margin: 0, fontWeight: 700, fontSize: '2rem', color: '#2563eb' }}>Study Materials</h1>
                 </div>
